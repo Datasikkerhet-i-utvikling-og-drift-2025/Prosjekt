@@ -14,25 +14,22 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $password = $_POST['password'];
-        $userType = $_POST['user_type'];
 
         // Validate user input
-        if (empty($email) || empty($password) || empty($userType)) {
+        if (empty($email) || empty($password)) {
             $error = "All fields are required.";
         } else {
-            // Hash the password securely
-            $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-
-            // Insert the user into the database
-            $sql = "INSERT INTO users (email, password_hash, user_type) VALUES (:email, :password_hash, :user_type)";
+            // Check the user in the database
+            $sql = "SELECT * FROM users WHERE email = :email";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':email' => $email,
-                ':password_hash' => $passwordHash,
-                ':user_type' => $userType
-            ]);
+            $stmt->execute([':email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $success = "User registered successfully!";
+            if ($user && password_verify($password, $user['password_hash'])) {
+                $success = "Login successful!";
+            } else {
+                $error = "Invalid email or password.";
+            }
         }
     }
 } catch (PDOException $e) {
@@ -45,7 +42,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testing User Registration!!</title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,7 +56,7 @@ try {
             border-radius: 10px;
             background: #f9f9f9;
         }
-        input, select, button {
+        input, button {
             display: block;
             width: 100%;
             margin-bottom: 10px;
@@ -78,7 +75,7 @@ try {
     </style>
 </head>
 <body>
-<h1>Testing User Registration</h1>
+<h1>Login</h1>
 
 <?php if (isset($error)): ?>
     <p class="error"><?= htmlspecialchars($error) ?></p>
@@ -93,18 +90,7 @@ try {
     <label for="password">Password:</label>
     <input type="password" name="password" id="password" required>
 
-    <label for="user_type">User Type:</label>
-    <select name="user_type" id="user_type" required>
-        <option value="student">Student</option>
-        <option value="lecturer">Lecturer</option>
-        <option value="admin">Admin</option>
-    </select>
-
-    <button type="submit">Register</button>
-</form>
-<form action="login.php" method="get">
-    <button type="submit">Go to Login</button>
+    <button type="submit">Login</button>
 </form>
 </body>
 </html>
-
