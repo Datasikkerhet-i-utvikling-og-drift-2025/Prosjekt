@@ -3,9 +3,10 @@ Clear-Host
 
 # Cool Boot-Up Banner
 Write-Host "
-╔══════════════════════════════════════════════════════╗
-║           Starting Development Environment           ║
-╚══════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════╗
+║                    Starting Docker Services                    ║
+║                     Development Environment                    ║
+╚════════════════════════════════════════════════════════════════╝
 " -ForegroundColor Cyan
 
 # Function to ensure Docker Desktop and the Docker daemon are running
@@ -74,20 +75,23 @@ try {
     exit 1
 }
 
-# Display application access link
-$applicationUrl = "http://localhost:8080"
-Write-Host "The application is running at: $applicationUrl" -ForegroundColor Blue
-Write-Host "[INFO] Open the link above to access the application." -ForegroundColor Yellow
-
-# Exit message for debugging
 Write-Host "
-╔══════════════════════════════════════════════════════╗
-║ [INFO] To stop the application, use:                 ║
-║        Run > Stop Debugging OR shift + F5            ║
-╚══════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════╗
+║                     Docker Services Status                     ║
+╚════════════════════════════════════════════════════════════════╝
 " -ForegroundColor Cyan
 
-# Keep the script running until stopped
+        docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"        
+
+        Write-Host "
+╔════════════════════════════════════════════════════════════════╗
+║ Frontend is running at: http://localhost:8080                  ║
+║ Backend API is accessible at: http://localhost:5000            ║
+╚════════════════════════════════════════════════════════════════╝
+" -ForegroundColor Blue
+
+Write-Host "[INFO] Open the above links in your browser to access the application." -ForegroundColor Yellow
+Write-Host "[INFO] Press Ctrl+C in console or shift+F5 in ide to stop." -ForegroundColor Yellow
 while ($true) {
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 60
 }

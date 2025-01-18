@@ -1,15 +1,45 @@
+version: '3.8'
+
 services:
-  php-apache:
-    extends:
-      file: ./Backend/docker-compose.yml
-      service: php-apache
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "5000:80"
+    networks:
+      - project_network
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8080:80"
+    networks:
+      - project_network
+    depends_on:
+      - backend
 
   mysql:
-    extends:
-      file: ./Database/init/docker-compose.yml
-      service: mysql
-
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    networks:
+      - project_network
+    volumes:
+      - ./Database/init/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 networks:
-  mysql_network:
+  project_network:
     driver: bridge
