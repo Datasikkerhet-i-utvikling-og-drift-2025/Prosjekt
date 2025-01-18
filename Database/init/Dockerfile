@@ -1,14 +1,14 @@
-# Bruk MySQL-basen image
+# Use the official MySQL base image
 FROM mysql:latest
 
-# Sett miljøvariabler for MySQL
+# Set environment variables for MySQL
 ENV MYSQL_ROOT_PASSWORD=root
 ENV MYSQL_DATABASE=database
 ENV MYSQL_USER=admin
 ENV MYSQL_PASSWORD=admin
 
-# Kopier SQL-filer til containeren
+# Copy SQL files to the container
 COPY init.sql /docker-entrypoint-initdb.d/
 
-# Eksponer standard MySQL-port
+# Expose default MySQL port
 EXPOSE 3306

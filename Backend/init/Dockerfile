@@ -2,7 +2,7 @@
 FROM php:8.1-apache
 
 # Copy project files to the Apache document root
-COPY . /var/www/html/
+COPY ../ /var/www/html/
 
 # Enable Apache mod_rewrite if needed (for frameworks or pretty URLs)
 RUN a2enmod rewrite

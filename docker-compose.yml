@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.9"
 
 services:
   backend:
     build:
-      context: ./Backend
+      context: ./Backend/init
       dockerfile: Dockerfile
     container_name: backend
     ports:
@@ -15,7 +15,7 @@ services:
 
   frontend:
     build:
-      context: ./Frontend
+      context: ./Frontend/init
       dockerfile: Dockerfile
     container_name: frontend
     ports:
@@ -26,19 +26,14 @@ services:
       - backend
 
   mysql:
-    image: mysql:latest
+    build:
+      context: ./Database/init
+      dockerfile: Dockerfile
     container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: database
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
     ports:
       - "3306:3306"
     networks:
       - project_network
-    volumes:
-      - ./Database/init/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 networks:
   project_network:

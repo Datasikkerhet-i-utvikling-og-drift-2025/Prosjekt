@@ -43,7 +43,7 @@ function Wait-ForDocker {
 
         Start-Process -FilePath $dockerDesktopPath -NoNewWindow
         Write-Host "[INFO] Waiting for Docker Desktop to start..." -ForegroundColor Yellow
-        Start-Sleep -Seconds 15 # Adjust if Docker Desktop takes longer to start
+        Start-Sleep -Seconds 15 
     } else {
         Write-Host "[SUCCESS] Docker Desktop is already running." -ForegroundColor Green
     }
@@ -75,22 +75,17 @@ try {
     exit 1
 }
 
+
 Write-Host "
-╔════════════════════════════════════════════════════════════════╗
-║                     Docker Services Status                     ║
-╚════════════════════════════════════════════════════════════════╝
-" -ForegroundColor Cyan
-
-        docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"        
-
-        Write-Host "
 ╔════════════════════════════════════════════════════════════════╗
 ║ Frontend is running at: http://localhost:8080                  ║
 ║ Backend API is accessible at: http://localhost:5000            ║
 ╚════════════════════════════════════════════════════════════════╝
 " -ForegroundColor Blue
-
 Write-Host "[INFO] Open the above links in your browser to access the application." -ForegroundColor Yellow
+
+
+
 Write-Host "[INFO] Press Ctrl+C in console or shift+F5 in ide to stop." -ForegroundColor Yellow
 while ($true) {
     Start-Sleep -Seconds 60
