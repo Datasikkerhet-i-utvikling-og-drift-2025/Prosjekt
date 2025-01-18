@@ -10,7 +10,7 @@ Write-Host "
 
 # Function to ensure Docker Desktop and the Docker daemon are running
 function Wait-ForDocker {
-    Write-Host "`n[INFO] Checking if Docker Desktop is running..." -ForegroundColor Yellow
+    Write-Host "[INFO] Checking if Docker Desktop is running..." -ForegroundColor Yellow
 
     # Check if Docker Desktop process is running
     $dockerdRunning = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
@@ -65,9 +65,9 @@ function Wait-ForDocker {
 Wait-ForDocker
 
 # Start Docker Compose
-Write-Host "`n[INFO] Starting Docker Compose services..." -ForegroundColor Yellow
+Write-Host "[INFO] Starting Docker Compose services..." -ForegroundColor Yellow
 try {
-    docker-compose -f "${PWD}/docker-compose.yml" up -d --build
+    docker-compose -f "${PWD}\docker-compose.yml" up -d --build
     Write-Host "[SUCCESS] Docker Compose services started successfully!" -ForegroundColor Green
 } catch {
     Write-Host "[ERROR] Failed to start Docker Compose services: $_" -ForegroundColor Red
@@ -76,7 +76,7 @@ try {
 
 # Display application access link
 $applicationUrl = "http://localhost:8080"
-Write-Host "`nThe application is running at: $applicationUrl" -ForegroundColor Blue
+Write-Host "The application is running at: $applicationUrl" -ForegroundColor Blue
 Write-Host "[INFO] Open the link above to access the application." -ForegroundColor Yellow
 
 # Exit message for debugging
