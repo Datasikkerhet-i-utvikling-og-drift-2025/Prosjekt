@@ -1,0 +1,18 @@
+Før du kan starte prosjektet:
+
+Steg 1:
+Sett opp WSL på windows
+https://medium.com/hydroinformatics/getting-started-with-windows-sub-system-for-linux-wsl-installation-68d8bf15175c
+
+Steg 2:
+Installer docker desktop
+https://www.docker.com/get-started/
+
+
+Starte prosjektet:
+
+Steg 1:
+Åpne prosjekt mappen i vscode
+
+Steg2 :
+Klikk F5 eller Run > Start Debugging

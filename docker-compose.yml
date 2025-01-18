@@ -1,0 +1,15 @@
+services:
+  php-apache:
+    extends:
+      file: ./Backend/docker-compose.yml
+      service: php-apache
+
+  mysql:
+    extends:
+      file: ./Database/init/docker-compose.yml
+      service: mysql
+
+
+networks:
+  mysql_network:
+    driver: bridge

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  php-apache:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php_docker_app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./tasks.json:/var/www/html/tasks.json
+      - ./styles.css:/var/www/html/styles.css
+      - ./index.php:/var/www/html/index.php
+    networks:
+      - mysql_network # Connect this service to the my_network
+
+networks:
+  mysql_network:
+    external: true # Use the existing my_network
