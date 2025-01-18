@@ -12,6 +12,10 @@ services:
       - project_network
     depends_on:
       - mysql
+    volumes:
+      - ./Backend:/var/www/html
+    environment:
+      - XDEBUG_CLIENT_HOST=host.docker.internal
 
   frontend:
     build:
@@ -24,6 +28,8 @@ services:
       - project_network
     depends_on:
       - backend
+    volumes:
+      - ./Frontend:/var/www/html
 
   mysql:
     build:
