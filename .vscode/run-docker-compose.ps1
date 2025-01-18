@@ -11,11 +11,36 @@ Write-Host "
 # Function to ensure Docker Desktop and the Docker daemon are running
 function Wait-ForDocker {
     Write-Host "`n[INFO] Checking if Docker Desktop is running..." -ForegroundColor Yellow
+
+    # Check if Docker Desktop process is running
     $dockerdRunning = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
 
     if (-not $dockerdRunning) {
         Write-Host "[INFO] Docker Desktop is not running. Launching Docker Desktop..." -ForegroundColor Yellow
-        Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -NoNewWindow
+
+        # Find Docker Desktop executable dynamically, fall back to default paths
+        $dockerDesktopPath = (Get-Command "Docker Desktop" -ErrorAction SilentlyContinue)?.Source
+
+        if (-not $dockerDesktopPath) {
+            $defaultPaths = @(
+                "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe",
+                "C:\\Program Files (x86)\\Docker\\Docker\\Docker Desktop.exe"
+            )
+
+            foreach ($path in $defaultPaths) {
+                if (Test-Path $path) {
+                    $dockerDesktopPath = $path
+                    break
+                }
+            }
+        }
+
+        if (-not $dockerDesktopPath) {
+            Write-Host "[ERROR] Docker Desktop executable not found. Please ensure Docker is installed and available in PATH or default locations." -ForegroundColor Red
+            exit 1
+        }
+
+        Start-Process -FilePath $dockerDesktopPath -NoNewWindow
         Write-Host "[INFO] Waiting for Docker Desktop to start..." -ForegroundColor Yellow
         Start-Sleep -Seconds 15 # Adjust if Docker Desktop takes longer to start
     } else {
