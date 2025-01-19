@@ -16,4 +16,10 @@
         </description>
         <accepts>starter.html</accepts>
     </rule>
+    <rule id="5495ca72">
+        <description>Created after removal of "API Reference" from Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og
+            Drift - Gruppe 1
+        </description>
+        <accepts>Api.html</accepts>
+    </rule>
 </rules>
