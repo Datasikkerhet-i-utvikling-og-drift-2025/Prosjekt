@@ -13,12 +13,13 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 # Install and configure Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
-# Configure Xdebug
-RUN echo "zend_extension=xdebug.so" >> /usr/local/etc/php/php.ini \
-    && echo "xdebug.mode=debug" >> /usr/local/etc/php/php.ini \
-    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/php.ini \
-    && echo "xdebug.client_host=${XDEBUG_CLIENT_HOST}" >> /usr/local/etc/php/php.ini \
-    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/php.ini
+# Install phpDocumentor
+RUN curl -L https://github.com/phpDocumentor/phpDocumentor/releases/download/v3.3.0/phpDocumentor.phar -o /usr/local/bin/phpdoc && \
+    chmod +x /usr/local/bin/phpdoc
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
+
+# Generate PHPDoc during startup
+CMD ["sh", "-c", "phpdoc -d /var/www/html -t /var/www/html/docs --template=markdown && apache2-foreground"]
+
