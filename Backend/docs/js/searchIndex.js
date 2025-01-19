@@ -28,7 +28,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\Database",
             "name": "Database",
-            "summary": "Database",
+            "summary": "Class\u0020Database",
             "url": "classes/Database.html"
         },                {
             "fqsen": "\\Database\u003A\u003AgetConnection\u0028\u0029",

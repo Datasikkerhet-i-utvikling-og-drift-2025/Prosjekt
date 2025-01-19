@@ -1,17 +1,16 @@
 <?php
 
 /**
- * Database
+ * Class Database
  *
- * A simple class for establishing a MySQLi connection using environment
- * variables from docker-compose or the defaults set within the container.
+ * Handles the MySQL database for the API controllers:
  */
 class Database
 {
-    private $host = 'mysql';      // docker-compose service name for MySQL
-    private $dbName = 'database'; // matches the init.sql definition
-    private $username = 'admin';  // your DB username
-    private $password = 'admin';  // your DB password
+    private $host = 'mysql';
+    private $dbName = 'database';
+    private $username = 'admin';
+    private $password = 'admin';
 
     public function getConnection()
     {
