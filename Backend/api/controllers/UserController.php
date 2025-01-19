@@ -28,11 +28,27 @@ class UsersController
     }
 
     /**
-     * Retrieves all users from the 'users' table.
+     * Retrieves all users from the 'users' table and returns the data in JSON format.
      *
-     * Endpoint: GET /api/index.php?route=users
+     * This method is used for the API endpoint:
+     * GET /api/index.php?route=users
      *
-     * @return void Outputs a JSON-encoded array of users.
+     * @api
+     * @method GET
+     * @endpoint /api/index.php?route=users
+     *
+     * @return string Returns a JSON-encoded string with an array of users, where each user is represented by keys like 'user_id', 'email', 'user_type', and 'created_at'.
+     *
+     * Example response:
+     *
+     * [
+     *     {
+     *         "user_id": "1",
+     *         "email": "tony@stark.com",
+     *         "user_type": "student",
+     *         "created_at": "2025-01-19 12:51:46"
+     *     }
+     * ]
      */
     public function getAllUsers()
     {
@@ -56,18 +72,37 @@ class UsersController
     /**
      * Creates a new user in the 'users' table.
      *
-     * Endpoint: POST /api/index.php?route=users
+     * This method is used for the API endpoint:
+     * POST /api/index.php?route=users
      *
-     * Expected JSON Request Body:
-     * {
-     *   "email": "user@example.com",
-     *   "password": "plaintext_password",
-     *   "user_type": "admin|user"
-     * }
+     * @api
+     * @method POST
+     * @endpoint /api/index.php?route=users
+     *
+     * @param string $email User's email address (e.g., "tony@stark.com")
+     * @param string $password User's password (e.g., "strongpassword123")
+     * @param string $userType User's type (e.g., "admin", "user")
      *
      * @return void Outputs a success or error message in JSON format.
      *
-     * @throws Exception When database errors occur.
+     * Example request:
+     * POST /api/index.php?route=users
+     * Body:
+     * {
+     *     "email": "tony@stark.com",
+     *     "password": "strongpassword123",
+     *     "user_type": "admin"
+     * }
+     *
+     * Example response:
+     * {
+     *     "status": "success",
+     *     "message": "User created successfully",
+     *     "user": {
+     *         "email": "tony@stark.com",
+     *         "user_type": "admin"
+     *     }
+     * }
      */
     public function createUser()
     {

@@ -13,7 +13,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\UsersController\u003A\u003AgetAllUsers\u0028\u0029",
             "name": "getAllUsers",
-            "summary": "Retrieves\u0020all\u0020users\u0020from\u0020the\u0020\u0027users\u0027\u0020table.",
+            "summary": "Retrieves\u0020all\u0020users\u0020from\u0020the\u0020\u0027users\u0027\u0020table\u0020and\u0020returns\u0020the\u0020data\u0020in\u0020JSON\u0020format.",
             "url": "classes/UsersController.html#method_getAllUsers"
         },                {
             "fqsen": "\\UsersController\u003A\u003AcreateUser\u0028\u0029",

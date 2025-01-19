@@ -147,9 +147,9 @@
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/UsersController.html#method_getAllUsers">getAllUsers()</a>
     <span>
-                                &nbsp;: void    </span>
+                                &nbsp;: string    </span>
 </dt>
-<dd>Retrieves all users from the &#039;users&#039; table.</dd>
+<dd>Retrieves all users from the &#039;users&#039; table and returns the data in JSON format.</dd>
 
         </dl>
 
@@ -252,7 +252,7 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="api/controllers/UserController.php"><a href="files/api-controllers-usercontroller.html"><abbr title="api/controllers/UserController.php">UserController.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">72</span>
+    <span class="phpdocumentor-element-found-in__line">107</span>
 
     </aside>
 
@@ -262,13 +262,8 @@
     <span class="phpdocumentor-signature__visibility">public</span>
                 <span class="phpdocumentor-signature__name">createUser</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
 
-        <section class="phpdocumentor-description"><p>Endpoint: POST /api/index.php?route=users</p>
-<p>Expected JSON Request Body:
-{
-&quot;email&quot;: &quot;user@example.com&quot;,
-&quot;password&quot;: &quot;plaintext_password&quot;,
-&quot;user_type&quot;: &quot;admin|user&quot;
-}</p>
+        <section class="phpdocumentor-description"><p>This method is used for the API endpoint:
+POST /api/index.php?route=users</p>
 </section>
 
     
@@ -279,12 +274,11 @@
     </h5>
     <dl class="phpdocumentor-tag-list">
                                     <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">throws</span>
+                    <span class="phpdocumentor-tag__name">endpoint</span>
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
-                                                                <span class="phpdocumentor-tag-link"><abbr title="\Exception">Exception</abbr></span>
-                                                            
-                                                 <section class="phpdocumentor-description"><p>When database errors occur.</p>
+                                                                                
+                                                 <section class="phpdocumentor-description"><p>/api/index.php?route=users</p>
 </section>
 
                                     </dd>
@@ -294,6 +288,23 @@
     <span class="phpdocumentor-signature__response_type">void</span>
             &mdash;
             <section class="phpdocumentor-description"><p>Outputs a success or error message in JSON format.</p>
+<p>Example request:
+POST /api/index.php?route=users
+Body:
+{
+&quot;email&quot;: &quot;tony@stark.com&quot;,
+&quot;password&quot;: &quot;strongpassword123&quot;,
+&quot;user_type&quot;: &quot;admin&quot;
+}</p>
+<p>Example response:
+{
+&quot;status&quot;: &quot;success&quot;,
+&quot;message&quot;: &quot;User created successfully&quot;,
+&quot;user&quot;: {
+&quot;email&quot;: &quot;tony@stark.com&quot;,
+&quot;user_type&quot;: &quot;admin&quot;
+}
+}</p>
 </section>
 
     
@@ -311,26 +322,51 @@
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="api/controllers/UserController.php"><a href="files/api-controllers-usercontroller.html"><abbr title="api/controllers/UserController.php">UserController.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">37</span>
+    <span class="phpdocumentor-element-found-in__line">53</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Retrieves all users from the &#039;users&#039; table.</p>
+        <p class="phpdocumentor-summary">Retrieves all users from the &#039;users&#039; table and returns the data in JSON format.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-                <span class="phpdocumentor-signature__name">getAllUsers</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
+                <span class="phpdocumentor-signature__name">getAllUsers</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
 
-        <section class="phpdocumentor-description"><p>Endpoint: GET /api/index.php?route=users</p>
+        <section class="phpdocumentor-description"><p>This method is used for the API endpoint:
+GET /api/index.php?route=users</p>
 </section>
 
     
     
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="#tags" class="headerlink"><i class="fas fa-link"></i></a>
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">endpoint</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><p>/api/index.php?route=users</p>
+</section>
+
+                                    </dd>
+                        </dl>
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-    <span class="phpdocumentor-signature__response_type">void</span>
+    <span class="phpdocumentor-signature__response_type">string</span>
             &mdash;
-            <section class="phpdocumentor-description"><p>Outputs a JSON-encoded array of users.</p>
+            <section class="phpdocumentor-description"><p>Returns a JSON-encoded string with an array of users, where each user is represented by keys like 'user_id', 'email', 'user_type', and 'created_at'.</p>
+<p>Example response:</p>
+<p>[
+{
+&quot;user_id&quot;: &quot;1&quot;,
+&quot;email&quot;: &quot;tony@stark.com&quot;,
+&quot;user_type&quot;: &quot;student&quot;,
+&quot;created_at&quot;: &quot;2025-01-19 12:51:46&quot;
+}
+]</p>
 </section>
 
     
