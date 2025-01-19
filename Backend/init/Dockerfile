@@ -21,5 +21,4 @@ RUN curl -L https://github.com/phpDocumentor/phpDocumentor/releases/download/v3.
 RUN chown -R www-data:www-data /var/www/html
 
 # Generate PHPDoc during startup
-CMD ["sh", "-c", "phpdoc -d /var/www/html -t /var/www/html/docs --template=markdown && apache2-foreground"]
-
+CMD ["sh", "-c", "phpdoc -d /var/www/html -t /var/www/html/docs && apache2-foreground"]
