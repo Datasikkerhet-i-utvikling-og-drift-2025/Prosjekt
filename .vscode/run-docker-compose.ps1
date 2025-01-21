@@ -2,12 +2,12 @@
 Clear-Host
 
 # Cool Boot-Up Banner
-Write-Host @"
+Write-Host "
 ╔════════════════════════════════════════════════════════════════╗
 ║                    Starting Docker Services                    ║
 ║                     Development Environment                    ║
 ╚════════════════════════════════════════════════════════════════╝
-"@ -ForegroundColor Cyan
+" -ForegroundColor Cyan
 
 # Function to ensure Docker Desktop and the Docker daemon are running
 function Wait-ForDocker {
