@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     students.student_id,
                     students.first_name,
                     students.last_name,
+                    users.password_hash,
                     students.study_program,
                     students.cohort_year,
                     users.created_at
