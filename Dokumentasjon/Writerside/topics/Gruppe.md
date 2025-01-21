@@ -5,7 +5,7 @@
 * Ayub Abdirazak Ali
 * Jon Petter Harwiss
 * Mahamoud Ibrahim
-* Mats Hansen
+* Mats Hansen - math@hiof.no
 * Sander Thorstein Nilsen
 
 ## Ansvarsområder
