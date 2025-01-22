@@ -1,6 +1,6 @@
 <?php
 // Dynamically construct the API base URL using the server's host
-$apiBaseUrl = "http://backend:80/api/index.php?route=users"; // Assumes 'backend' is resolvable in the Docker network
+$apiBaseUrl = "http://backend:80/api/index.php"; // Assumes 'backend' is resolvable in the Docker network
 
 $error = null;
 
@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? null;
     $password = $_POST['password'] ?? null;
     $userType = $_POST['user_type'] ?? null;
+    $studyProgram = $_POST['study_program'] ?? null;
+    $cohortYear = $_POST['cohort_year'] ?? null;
 
     // Validate input fields
     if (!$firstName || !$lastName || !$email || !$password || !$userType) {
@@ -23,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email' => $email,
             'password' => $password,
             'user_type' => $userType,
+            'study_program' => $studyProgram,
+            'cohort_year' => $cohortYear,
         ]);
 
         // Create HTTP context for the POST request
@@ -68,68 +72,92 @@ if ($response === false) {
     <link rel="stylesheet" href="style.css"> <!-- Link the CSS file -->
 </head>
 <body>
-<section class="navigation">
-    <a href="loggInn.php">Go to Login</a>
-</section>
-<div class="container">
-    <h1>Manage Users</h1>
+    <section class="navigation">
+        <a href="loggInn.php">Go to Login</a>
+    </section>
+    <div class="container">
+        <h1>Manage Users</h1>
 
-    <!-- Display error message if any -->
-    <?php if (!empty($error)): ?>
-        <div class="error" style="color: red;"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
-
-    <h2>Add New User</h2>
-    <form action="" method="POST">
-        <label for="first_name">First Name:</label>
-        <input type="text" id="first_name" name="first_name" required>
-
-        <label for="last_name">Last Name:</label>
-        <input type="text" id="last_name" name="last_name" required>
-
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-
-        <label for="user_type">User Type:</label>
-        <select id="user_type" name="user_type" required>
-            <option value="student">Student</option>
-            <option value="lecturer">Lecturer</option>
-            <option value="admin">Admin</option>
-        </select>
-
-        <button type="submit">Add User</button>
-    </form>
-
-    <h2>Users</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Email</th>
-            <th>User Type</th>
-            <th>Created At</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php if (!empty($users)): ?>
-            <?php foreach ($users as $user): ?>
-                <tr>
-                    <td><?= htmlspecialchars($user['user_id']) ?></td>
-                    <td><?= htmlspecialchars($user['email']) ?></td>
-                    <td><?= htmlspecialchars($user['user_type']) ?></td>
-                    <td><?= htmlspecialchars($user['created_at']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="4">No users found.</td>
-            </tr>
+        <!-- Display error message if any -->
+        <?php if (!empty($error)): ?>
+            <div class="error" style="color: red;"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
-        </tbody>
-    </table>
-</div>
+
+        <h2>Add New User</h2>
+        <form action="" method="POST">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="user_type">User Type:</label>
+            <select id="user_type" name="user_type" required>
+                <option value="student">Student</option>
+                <option value="lecturer">Lecturer</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <div id="studentFields" style="display: none;">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name">
+                <label for="study_program">Study Program:</label>
+                <input type="text" id="study_program" name="study_program">
+                <label for="cohort_year">Cohort Year:</label>
+                <input type="number" id="cohort_year" name="cohort_year">
+            </div>
+
+            <button type="submit">Add User</button>
+        </form>
+
+        <h2>Users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>User Type</th>
+                    <th>Created At</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Study Program</th>
+                    <th>Cohort Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($users)): ?>
+                    <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($user['user_id']) ?></td>
+                            <td><?= htmlspecialchars($user['email']) ?></td>
+                            <td><?= htmlspecialchars($user['user_type']) ?></td>
+                            <td><?= htmlspecialchars($user['created_at']) ?></td>
+                            <td><?= htmlspecialchars($user['first_name'] ?? '') ?></td>
+                            <td><?= htmlspecialchars($user['last_name'] ?? '') ?></td>
+                            <td><?= htmlspecialchars($user['study_program'] ?? '') ?></td>
+                            <td><?= htmlspecialchars($user['cohort_year'] ?? '') ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="8">No users found.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('user_type').addEventListener('change', function() {
+            const studentFields = document.getElementById('studentFields');
+            if (this.value === 'student') {
+                studentFields.style.display = 'block';
+            } else {
+                studentFields.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

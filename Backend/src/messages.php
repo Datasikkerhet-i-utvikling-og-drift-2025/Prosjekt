@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 $host = 'mysql';
 $db = 'database';
 $user = 'admin';
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $stmt = $conn->prepare("INSERT INTO messages (course_id, student_id, message_text, is_anonymous) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO `database`.messages (course_id, student_id, message_text, is_anonymous) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("iisi", $course_id, $student_id, $message_text, $is_anonymous);
 
     if ($stmt->execute()) {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Handle fetching messages
-    $sql = "SELECT message_id, course_id, student_id, message_text, is_anonymous, created_at FROM messages";
+    $sql = "SELECT message_id, course_id, student_id, message_text, is_anonymous, created_at FROM `database`.messages";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -54,4 +54,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
-?>
+?> -->

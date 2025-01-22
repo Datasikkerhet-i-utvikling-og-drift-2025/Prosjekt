@@ -1,46 +1,51 @@
 <?php
 
-$host = 'mysql';
-$db = 'database';
-$user = 'admin';
-$pass = 'admin';
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
 
-$conn = new mysqli($host, $user, $pass, $db);
+require_once __DIR__ . '/controllers/UserController.php';
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+use api\controllers\UserController;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $user_type = $_POST['user_type'];
+$method = $_SERVER['REQUEST_METHOD'];
+$route = $_GET['route'] ?? null; // Get the 'route' query parameter
 
-    $stmt = $conn->prepare("INSERT INTO users (email, password_hash, user_type) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $email, $password, $user_type);
+$controller = new UserController();
 
-    if ($stmt->execute()) {
-        echo "User added successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-    exit;
-} else {
-    $sql = "SELECT user_id, email, user_type, created_at FROM users";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $users = [];
-        while ($row = $result->fetch_assoc()) {
-            $users[] = $row;
+switch ($route) {
+    case 'users':
+        if ($method === 'POST') {
+            $controller->saveUser();
+        } elseif ($method === 'GET') {
+            $controller->getAllUsers();
+        } else {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
         }
-        echo json_encode($users);
-    } else {
-        echo json_encode([]);
-    }
-}
+        break;
 
-$conn->close();
+    case 'students':
+        if ($method === 'GET') {
+            $controller->getAllStudents();
+        } else {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        }
+        break;
+
+    case 'login':
+        if ($method === 'POST') {
+            $controller->loginUser();
+        } else {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        }
+        break;
+
+    default:
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Endpoint not found']);
+        break;
+}
 ?>

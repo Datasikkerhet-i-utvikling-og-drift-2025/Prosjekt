@@ -2,7 +2,6 @@
 
 namespace models\user;
 
-use DateTime;
 use db\DB;
 use Exception;
 
@@ -32,11 +31,10 @@ class User {
         $this->lastName = $lastName;
         $this->email = $email;
         $this->unHashedPassword = $unHashedPassword;
-        $this->userType = $userType ?? UserType::GUEST.toString();
+        $this->userType = $userType;
         $this->createdAt = $createdAt ?? date('Y-m-d H:i:s');
     }
 
-    // Denne er her for demo og skal slettes
     public function saveToDB()
     {
         try {
@@ -54,96 +52,12 @@ class User {
                 ':created_at' => $this->createdAt,
             ]);
 
+            $this->userId = $conn->lastInsertId();
             $db->closeConnection();
-            return $conn->lastInsertId();
+            return $this->userId;
         } catch (Exception $e) {
             error_log($e->getMessage(), 3, __DIR__ . '/../../logs/error.log');
             throw new Exception("Error saving user");
         }
-    }
-
-    public function login()
-    {
-
-    }
-
-    public function register()
-    {
-
-    }
-
-    public function forgotPassword()
-    {
-
-    }
-
-    public function getUserId(): int
-    {
-        return $this->userId;
-    }
-
-    public function setUserId(int $userId): void
-    {
-        $this->userId = $userId;
-    }
-
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(string $firstName): void
-    {
-        $this->firstName = $firstName;
-    }
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    public function setLastName(string $lastName): void
-    {
-        $this->lastName = $lastName;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    public function getUnHashedPassword(): string
-    {
-        return $this->unHashedPassword;
-    }
-
-    public function setUnHashedPassword(string $unHashedPassword): void
-    {
-        $this->unHashedPassword = $unHashedPassword;
-    }
-
-    public function getUserType(): string
-    {
-        return $this->userType;
-    }
-
-    public function setUserType(string $userType): void
-    {
-        $this->userType = $userType;
-    }
-
-    public function getCreatedAt(): string
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(string $createdAt): void
-    {
-        $this->createdAt = $createdAt;
     }
 }
