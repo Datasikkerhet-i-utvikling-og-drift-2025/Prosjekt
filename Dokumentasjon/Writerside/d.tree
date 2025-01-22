@@ -7,6 +7,6 @@
                  start-page="Gruppe.md">
 
     <toc-element topic="Gruppe.md"/>
-    <toc-element topic="Api.md"/>
     <toc-element topic="Prosjektbeskrivelse.md"/>
+    <toc-element topic="Api.md"/>
 </instance-profile>
