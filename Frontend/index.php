@@ -34,6 +34,10 @@ $users = json_decode($response, true);
     <link rel="stylesheet" href="style.css"> <!-- Link the CSS file -->
 </head>
 <body>
+
+<section class="navigation">
+        <a href="loggInn.php">Go to Login</a>
+</section>
     <div class="container">
         <h1>Manage Users</h1>
 

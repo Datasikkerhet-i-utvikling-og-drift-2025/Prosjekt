@@ -56,6 +56,26 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/Database.html#property_password"
         },                {
+            "fqsen": "\\LoginUser",
+            "name": "LoginUser",
+            "summary": "",
+            "url": "classes/LoginUser.html"
+        },                {
+            "fqsen": "\\LoginUser\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/LoginUser.html#method___construct"
+        },                {
+            "fqsen": "\\LoginUser\u003A\u003AloginUser\u0028\u0029",
+            "name": "loginUser",
+            "summary": "",
+            "url": "classes/LoginUser.html#method_loginUser"
+        },                {
+            "fqsen": "\\LoginUser\u003A\u003A\u0024dbConnection",
+            "name": "dbConnection",
+            "summary": "",
+            "url": "classes/LoginUser.html#property_dbConnection"
+        },                {
             "fqsen": "\\",
             "name": "\\",
             "summary": "",
