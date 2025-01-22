@@ -1,45 +1,19 @@
 <?php
 
-$host = 'mysql';
-$db = 'database';
-$user = 'admin';
-$pass = 'admin';
+require_once __DIR__ . '/controllers/UserController.php';
 
-$conn = new mysqli($host, $user, $pass, $db);
+use api\controllers\UserController;
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$method = $_SERVER['REQUEST_METHOD'];
+$route = $_GET['route'] ?? null; // Get the 'route' query parameter
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $userType = $_POST['user_type'];
+$controller = new UserController();
 
-    $stmt = $conn->prepare("INSERT INTO users (email, password_hash, user_type) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $email, $password, $userType);
-
-    if ($stmt->execute()) {
-        echo "User added successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-    exit;
+if ($route === 'users' && $method === 'POST') {
+    $controller->saveUser();
+} elseif ($route === 'users' && $method === 'GET') {
+    $controller->getAllUsers();
 } else {
-    $sql = "SELECT user_id, email, user_type, created_at FROM users";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $users = [];
-        while ($row = $result->fetch_assoc()) {
-            $users[] = $row;
-        }
-        echo json_encode($users);
-    } else {
-        echo json_encode([]);
-    }
+    http_response_code(404);
+    echo json_encode(['success' => false, 'message' => 'Endpoint not found']);
 }
-
-$conn->close();

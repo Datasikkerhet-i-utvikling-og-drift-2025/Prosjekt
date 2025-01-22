@@ -1,10 +1,17 @@
+namespace api\controllers;
+namespace api\controllers;
+namespace api\controllers;
+namespace api\controllers;
+namespace api\controllers;
+namespace api\controllers;
+namespace api\controllers;
+namespace api\controllers;
+/LoginUser.php
 <?php
 
-namespace api\controllers;
+use database\DB;
 
-use db\DB;
-
-require_once __DIR__ . '/../../database/DB.php';
+require_once __DIR__ . '/../database/Database.php';
 
 class LoginUser
 {
@@ -21,8 +28,8 @@ class LoginUser
 
     public function loginUser()
     {
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
         if (empty($email) || empty($password)) {
             http_response_code(400);

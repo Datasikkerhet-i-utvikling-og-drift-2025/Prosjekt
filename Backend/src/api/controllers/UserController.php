@@ -2,71 +2,71 @@
 
 namespace api\controllers;
 
+use models\user\User;
 use db\DB;
+use Exception;
 
+require_once __DIR__ . '/../../models/user/User.php';
 require_once __DIR__ . '/../../database/DB.php';
 
-class UserController
-{
-    private $dbConnection;
-
-    public function __construct()
-    {
-        $database = new DB();
-        $this->dbConnection = $database->getConnection();
-    }
-
-    public function getAllUsers()
-    {
-        $sql = "SELECT user_id, email, user_type, created_at FROM users";
-        $result = $this->dbConnection->query($sql);
-
-        $users = [];
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $users[] = $row;
-            }
-        }
-
+class UserController {
+    public function saveUser() {
         header('Content-Type: application/json');
-        echo json_encode($users);
 
-        $this->dbConnection->close();
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            if (!$data) {
+                throw new Exception("Invalid input");
+            }
+
+            $user = new User(
+                0,
+                $data['first_name'],
+                $data['last_name'],
+                $data['email'],
+                $data['password'],
+                $data['user_type'],
+                null
+            );
+
+            $userId = $user->saveToDB();
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'User created successfully',
+                'userId' => $userId,
+            ]);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
-    public function createUser()
-    {
-        $jsonData = file_get_contents("php://input");
-        $data = json_decode($jsonData, true);
+    public function getAllUsers() {
+        header('Content-Type: application/json');
 
-        if (!isset($data['email'], $data['password'], $data['user_type'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Missing required fields"]);
-            return;
-        }
+        try {
+            $db = new DB();
+            $conn = $db->getConnection();
 
-        $email = $data['email'];
-        $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-        $userType = $data['user_type'];
+            $stmt = $conn->prepare("SELECT user_id, email, user_type, created_at FROM users");
+            $stmt->execute();
 
-        $stmt = $this->dbConnection->prepare("INSERT INTO users (email, password_hash, user_type) VALUES (?, ?, ?)");
-        if (!$stmt) {
+            $users = $stmt->fetchAll();
+
+            echo json_encode([
+                'success' => true,
+                'data' => $users,
+            ]);
+        } catch (Exception $e) {
             http_response_code(500);
-            echo json_encode(["error" => "Database prepare failed"]);
-            return;
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
         }
-
-        $stmt->bind_param("sss", $email, $passwordHash, $userType);
-
-        if ($stmt->execute()) {
-            http_response_code(201);
-            echo json_encode(["message" => "User created successfully"]);
-        } else {
-            http_response_code(500);
-            echo json_encode(["error" => $stmt->error]);
-        }
-
-        $stmt->close();
-        $this->dbConnection->close();
     }
 }

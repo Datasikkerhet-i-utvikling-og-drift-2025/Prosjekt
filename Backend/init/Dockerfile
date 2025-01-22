@@ -13,9 +13,14 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 # Install and configure Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
+
 # Install phpDocumentor
 #RUN curl -L https://github.com/phpDocumentor/phpDocumentor/releases/download/v3.3.0/phpDocumentor.phar -o /usr/local/bin/phpdoc && \
 #    chmod +x /usr/local/bin/phpdoc
+
+# Ensure the .env file exists and is accessible
+#ENV APP_ENV=production
+#COPY /var/www/html/.env /var/www/html/.env
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
@@ -26,7 +31,6 @@ RUN chown -R www-data:www-data /var/www/html
 # Generate PHPDoc during startup
 #CMD ["sh", "-c", "phpdoc -d /var/www/html -t /var/www/html/docs && apache2-foreground"]
 
+EXPOSE 80
+
 CMD ["apache2-foreground"]
-
-
-

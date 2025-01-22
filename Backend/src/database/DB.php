@@ -2,23 +2,57 @@
 
 namespace db;
 
-use mysqli;
+use PDO;
+use PDOException;
 
 class DB
 {
-    private $host = 'mysql';
-    private $dbName = 'database';
-    private $username = 'admin';
-    private $password = 'admin';
+    private string $host;
+    private string $dbName;
+    private string $username;
+    private string $password;
+    private ?PDO $connection = null;
 
-    public function getConnection()
+    public function __construct()
     {
-        $conn = new mysqli($this->host, $this->username, $this->password, $this->dbName);
+        // Load environment variables
+        #$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+        #$dotenv->load();
 
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+        // Set properties from .env or fallback defaults
+        #$this->host = $_ENV['DB_HOST'] ?? 'mysql';
+        #$this->dbName = $_ENV['DB_NAME'] ?? 'database';
+        #$this->username = $_ENV['DB_USER'] ?? 'admin';
+        #$this->password = $_ENV['DB_PASS'] ?? 'admin';
+        $this->host = 'mysql';
+        $this->dbName = 'database';
+        $this->username = 'admin';
+        $this->password = 'admin';
+    }
+
+    public function getConnection(): PDO
+    {
+        if ($this->connection === null) {
+            try {
+                $dsn = "mysql:host={$this->host};dbname={$this->dbName};charset=utf8mb4";
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_PERSISTENT => true,
+                ];
+
+                $this->connection = new PDO($dsn, $this->username, $this->password, $options);
+            } catch (PDOException $e) {
+                error_log($e->getMessage(), 3, __DIR__ . '/../logs/error.log');
+                die("Database connection failed. Please try again later.");
+            }
         }
 
-        return $conn;
+        return $this->connection;
+    }
+
+    public function closeConnection(): void
+    {
+        $this->connection = null;
     }
 }
