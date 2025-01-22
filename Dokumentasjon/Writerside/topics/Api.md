@@ -74,7 +74,6 @@ The response is a JSON-encoded array of users, where each user is represented by
 {
     "error": "Missing required fields: email, password, user_type"
 }
-
 ```
 
 
