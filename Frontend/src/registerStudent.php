@@ -1,3 +1,64 @@
+<?php
+// Dynamically construct the API base URL using the server's host
+$apiBaseUrl = "http://backend:80/api/index.php?route=users"; // Assumes 'backend' is resolvable in the Docker network
+
+$error = null;
+
+function redirectToUserPage() {
+    header("Location: user.php");
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Safely retrieve POST data and validate it
+    $firstName = $_POST['first_name'] ?? null;
+    $lastName = $_POST['last_name'] ?? null;
+    $email = $_POST['email'] ?? null;
+    $password = $_POST['password'] ?? null;
+    $userType = $_POST['user_type'] ?? null;
+
+    // Validate input fields
+    if (!$firstName || !$lastName || !$email || !$password || !$userType) {
+        $error = "All fields are required.";
+    } else {
+        // Prepare data for POST request
+        $postData = json_encode([
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'password' => $password,
+            'user_type' => $userType,
+        ]);
+
+        // Create HTTP context for the POST request
+        $options = [
+            'http' => [
+                'header'  => "Content-Type: application/json\r\n",
+                'method'  => 'POST',
+                'content' => $postData,
+            ],
+        ];
+        $context = stream_context_create($options);
+
+        // Send the POST request
+        $result = @file_get_contents($apiBaseUrl, false, $context);
+
+        if ($result === false) {
+            $error = "Error connecting to the backend. Please check the API configuration.";
+        } else {
+            $response = json_decode($result, true);
+            if ($response['success']) {
+                // Redirect to login page after successful registration
+                header("Location: index.php");
+                exit();
+            } else {
+                $error = $response['message'] ?? "Failed to register the user.";
+            }
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +68,12 @@
 </head>
 <body>
     <h1>Register Student</h1>
+
+    <!-- Display error message if any -->
+    <?php if (!empty($error)): ?>
+        <div class="error" style="color: red;"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
     <form action="registerStudent.php" method="POST">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
