@@ -13,8 +13,8 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./Backend:/var/www/html
-      - ./Backend/docs:/var/www/html/docs
+      - ./Backend/src:/var/www/html
+#      - ./Backend/docs:/var/www/html/docs
     environment:
       - XDEBUG_CLIENT_HOST=host.docker.internal
 
@@ -30,7 +30,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./Frontend:/var/www/html
+      - ./Frontend/src:/var/www/html
 
   mysql:
     build:
