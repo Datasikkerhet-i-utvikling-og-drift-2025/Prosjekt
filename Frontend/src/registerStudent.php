@@ -20,9 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'] ?? null;
         $password = $_POST['password'] ?? null;
         $userType = $_POST['user_type'] ?? null;
+        $studyProgram = $_POST['study_program'] ?? null;
+        $cohortYear = $_POST['cohort_year'] ?? null;
 
         // Validate input fields
-        if (!$firstName || !$lastName || !$email || !$password || !$userType) {
+        if (!$firstName || !$lastName || !$email || !$password || !$userType || !$studyProgram || !$cohortYear) {
             $error = "All fields are required.";
         } else {
             // Prepare data for POST request
@@ -32,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email' => $email,
                 'password' => $password,
                 'user_type' => $userType,
+                'study_program' => $studyProgram,
+                'cohort_year' => $cohortYear,
             ]);
 
             // Create HTTP context for the POST request
@@ -97,6 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="lecturer">Lecturer</option>
             <option value="admin">Admin</option>
         </select>
+        <br>
+        <label for="study_program">Study Program:</label>
+        <input type="text" id="study_program" name="study_program" required>
+        <br>
+        <label for="cohort_year">Cohort Year:</label>
+        <input type="number" id="cohort_year" name="cohort_year" required>
         <br>
         <button type="submit" name="register">Register</button>
     </form>

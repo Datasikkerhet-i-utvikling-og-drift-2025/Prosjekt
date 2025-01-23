@@ -11,14 +11,14 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle user registration
-    $email = $_POST['email'];
+    // Safely retrieve POST data and validate it
+    $email = $_POST['email'] ?? null;
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $user_type = $_POST['user_type'];
-    $study_program = $_POST['study_program'];
-    $cohort_year = $_POST['cohort_year'];
+    $first_name = $_POST['first_name'] ?? null;
+    $last_name = $_POST['last_name'] ?? null;
+    $user_type = $_POST['user_type'] ?? null;
+    $study_program = $_POST['study_program'] ?? null;
+    $cohort_year = $_POST['cohort_year'] ?? null;
 
     if (empty($email) || empty($password) || empty($first_name) || empty($last_name) || empty($user_type) || empty($study_program) || empty($cohort_year)) {
         http_response_code(400);
@@ -32,32 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt->execute()) {
         $user_id = $stmt->insert_id; // Get the inserted user ID
-
-        // Insert student details into students table
+    
+        // Insert student details into students table using the user_id as student_id
         $stmt = $conn->prepare("INSERT INTO students (student_id, first_name, last_name, study_program, cohort_year) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("isssi", $user_id, $first_name, $last_name, $study_program, $cohort_year);
-
+    
         if ($stmt->execute()) {
-            // Fetch the combined user and student details
-            $sql = "
-                SELECT
-                    users.user_id,
-                    users.email,
-                    users.user_type,
-                    students.student_id,
-                    students.first_name,
-                    students.last_name,
-                    users.password_hash,
-                    students.study_program,
-                    students.cohort_year,
-                    users.created_at
-                FROM
-                    `database`.users
-                JOIN
-                    `database`.students ON users.user_id = students.student_id
-                WHERE
-                    users.user_id = ?
-            ";
+            // Registration successful, return a success message
+            echo json_encode(['message' => 'Student registered successfully.']);
+        } else {
+            error_log("Failed to insert student details: " . $stmt->error);
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to insert student details']);
+        }
+    } else {
+        error_log("Failed to insert user credentials: " . $stmt->error);
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to insert user credentials']);
+    }
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $user_id);
             $stmt->execute();
@@ -66,10 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             echo json_encode(['message' => 'Student registered successfully.', 'user' => $user_details]);
         } else {
-            echo json_encode(['error' => 'Error: ' . $stmt->error]);
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to insert student details']);
         }
     } else {
-        echo json_encode(['error' => 'Error: ' . $stmt->error]);
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to insert user credentials']);
     }
 
     $stmt->close();
