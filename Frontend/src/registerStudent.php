@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = json_decode($result, true);
                 if ($response['success']) {
                     // Redirect to index page after successful registration
-                    redirectToIndexPage();
+                   // redirectToIndexPage();
                 } else {
                     $error = $response['message'] ?? "Failed to register the user.";
                 }
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" name="register">Register</button>
     </form>
 
-    <form action="registerStudent.php" method="POST" style="margin-top: 10px;">
+    <form method="POST" style="margin-top: 10px;">
         <button type="submit" name="back_to_login">Back to Login</button>
     </form>
 </body>

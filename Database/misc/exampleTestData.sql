@@ -1,3 +1,5 @@
+-- Test data for schema creation er nå forskjellig og må eventuelt oppdateres
+
 -- Insert users
 INSERT INTO users (email, password_hash, user_type) VALUES
                                                         ('student1@example.com', 'hashedpassword1', 'student'),
