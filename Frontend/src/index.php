@@ -2,8 +2,8 @@
 session_start();
 
 // Dynamically construct the API base URL using the server's host
-$usersApiUrl = "http://backend:80/api/index.php?route=users"; // API endpoint to fetch users
-$loginApiUrl = "http://backend:80/loggInn.php"; // Backend service name in Docker network
+$usersApiUrl = "http://localhost/src/api/index.php?route=users"; // API endpoint to fetch users
+$loginApiUrl = "http://backend:80/src/api/index.php?route=users"; // Backend service name in Docker network
 
 $error = null;
 $users = [];
@@ -13,7 +13,7 @@ $response = @file_get_contents($usersApiUrl);
 if ($response !== false) {
     $users = json_decode($response, true)['data'] ?? [];
 } else {
-    $error = "Error connecting to the backend. Please check the API configuration.";
+    $error = "Error connecting to the backend. Please check the API configuration. " . error_get_last()['message'];
 }
 
 // Handle login form submission
@@ -31,20 +31,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             'content' => $postData,
         ],
     ];
-    $context  = stream_context_create($options);
-    $result = @file_get_contents($loginApiUrl, false, $context);
-    $response = json_decode($result, true);
 
-    if (isset($response['message']) && $response['message'] === 'Login successful') {
-        // Set user session
-        $_SESSION['user'] = $response['user'];
-        // Redirect to user page
-        header("Location: user.php");
-        exit;
+    if (!empty($loginApiUrl)) {
+        $context  = stream_context_create($options);
+        $result = @file_get_contents($loginApiUrl, false, $context);
+        $response = json_decode($result, true);
+
+            if (isset($response['message']) && $response['message'] === 'Login successful') {
+                // Set user session
+                $_SESSION['user'] = $response['user'];
+                // Redirect to user page
+                header("Location: user.php");
+                exit;
+            } else {
+                $error = isset($response['error']) ? $response['error'] : 'Login failed';
+            }
+        } else {
+            $error = "Error connecting to the backend. Please check the API configuration. " . error_get_last()['message'];
+        }
     } else {
-        $error = isset($response['error']) ? $response['error'] : 'Login failed';
+        $error = 'Login API URL is not configured.';
     }
-}
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <?php endif; ?>
 
     <h2>Login</h2>
-    <form action="" method="POST">
+    <form action="index.php" method="POST">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
         <br>
@@ -84,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         <tr>
             <th>ID</th>
             <th>Email</th>
-            <th>User Type</th>
             <th>Created At</th>
         </tr>
         </thead>
@@ -94,7 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 <tr>
                     <td><?= htmlspecialchars($user['user_id']) ?></td>
                     <td><?= htmlspecialchars($user['email']) ?></td>
-                    <td><?= htmlspecialchars($user['user_type']) ?></td>
                     <td><?= htmlspecialchars($user['created_at']) ?></td>
                 </tr>
             <?php endforeach; ?>

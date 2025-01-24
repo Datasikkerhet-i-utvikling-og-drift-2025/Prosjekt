@@ -11,29 +11,26 @@ require_once __DIR__ . '/../../database/DB.php';
 // Base class for all users
 class User {
     protected int $userId;
-    private string $firstName;
-    private string $lastName;
     protected string $email;
     protected string $unHashedPassword;
-    protected string $userType; // 'student', 'lecturer', 'admin'
     protected string $createdAt;
+    private string $firstName;
+    private string $lastName;
 
     public function __construct(
         int $userId,
-        string $firstName,
-        string $lastName,
         string $email,
         string $unHashedPassword,
-        string $userType,
-        ?string $createdAt = null
+        ?string $createdAt = null,
+        string $firstName,
+        string $lastName,
     ) {
         $this->userId = $userId;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
         $this->email = $email;
         $this->unHashedPassword = $unHashedPassword;
-        $this->userType = $userType ?? UserType::GUEST.toString();
         $this->createdAt = $createdAt ?? date('Y-m-d H:i:s');
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
     }
 
     // Denne er her for demo og skal slettes
@@ -43,15 +40,16 @@ class User {
             $db = new DB();
             $conn = $db->getConnection();
 
-            $sql = "INSERT INTO users (email, password_hash, user_type, created_at) 
-                    VALUES (:email, :password_hash, :user_type, :created_at)";
+            $sql = "INSERT INTO users (email, password_hash, created_at, first_name, last_name) 
+                    VALUES (:email, :password_hash, :created_at, :first_name, :last_name)";
 
             $stmt = $conn->prepare($sql);
             $stmt->execute([
                 ':email' => $this->email,
                 ':password_hash' => password_hash($this->unHashedPassword, PASSWORD_DEFAULT),
-                ':user_type' => $this->userType,
                 ':created_at' => $this->createdAt,
+                ':first_name' => $this->firstName,
+                ':last_name' => $this->lastName,
             ]);
 
             $db->closeConnection();
@@ -60,21 +58,6 @@ class User {
             error_log($e->getMessage(), 3, __DIR__ . '/../../logs/error.log');
             throw new Exception("Error saving user");
         }
-    }
-
-    public function login()
-    {
-
-    }
-
-    public function register()
-    {
-
-    }
-
-    public function forgotPassword()
-    {
-
     }
 
     public function getUserId(): int
@@ -125,16 +108,6 @@ class User {
     public function setUnHashedPassword(string $unHashedPassword): void
     {
         $this->unHashedPassword = $unHashedPassword;
-    }
-
-    public function getUserType(): string
-    {
-        return $this->userType;
-    }
-
-    public function setUserType(string $userType): void
-    {
-        $this->userType = $userType;
     }
 
     public function getCreatedAt(): string

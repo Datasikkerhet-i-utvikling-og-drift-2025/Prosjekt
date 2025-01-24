@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
 <body>
 <div class="user-info">
     <h2>Welcome, <?= htmlspecialchars($user['email']) ?></h2>
-    <p>User Type: <?= htmlspecialchars($user['user_type']) ?></p>
+    <p>user: <?= htmlspecialchars($user['first_name']) ?></p>
     <p>Created At: <?= htmlspecialchars($user['created_at']) ?></p>
     <form class="logout-form" action="" method="POST">
         <button type="submit" name="logout">Logout</button>

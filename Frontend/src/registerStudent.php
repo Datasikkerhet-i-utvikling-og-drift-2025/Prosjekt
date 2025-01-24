@@ -19,23 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lastName = $_POST['last_name'] ?? null;
         $email = $_POST['email'] ?? null;
         $password = $_POST['password'] ?? null;
-        $userType = $_POST['user_type'] ?? null;
-        $studyProgram = $_POST['study_program'] ?? null;
-        $cohortYear = $_POST['cohort_year'] ?? null;
+       
 
         // Validate input fields
-        if (!$firstName || !$lastName || !$email || !$password || !$userType || !$studyProgram || !$cohortYear) {
+        if (!$email || !$password || !$firstName || !$lastName) {
             $error = "All fields are required.";
         } else {
             // Prepare data for POST request
             $postData = json_encode([
-                'first_name' => $firstName,
-                'last_name' => $lastName,
                 'email' => $email,
                 'password' => $password,
-                'user_type' => $userType,
-                'study_program' => $studyProgram,
-                'cohort_year' => $cohortYear,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
             ]);
 
             // Create HTTP context for the POST request
@@ -57,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = json_decode($result, true);
                 if ($response['success']) {
                     // Redirect to index page after successful registration
-                   // redirectToIndexPage();
+                    redirectToIndexPage();
                 } else {
                     $error = $response['message'] ?? "Failed to register the user.";
                 }
@@ -82,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="error" style="color: red;"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form action="registerStudent.php" method="POST">
+    <form action="index.php" method="POST">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
         <br>
@@ -94,19 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label for="last_name">Last Name:</label>
         <input type="text" id="last_name" name="last_name" required>
-        <br>
-        <label for="user_type">User Type:</label>
-        <select id="user_type" name="user_type" required>
-            <option value="student">Student</option>
-            <option value="lecturer">Lecturer</option>
-            <option value="admin">Admin</option>
-        </select>
-        <br>
-        <label for="study_program">Study Program:</label>
-        <input type="text" id="study_program" name="study_program" required>
-        <br>
-        <label for="cohort_year">Cohort Year:</label>
-        <input type="number" id="cohort_year" name="cohort_year" required>
         <br>
         <button type="submit" name="register">Register</button>
     </form>
