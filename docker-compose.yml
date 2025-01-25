@@ -1,45 +1,7 @@
-
 services:
-  backend:
-    build:
-      context: ./Backend/init
-      dockerfile: Dockerfile
-    container_name: backend
-    ports:
-      - "5000:80"
-    networks:
-      - project_network
-    depends_on:
-      - mysql
-    volumes:
-      - ./Backend/src:/var/www/html
-      #- ./.env:/var/www/html/.env:ro
-#      - ./Backend/docs:/var/www/html/docs
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
-    env_file:
-      - .env
-
-  frontend:
-    build:
-      context: ./Frontend/init
-      dockerfile: Dockerfile
-    container_name: frontend
-    ports:
-      - "8080:80"
-    networks:
-      - project_network
-    depends_on:
-      - backend
-    volumes:
-      - ./Frontend/src:/var/www/html
-
   mysql:
     build:
-      context: ./Database/init
+      context: Database/.docker
       dockerfile: Dockerfile
     container_name: mysql
     ports:
@@ -53,7 +15,34 @@ services:
       - MYSQL_PASSWORD=${DB_PASS}
     env_file:
       - .env
+    volumes:
+      - db_data:/var/lib/mysql
+
+  webapp:
+    build:
+      context: ./WebApp
+      dockerfile: .docker/Dockerfile
+    container_name: webapp
+    ports:
+      - "8080:80"
+    networks:
+      - project_network
+    volumes:
+      - ./WebApp:/var/www/html
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+    env_file:
+      - .env
+
 
 networks:
   project_network:
     driver: bridge
+
+volumes:
+  db_data:
