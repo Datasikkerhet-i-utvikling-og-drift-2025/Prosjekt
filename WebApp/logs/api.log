@@ -1,0 +1,26 @@
+2025-01-26 22:11:12 [error] {
+    "status_code": 500,
+    "message": "Failed to register user.",
+    "errors": []
+}
+2025-01-26 22:11:12 [response] {
+    "status_code": 500,
+    "message": "Failed to register user.",
+    "data": [],
+    "success": false
+}
+2025-01-26 22:20:10 [error] {
+    "status_code": 400,
+    "message": "Invalid JSON input.",
+    "errors": {
+        "error": "Syntax error"
+    }
+}
+2025-01-26 22:20:10 [response] {
+    "status_code": 400,
+    "message": "Invalid JSON input.",
+    "data": {
+        "error": "Syntax error"
+    },
+    "success": false
+}

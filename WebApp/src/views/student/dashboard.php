@@ -10,8 +10,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
 // Get the student's name for display
 $studentName = $_SESSION['user']['name'] ?? 'Student';
 
-// Include database connection
-require_once '../../helpers/Database.php';
+// Include required files
+require_once __DIR__ . '/../../helpers/Database.php';
+require_once __DIR__ . '/../../helpers/Logger.php';
 
 try {
     $db = new \db\Database();
@@ -25,24 +26,27 @@ try {
     // Fetch available courses
     $stmtCourses = $pdo->query("SELECT id, code, name FROM courses");
     $courses = $stmtCourses->fetchAll();
+
+    Logger::info("Student dashboard loaded successfully for user ID {$_SESSION['user']['id']}.");
 } catch (Exception $e) {
     $error = 'Failed to load data. Please try again later.';
+    Logger::error('Error loading student dashboard: ' . $e->getMessage());
 }
 ?>
 
-<?php include '../partials/header.php'; ?>
-<?php include '../partials/navbar.php'; ?>
+<?php include __DIR__ . '/../partials/header.php'; ?>
+<?php include __DIR__ . '/../partials/navbar.php'; ?>
 
 <div class="container">
     <h1>Welcome, <?php echo htmlspecialchars($studentName, ENT_QUOTES, 'UTF-8'); ?>!</h1>
     <p>This is your dashboard. Here you can view your messages and explore courses.</p>
 
     <?php if (!empty($error)): ?>
-        <div style="color: red;"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+        <div class="alert alert-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
     <!-- Messages Section -->
-    <section>
+    <section class="messages-section">
         <h2>Your Messages</h2>
         <div id="messages-container">
             <?php if (!empty($messages)): ?>
@@ -50,7 +54,6 @@ try {
                     <div class="message-item">
                         <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Reply:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No reply yet', ENT_QUOTES, 'UTF-8'); ?></p>
-                        <hr>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -60,7 +63,7 @@ try {
     </section>
 
     <!-- Courses Section -->
-    <section>
+    <section class="courses-section">
         <h2>Available Courses</h2>
         <div id="courses-container">
             <?php if (!empty($courses)): ?>
@@ -68,8 +71,7 @@ try {
                     <div class="course-item">
                         <p><strong>Course Code:</strong> <?php echo htmlspecialchars($course['code'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Course Name:</strong> <?php echo htmlspecialchars($course['name'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <a href="/student/send-message.php?course_id=<?php echo $course['id']; ?>" class="btn">Send a Message</a>
-                        <hr>
+                        <a href="/student/send-message?course_id=<?php echo $course['id']; ?>" class="btn btn-primary">Send a Message</a>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -79,4 +81,4 @@ try {
     </section>
 </div>
 
-<?php include '../partials/footer.php'; ?>
+<?php include __DIR__ . '/../partials/footer.php'; ?>

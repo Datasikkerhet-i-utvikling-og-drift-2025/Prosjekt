@@ -1,112 +1,104 @@
 <?php
 
-// Enable error reporting in development mode
+// Enable error reporting for debugging (disable in production)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Load dependencies
-require_once '../src/config/app.php'; // Application config
-require_once '../src/helpers/ApiHelper.php'; // API helpers
-require_once '../src/config/Database.php'; // Database connection
-require_once '../src/helpers/Logger.php'; // Logger for error tracking
+// Autoload required files
+require_once __DIR__ . '/../src/config/app.php'; // Application config
+require_once __DIR__ . '/../src/helpers/ApiHelper.php'; // API helpers
+require_once __DIR__ . '/../src/config/Database.php'; // Database connection
+require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger for error tracking
+require_once __DIR__ . '/../src/autoload.php';
 
-// Load application config
-$appConfig = require_once '../src/config/app.php';
+// Ensure logs directory exists
+if (!is_dir(__DIR__ . '/../logs')) {
+    mkdir(__DIR__ . '/../logs', 0777, true);
+}
 
-// Set CORS headers for cross-origin requests
+// Handle CORS (Cross-Origin Resource Sharing) headers
+header('Access-Control-Allow-Origin: *');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
     exit(0);
-} else {
-    header('Access-Control-Allow-Origin: *');
 }
 
-// Get the HTTP method and request URI
+// Get HTTP method and requested URI
 $method = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query parameters
 
-// Routing for views (handling static pages)
+// Define view routes
 $views = [
-    '/' => '../src/views/auth/login.php',
-    '/register' => '../src/views/auth/register.php',
-    '/reset-password' => '../src/views/auth/reset-password.php',
-    '/change-password' => '../src/views/auth/change-password.php',
-    '/student/dashboard' => '../src/views/student/dashboard.php',
-    '/student/send-message' => '../src/views/student/send-message.php',
-    '/student/view-responses' => '../src/views/student/view-responses.php',
-    '/lecturer/dashboard' => '../src/views/lecturer/dashboard.php',
-    '/lecturer/read-messages' => '../src/views/lecturer/read-messages.php',
-    '/lecturer/reply' => '../src/views/lecturer/reply.php',
-    '/admin/dashboard' => '../src/views/admin/dashboard.php',
-    '/admin/manage-users' => '../src/views/admin/manage-users.php',
-    '/admin/manage-messages' => '../src/views/admin/manage-messages.php',
-    '/admin/reports' => '../src/views/admin/reports.php',
-    '/guest/view-messages' => '../src/views/guest/view-messages.php',
-    '/guest/report-message' => '../src/views/guest/report-message.php',
+    '/' => __DIR__ . '/../src/views/auth/login.php',
+    '/register' => __DIR__ . '/../src/views/auth/register.php',
+    '/reset-password' => __DIR__ . '/../src/views/auth/reset-password.php',
+    '/change-password' => __DIR__ . '/../src/views/auth/change-password.php',
+    '/student/dashboard' => __DIR__ . '/../src/views/student/dashboard.php',
+    '/student/send-message' => __DIR__ . '/../src/views/student/send-message.php',
+    '/student/view-responses' => __DIR__ . '/../src/views/student/view-responses.php',
+    '/lecturer/dashboard' => __DIR__ . '/../src/views/lecturer/dashboard.php',
+    '/lecturer/read-messages' => __DIR__ . '/../src/views/lecturer/read-messages.php',
+    '/lecturer/reply' => __DIR__ . '/../src/views/lecturer/reply.php',
+    '/admin/dashboard' => __DIR__ . '/../src/views/admin/dashboard.php',
+    '/admin/manage-users' => __DIR__ . '/../src/views/admin/manage-users.php',
+    '/admin/manage-messages' => __DIR__ . '/../src/views/admin/manage-messages.php',
+    '/admin/reports' => __DIR__ . '/../src/views/admin/reports.php',
+    '/guest/view-messages' => __DIR__ . '/../src/views/guest/view-messages.php',
+    '/guest/report-message' => __DIR__ . '/../src/views/guest/report-message.php',
 ];
 
 // Handle view requests
-if (array_key_exists($requestUri, $views)) {
-    if (file_exists($views[$requestUri])) {
-        require_once $views[$requestUri];
+if (isset($views[$requestUri])) {
+    $viewPath = $views[$requestUri];
+    if (file_exists($viewPath)) {
+        require_once $viewPath;
         exit;
     } else {
         Logger::error("View not found: $requestUri");
         http_response_code(404);
-        require_once '../public/errors/404.php';
+        require_once __DIR__ . '/../public/errors/404.php';
         exit;
     }
 }
 
 // Load API routes
-$routes = require_once '../src/config/api-routes.php';
+$routes = require_once __DIR__ . '/../src/config/api-routes.php';
 
-// Debugging - Check if routes are valid
+// Validate API routes configuration
 if (!is_array($routes) || empty($routes)) {
-    $message = 'Routes are not properly configured or empty.';
-    Logger::error($message);
-
+    Logger::error('No API routes configured.');
     http_response_code(500);
-    ApiHelper::sendError(500, 'Internal Server Error. No routes configured.');
+    ApiHelper::sendError(500, 'Internal Server Error: No routes configured.');
     exit;
 }
 
-// Match the request to an API route
+// Match request to API route
 $matchedRoute = null;
-if (is_array($routes)) {
-    foreach ($routes as $route) {
-        [$routeMethod, $routeUri, $callback] = $route;
-
-        if ($method === $routeMethod && $requestUri === $routeUri) {
-            $matchedRoute = $callback;
-            break;
-        }
+foreach ($routes as $route) {
+    [$routeMethod, $routeUri, $callback] = $route;
+    if ($method === $routeMethod && $requestUri === $routeUri) {
+        $matchedRoute = $callback;
+        break;
     }
 }
 
-// Handle the matched API route
+// Handle API requests
 if ($matchedRoute) {
     try {
-        // Call the corresponding controller method
+        // Execute matched route callback
         call_user_func($matchedRoute);
     } catch (Exception $e) {
-        // Log and send unexpected errors
         Logger::error('Error handling request: ' . $e->getMessage());
-
         http_response_code(500);
-        ApiHelper::sendError(500, 'An internal server error occurred.', [
+        ApiHelper::sendError(500, 'Internal Server Error', [
             'error' => $e->getMessage(),
         ]);
     }
 } else {
-    // Log unmatched route
-    $message = "Route not found: $method $requestUri";
-    Logger::error($message);
-
-    // If no route matches, return a 404 error
+    // Log unmatched routes
+    Logger::error("Route not found: $method $requestUri");
     http_response_code(404);
-    require_once '../public/errors/404.php';
+    require_once __DIR__ . '/../public/errors/404.php';
 }

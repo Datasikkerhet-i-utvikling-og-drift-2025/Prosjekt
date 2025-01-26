@@ -1,32 +1,45 @@
-<?php include '../src/views/partials/header.php'; ?>
+<?php include __DIR__ . '/../partials/header.php'; ?>
 
 <div class="container">
     <h1>Login</h1>
 
     <!-- Error Message Placeholder -->
     <?php if (!empty($_GET['error'])): ?>
-        <div id="error-message" style="color: red;">
+        <div id="error-message" class="error">
             <?= htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8') ?>
         </div>
     <?php endif; ?>
 
     <!-- Login Form -->
-    <form action="/auth/login" method="POST">
+    <form action="/auth/login" method="POST" class="form">
         <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                    value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+            >
         </div>
 
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required>
         </div>
 
-        <button type="submit">Login</button>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Login</button>
+            <a href="/register" class="btn btn-secondary">Register</a>
+            <a href="/guest/messages" class="btn btn-guest">Continue as Guest</a>
+        </div>
     </form>
-
-    <!-- Link to Registration -->
-    <p>Don't have an account? <a href="/register">Register here</a>.</p>
 </div>
 
-<?php include '../src/views/partials/footer.php'; ?>
+<?php include __DIR__ . '/../partials/footer.php'; ?>

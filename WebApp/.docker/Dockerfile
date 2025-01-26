@@ -19,3 +19,4 @@ EXPOSE 80
 
 # Update the DocumentRoot for Apache
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
+RUN mkdir -p /var/www/html/logs && chmod -R 777 /var/www/html/logs

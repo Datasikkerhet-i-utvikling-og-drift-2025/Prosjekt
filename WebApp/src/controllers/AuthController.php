@@ -1,9 +1,14 @@
 <?php
 
-require_once '../src/helpers/ApiHelper.php';
-require_once '../src/helpers/AuthHelper.php';
-require_once '../src/helpers/InputValidator.php';
-require_once '../src/models/User.php';
+require_once __DIR__ . '/../helpers/ApiHelper.php';
+require_once __DIR__ . '/../helpers/AuthHelper.php';
+require_once __DIR__ . '/../helpers/InputValidator.php';
+require_once __DIR__ . '/../helpers/Logger.php';
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../helpers/Mailer.php';
+
+use helpers\ApiHelper;
+use helpers\AuthHelper;
 
 class AuthController
 {
@@ -24,11 +29,12 @@ class AuthController
             'name' => ['required' => true, 'min' => 3, 'max' => 50],
             'email' => ['required' => true, 'email' => true],
             'password' => ['required' => true, 'password' => true],
-            'role' => ['required' => true]
+            'role' => ['required' => true],
         ];
         $validation = InputValidator::validateInputs($input, $validationRules);
 
         if (!empty($validation['errors'])) {
+            Logger::error("Registration failed: Validation errors.", $validation['errors']);
             ApiHelper::sendError(400, 'Validation failed.', $validation['errors']);
         }
 
@@ -36,19 +42,24 @@ class AuthController
 
         // Check if the email already exists
         if ($this->userModel->getUserByEmail($sanitized['email'])) {
+            Logger::error("Registration failed: Email already registered.");
             ApiHelper::sendError(400, 'Email is already registered.');
         }
 
         // Hash password and create user
         $hashedPassword = AuthHelper::hashPassword($sanitized['password']);
-        $this->userModel->createUser(
+        if ($this->userModel->createUser(
             $sanitized['name'],
             $sanitized['email'],
             $hashedPassword,
             $sanitized['role']
-        );
-
-        ApiHelper::sendResponse(201, [], 'User registered successfully.');
+        )) {
+            Logger::info("User registered successfully: " . $sanitized['email']);
+            ApiHelper::sendResponse(201, [], 'User registered successfully.');
+        } else {
+            Logger::error("Failed to create user in the database.");
+            ApiHelper::sendError(500, 'Failed to register user.');
+        }
     }
 
     // User Login
@@ -61,11 +72,13 @@ class AuthController
 
         $user = $this->userModel->getUserByEmail($input['email']);
         if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
+            Logger::error("Login failed for email: " . $input['email']);
             ApiHelper::sendError(401, 'Invalid email or password.');
         }
 
         // Log in the user
         AuthHelper::loginUser($user['id'], $user['role']);
+        Logger::info("User logged in: " . $input['email']);
         ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
     }
 
@@ -73,6 +86,7 @@ class AuthController
     public function logout()
     {
         AuthHelper::logoutUser();
+        Logger::info("User logged out.");
         ApiHelper::sendResponse(200, [], 'User logged out successfully.');
     }
 
@@ -84,22 +98,28 @@ class AuthController
 
         $user = $this->userModel->getUserByEmail($input['email']);
         if (!$user) {
+            Logger::error("Password reset request failed: Email not found.");
             ApiHelper::sendError(404, 'Email not found.');
         }
 
         // Generate reset token and link
         $resetToken = bin2hex(random_bytes(16));
-        $resetLink = "https://yourapp.com/reset-password?token=$resetToken";
+        $resetLink = getenv('APP_URL') . "/reset-password?token=$resetToken"; // Use environment variable for base URL
 
         // Save the reset token
-        $this->userModel->savePasswordResetToken($user['id'], $resetToken);
-
-        // Send password reset email
-        $mailer = new Mailer();
-        if ($mailer->sendPasswordReset($input['email'], $resetLink)) {
-            ApiHelper::sendResponse(200, [], 'Password reset email sent successfully.');
+        if ($this->userModel->savePasswordResetToken($user['id'], $resetToken)) {
+            // Send password reset email
+            $mailer = new Mailer();
+            if ($mailer->sendPasswordReset($input['email'], $resetLink)) {
+                Logger::info("Password reset email sent to: " . $input['email']);
+                ApiHelper::sendResponse(200, [], 'Password reset email sent successfully.');
+            } else {
+                Logger::error("Failed to send password reset email to: " . $input['email']);
+                ApiHelper::sendError(500, 'Failed to send password reset email.');
+            }
         } else {
-            ApiHelper::sendError(500, 'Failed to send password reset email.');
+            Logger::error("Failed to save password reset token for email: " . $input['email']);
+            ApiHelper::sendError(500, 'Failed to process password reset request.');
         }
     }
 
@@ -109,16 +129,20 @@ class AuthController
         $input = ApiHelper::getJsonInput();
         ApiHelper::validateRequest(['token', 'new_password'], $input);
 
-        // Validate token and reset password
         $user = $this->userModel->getUserByResetToken($input['token']);
         if (!$user) {
+            Logger::error("Password reset failed: Invalid or expired token.");
             ApiHelper::sendError(400, 'Invalid or expired token.');
         }
 
         // Update password
         $hashedPassword = AuthHelper::hashPassword($input['new_password']);
-        $this->userModel->updatePassword($user['id'], $hashedPassword);
-
-        ApiHelper::sendResponse(200, [], 'Password reset successfully.');
+        if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+            Logger::info("Password reset successfully for user ID: " . $user['id']);
+            ApiHelper::sendResponse(200, [], 'Password reset successfully.');
+        } else {
+            Logger::error("Failed to reset password for user ID: " . $user['id']);
+            ApiHelper::sendError(500, 'Failed to reset password.');
+        }
     }
 }

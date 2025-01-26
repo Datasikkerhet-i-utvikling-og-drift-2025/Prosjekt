@@ -29,6 +29,7 @@ services:
       - project_network
     volumes:
       - ./WebApp:/var/www/html
+      - ./WebApp/logs:/var/www/html/logs
     depends_on:
       - mysql
     environment:

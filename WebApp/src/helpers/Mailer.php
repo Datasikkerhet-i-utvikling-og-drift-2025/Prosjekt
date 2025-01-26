@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/PHPMailer/src/Exception.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
-require '../vendor/autoload.php'; // Ensure PHPMailer is installed via Composer
 
 class Mailer
 {
@@ -15,21 +17,29 @@ class Mailer
 
         // Server settings
         $this->mailer->isSMTP();
-        $this->mailer->Host = getenv('MAIL_HOST') ?: 'smtp.example.com'; // SMTP server
+        $this->mailer->Host = getenv('MAIL_HOST') ?: 'smtp.example.com';
         $this->mailer->SMTPAuth = true;
-        $this->mailer->Username = getenv('MAIL_USERNAME') ?: 'your_email@example.com'; // SMTP username
-        $this->mailer->Password = getenv('MAIL_PASSWORD') ?: 'your_password'; // SMTP password
+        $this->mailer->Username = getenv('MAIL_USERNAME') ?: 'your_email@example.com';
+        $this->mailer->Password = getenv('MAIL_PASSWORD') ?: 'your_password';
         $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $this->mailer->Port = getenv('MAIL_PORT') ?: 587; // SMTP port
+        $this->mailer->Port = getenv('MAIL_PORT') ?: 587;
 
         // Sender info
-        $this->mailer->setFrom(getenv('MAIL_FROM_ADDRESS') ?: 'noreply@example.com', getenv('MAIL_FROM_NAME') ?: 'Your App Name');
+        $this->mailer->setFrom(
+            getenv('MAIL_FROM_ADDRESS') ?: 'noreply@example.com',
+            getenv('MAIL_FROM_NAME') ?: 'Your App Name'
+        );
     }
 
     // Send an email
     public function sendEmail($to, $subject, $body, $altBody = '')
     {
         try {
+            // Validate email
+            if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email address: $to");
+            }
+
             // Recipient
             $this->mailer->addAddress($to);
 
@@ -41,11 +51,11 @@ class Mailer
 
             // Send email
             $this->mailer->send();
-
-            return true;
+            return ['success' => true];
         } catch (Exception $e) {
-            Logger::error("Email could not be sent to $to. Error: " . $this->mailer->ErrorInfo);
-            return false;
+            $errorMessage = "Email could not be sent to $to. Error: " . $this->mailer->ErrorInfo;
+            Logger::error($errorMessage);
+            return ['success' => false, 'error' => $errorMessage];
         }
     }
 

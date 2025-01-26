@@ -1,49 +1,36 @@
-[2025-01-25 16:56:43] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 16:56:47] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:07:14] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:08:13] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:08:14] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:08:16] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:09:17] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:10:07] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:10:45] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:11:23] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:11:53] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:13:00] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:22:47] [ERROR] Routes are not properly configured or empty.
-[2025-01-25 17:22:50] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:02] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:02] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:09] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:09] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:11] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:11] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:23] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:23] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
-[2025-01-26 11:41:09] [ERROR] Route not found: GET /favicon.ico
-[2025-01-26 11:41:11] [ERROR] Route not found: GET /auth/register.php
-[2025-01-26 11:41:20] [ERROR] Route not found: GET /auth/register.php
-[2025-01-26 11:41:31] [ERROR] Route not found: GET /auth/register.php
-[2025-01-26 11:42:24] [ERROR] Route not found: GET /auth/login.php
-[2025-01-26 11:42:37] [ERROR] Route not found: GET /auth/login.php
-[2025-01-26 11:44:49] [ERROR] Route not found: GET /index.php
-[2025-01-26 11:48:06] [ERROR] Route not found: GET /assets/images/favicon.ico
-[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
-[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
-[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
-[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
-[2025-01-26 12:02:54] [ERROR] Route not found: GET /assets/images/favicon.ico
-[2025-01-26 12:02:59] [ERROR] Route not found: GET /auth/login.php
-[2025-01-26 12:07:24] [ERROR] View not found: /guest/view-messages
-[2025-01-26 12:07:30] [ERROR] View not found: /guest/report-message
-[2025-01-26 12:10:17] [ERROR] Route not found: GET /assets/images/favicon.ico
-[2025-01-26 12:10:23] [ERROR] Route not found: GET /about
-[2025-01-26 12:10:23] [ERROR] Route not found: GET /favicon.ico
-[2025-01-26 12:11:20] [ERROR] View not found: /guest/view-messages
-[2025-01-26 12:12:24] [ERROR] Route not found: GET /api
+[2025-01-26 22:11:12] [INFO] Initializing application... [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [INFO] Database connection initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [INFO] Controllers initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [INFO] Routes initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [INFO] Routes logged successfully to /var/www/html/src/config/../../logs/routes.log [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [INFO] Application initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [INFO] Parsed JSON input: {"name":"John Doe","email":"johndoe@example.com","password":"Secure@123","role":"student","study_program":"Computer Science","cohort_year":2023} [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:11:12] [ERROR] User creation failed: Validation errors - {"password":["Password must contain at least 8 characters, including an uppercase letter, a lowercase letter, a digit, and a special character."]} [in /var/www/html/src/helpers/Logger.php:28]
+[2025-01-26 22:11:12] [ERROR] Failed to create user in the database. [in /var/www/html/src/helpers/Logger.php:28]
+[2025-01-26 22:13:02] [INFO] Initializing application... [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:02] [INFO] Database connection initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:02] [INFO] Controllers initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:02] [INFO] Routes initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:02] [INFO] Routes logged successfully to /var/www/html/src/config/../../logs/routes.log [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:02] [INFO] Application initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:02] [INFO] Debug route accessed. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Initializing application... [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Database connection initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Controllers initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Routes initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Routes logged successfully to /var/www/html/src/config/../../logs/routes.log [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Application initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:13:03] [INFO] Debug route accessed. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:18:43] [INFO] Initializing application... [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:18:43] [INFO] Database connection initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:18:43] [INFO] Controllers initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:18:43] [INFO] Routes initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:18:43] [INFO] Routes logged successfully to /var/www/html/src/config/../../logs/routes.log [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:18:43] [INFO] Application initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [INFO] Initializing application... [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [INFO] Database connection initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [INFO] Controllers initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [INFO] Routes initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [INFO] Routes logged successfully to /var/www/html/src/config/../../logs/routes.log [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [INFO] Application initialized successfully. [in /var/www/html/src/helpers/Logger.php:16]
+[2025-01-26 22:20:10] [ERROR] JSON parsing failed: Syntax error. Raw input: email=admin%40admin.com&password=admin [in /var/www/html/src/helpers/Logger.php:28]

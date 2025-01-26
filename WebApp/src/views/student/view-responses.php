@@ -3,7 +3,7 @@ session_start();
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
-    header('Location: /auth/login.php');
+    header('Location: /auth/login');
     exit;
 }
 
@@ -15,44 +15,41 @@ $responses = [];
 $errorMessage = '';
 
 try {
-    require_once '../../helpers/Database.php';
+    require_once __DIR__ . '/../../helpers/Database.php';
+    require_once __DIR__ . '/../../helpers/Logger.php';
 
     $db = new \db\Database();
     $pdo = $db->getConnection();
 
     $studentId = $_SESSION['user']['id'];
 
+    // Fetch student messages with replies
     $stmt = $pdo->prepare("
-        SELECT messages.content, messages.reply, messages.created_at 
+        SELECT content, reply, created_at 
         FROM messages 
-        WHERE messages.student_id = :student_id 
-        ORDER BY messages.created_at DESC
+        WHERE student_id = :student_id 
+        ORDER BY created_at DESC
     ");
     $stmt->execute([':student_id' => $studentId]);
     $responses = $stmt->fetchAll();
 } catch (Exception $e) {
     $errorMessage = 'Failed to load messages and responses. Please try again later.';
+    Logger::error('Error fetching student responses: ' . $e->getMessage());
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Responses - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
-<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include __DIR__ . '/../partials/header.php'; ?>
+<?php include __DIR__ . '/../partials/navbar.php'; ?>
 
 <div class="container">
     <h1>Responses to Your Messages</h1>
     <p>Here you can view all your messages and any responses from the lecturers.</p>
 
-    <!-- Error Message Placeholder -->
+    <!-- Error Message -->
     <?php if (!empty($errorMessage)): ?>
-        <div style="color: red;"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+        <div class="alert alert-error">
+            <?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?>
+        </div>
     <?php endif; ?>
 
     <!-- Messages and Responses Section -->
@@ -64,7 +61,7 @@ try {
                 <div class="message-item">
                     <p><strong>Message:</strong> <?php echo htmlspecialchars($response['content'], ENT_QUOTES, 'UTF-8'); ?></p>
                     <p><strong>Response:</strong> <?php echo htmlspecialchars($response['reply'] ?? 'No response yet', ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p><strong>Sent At:</strong> <?php echo htmlspecialchars($response['created_at'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Sent At:</strong> <?php echo htmlspecialchars(date('F j, Y, g:i a', strtotime($response['created_at'])), ENT_QUOTES, 'UTF-8'); ?></p>
                     <hr>
                 </div>
             <?php endforeach; ?>
@@ -72,6 +69,4 @@ try {
     </div>
 </div>
 
-<?php include '../partials/footer.php'; ?>
-</body>
-</html>
+<?php include __DIR__ . '/../partials/footer.php'; ?>

@@ -3,58 +3,50 @@ session_start();
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: /auth/login.php');
+    header('Location: /auth/login');
     exit;
 }
 
 // Get the admin's name for display
 $adminName = $_SESSION['user']['name'] ?? 'Administrator';
+
+// Include required files using __DIR__
+require_once __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../partials/navbar.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
-<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
-
 <div class="container">
-    <h1>Welcome, <?php echo htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8'); ?>!</h1>
-    <p>This is your dashboard. Here you can manage users, messages, and reports.</p>
+    <h1>Welcome, <?= htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8') ?>!</h1>
+    <p>This is your dashboard. Here you can manage users, messages, and reports efficiently.</p>
 
     <!-- Error Message Placeholder -->
     <?php if (isset($_SESSION['error_message'])): ?>
-        <div style="color: red;">
-            <?php
-            echo htmlspecialchars($_SESSION['error_message'], ENT_QUOTES, 'UTF-8');
-            unset($_SESSION['error_message']);
-            ?>
+        <div class="alert alert-error">
+            <?= htmlspecialchars($_SESSION['error_message'], ENT_QUOTES, 'UTF-8') ?>
+            <?php unset($_SESSION['error_message']); // Clear error message after displaying ?>
         </div>
     <?php endif; ?>
 
-    <!-- Manage Users Section -->
-    <section>
-        <h2>Manage Users</h2>
-        <a href="/admin/manage-users.php" class="btn">View and Manage Users</a>
-    </section>
+    <!-- Admin Actions -->
+    <div class="admin-actions">
+        <section class="action-section">
+            <h2>Manage Users</h2>
+            <p>View, edit, or remove users in the system.</p>
+            <a href="/admin/manage-users" class="btn btn-primary">Manage Users</a>
+        </section>
 
-    <!-- Manage Messages Section -->
-    <section>
-        <h2>Manage Messages</h2>
-        <a href="/admin/manage-messages.php" class="btn">View and Manage Messages</a>
-    </section>
+        <section class="action-section">
+            <h2>Manage Messages</h2>
+            <p>View all messages, respond to them, or delete inappropriate ones.</p>
+            <a href="/admin/manage-messages" class="btn btn-primary">Manage Messages</a>
+        </section>
 
-    <!-- View Reports Section -->
-    <section>
-        <h2>View Reports</h2>
-        <a href="/admin/reports.php" class="btn">View Reported Messages</a>
-    </section>
+        <section class="action-section">
+            <h2>View Reports</h2>
+            <p>Review and resolve reports on inappropriate messages.</p>
+            <a href="/admin/reports" class="btn btn-primary">View Reports</a>
+        </section>
+    </div>
 </div>
 
-<?php include '../partials/footer.php'; ?> <!-- Include Footer -->
-</body>
-</html>
+<?php include __DIR__ . '/../partials/footer.php'; ?> <!-- Include Footer -->

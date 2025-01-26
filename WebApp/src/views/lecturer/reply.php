@@ -3,7 +3,7 @@ session_start();
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
-    header('Location: /auth/login.php');
+    header('Location: /auth/login');
     exit;
 }
 
@@ -19,38 +19,36 @@ $message = null;
 $errorMessage = '';
 $successMessage = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle reply submission
-    $replyContent = htmlspecialchars($_POST['reply_content'] ?? '', ENT_QUOTES, 'UTF-8');
-
-    if (!empty($replyContent)) {
-        try {
-            require_once '../../helpers/Database.php';
-
-            $db = new \db\Database();
-            $pdo = $db->getConnection();
-
-            // Update the reply in the database
-            $stmt = $pdo->prepare("UPDATE messages SET reply = :reply WHERE id = :message_id");
-            $stmt->execute([
-                ':reply' => $replyContent,
-                ':message_id' => $messageId,
-            ]);
-
-            $successMessage = 'Reply sent successfully!';
-        } catch (Exception $e) {
-            $errorMessage = 'Failed to send reply. Please try again later.';
-        }
-    } else {
-        $errorMessage = 'Reply content cannot be empty.';
-    }
-}
-
 try {
-    require_once '../../helpers/Database.php';
+    require_once __DIR__ . '/../../helpers/Database.php';
+    require_once __DIR__ . '/../../helpers/Logger.php';
 
     $db = new \db\Database();
     $pdo = $db->getConnection();
+
+    // Handle reply submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $replyContent = htmlspecialchars($_POST['reply_content'] ?? '', ENT_QUOTES, 'UTF-8');
+
+        if (!empty($replyContent)) {
+            try {
+                // Update the reply in the database
+                $stmt = $pdo->prepare("UPDATE messages SET reply = :reply, updated_at = NOW() WHERE id = :message_id");
+                $stmt->execute([
+                    ':reply' => $replyContent,
+                    ':message_id' => $messageId,
+                ]);
+
+                $successMessage = 'Reply sent successfully!';
+                Logger::info("Reply sent for message ID $messageId by lecturer ID {$_SESSION['user']['id']}.");
+            } catch (Exception $e) {
+                $errorMessage = 'Failed to send reply. Please try again later.';
+                Logger::error("Error sending reply for message ID $messageId: " . $e->getMessage());
+            }
+        } else {
+            $errorMessage = 'Reply content cannot be empty.';
+        }
+    }
 
     // Fetch the message details
     $stmt = $pdo->prepare("SELECT content, created_at, reply FROM messages WHERE id = :message_id");
@@ -58,19 +56,12 @@ try {
     $message = $stmt->fetch();
 } catch (Exception $e) {
     $errorMessage = 'Failed to load the message. Please try again later.';
+    Logger::error("Error fetching message ID $messageId: " . $e->getMessage());
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reply to Message - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
-<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include __DIR__ . '/../partials/header.php'; ?>
+<?php include __DIR__ . '/../partials/navbar.php'; ?>
 
 <div class="container">
     <h1>Reply to Message</h1>
@@ -78,9 +69,9 @@ try {
 
     <!-- Error or Success Messages -->
     <?php if (!empty($errorMessage)): ?>
-        <div style="color: red;"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+        <div class="alert alert-error"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php elseif (!empty($successMessage)): ?>
-        <div style="color: green;"><?php echo htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+        <div class="alert alert-success"><?php echo htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
     <!-- Message Content -->
@@ -101,10 +92,8 @@ try {
             <textarea id="reply_content" name="reply_content" rows="4" placeholder="Type your reply here..." required></textarea>
         </div>
 
-        <button type="submit">Send Reply</button>
+        <button type="submit" class="btn btn-primary">Send Reply</button>
     </form>
 </div>
 
-<?php include '../partials/footer.php'; ?> <!-- Include Footer -->
-</body>
-</html>
+<?php include __DIR__ . '/../partials/footer.php'; ?>

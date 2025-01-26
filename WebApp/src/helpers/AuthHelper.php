@@ -1,5 +1,7 @@
 <?php
 
+namespace helpers;
+
 class AuthHelper
 {
     // Hash a password securely
@@ -28,6 +30,7 @@ class AuthHelper
         self::startSession();
         $_SESSION['user_id'] = $userId;
         $_SESSION['user_role'] = $role;
+        $_SESSION['last_activity'] = time(); // For session timeout
     }
 
     // Check if a user is logged in
@@ -80,6 +83,39 @@ class AuthHelper
     {
         if (!self::isRole($role)) {
             header("Location: $redirectUrl");
+            exit;
+        }
+    }
+
+    // Enforce session timeout
+    public static function enforceSessionTimeout($timeout = 1800)
+    {
+        self::startSession();
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
+            self::logoutUser();
+            header("Location: /login?timeout=true");
+            exit;
+        }
+        $_SESSION['last_activity'] = time();
+    }
+
+    // Generate a CSRF token
+    public static function generateCsrfToken()
+    {
+        self::startSession();
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
+    }
+
+    // Verify a CSRF token
+    public static function verifyCsrfToken($token)
+    {
+        self::startSession();
+        if (!isset($_SESSION['csrf_token']) || $_SESSION['csrf_token'] !== $token) {
+            self::logoutUser();
+            header("Location: /login?csrf_error=true");
             exit;
         }
     }

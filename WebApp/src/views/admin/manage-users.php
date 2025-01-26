@@ -3,12 +3,12 @@ session_start();
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: /auth/login.php');
+    header('Location: /auth/login');
     exit;
 }
 
 // Include database connection
-require_once '../src/config/Database.php';
+require_once __DIR__ . '/../../config/Database.php';
 
 // Function to sanitize output
 function sanitize($value) {
@@ -46,16 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
-<?php include '../src/views/partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include __DIR__ . '/../partials/header.php'; ?>
+<?php include __DIR__ . '/../partials/navbar.php'; ?>
 
 <div class="container">
     <h1>Manage Users</h1>
@@ -63,13 +55,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
 
     <!-- Success/Error Messages -->
     <?php if ($successMessage): ?>
-        <div class="success-message" style="color: green; margin-bottom: 20px;">
-            <?php echo sanitize($successMessage); ?>
+        <div class="alert alert-success">
+            <?= sanitize($successMessage) ?>
         </div>
     <?php endif; ?>
     <?php if ($errorMessage): ?>
-        <div class="error-message" style="color: red; margin-bottom: 20px;">
-            <?php echo sanitize($errorMessage); ?>
+        <div class="alert alert-error">
+            <?= sanitize($errorMessage) ?>
         </div>
     <?php endif; ?>
 
@@ -92,14 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
         <?php else: ?>
             <?php foreach ($users as $user): ?>
                 <tr>
-                    <td><?php echo sanitize($user['id']); ?></td>
-                    <td><?php echo sanitize($user['name']); ?></td>
-                    <td><?php echo sanitize($user['email']); ?></td>
-                    <td><?php echo sanitize($user['role']); ?></td>
+                    <td><?= sanitize($user['id']) ?></td>
+                    <td><?= sanitize($user['name']) ?></td>
+                    <td><?= sanitize($user['email']) ?></td>
+                    <td><?= sanitize($user['role']) ?></td>
                     <td>
-                        <a href="/admin/edit-user.php?user_id=<?php echo sanitize($user['id']); ?>" class="btn btn-edit">Edit</a>
+                        <a href="/admin/edit-user?user_id=<?= sanitize($user['id']) ?>" class="btn btn-edit">Edit</a>
                         <form action="" method="POST" style="display: inline;">
-                            <input type="hidden" name="delete_user_id" value="<?php echo sanitize($user['id']); ?>">
+                            <input type="hidden" name="delete_user_id" value="<?= sanitize($user['id']) ?>">
                             <button type="submit" class="btn btn-delete">Delete</button>
                         </form>
                     </td>
@@ -110,71 +102,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
     </table>
 </div>
 
-<style>
-    .container {
-        max-width: 1000px;
-        margin: 50px auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th, td {
-        padding: 10px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-
-    th {
-        background-color: #f4f4f4;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 5px 10px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-
-    .btn:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-delete {
-        background-color: #dc3545;
-        border: none;
-        padding: 5px 10px;
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .btn-delete:hover {
-        background-color: #a71d2a;
-    }
-
-    .btn-edit {
-        background-color: #ffc107;
-    }
-
-    .btn-edit:hover {
-        background-color: #e0a800;
-    }
-</style>
-</body>
-</html>
+<?php include __DIR__ . '/../partials/footer.php'; ?>

@@ -24,7 +24,6 @@ class InputValidator
     // Validate password strength
     public static function isValidPassword($password)
     {
-        // Example: At least 8 characters, 1 uppercase, 1 lowercase, 1 digit, 1 special character
         return preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
     }
 
@@ -52,6 +51,12 @@ class InputValidator
     public static function sanitizeEmail($email)
     {
         return filter_var($email, FILTER_SANITIZE_EMAIL);
+    }
+
+    // Sanitize URL input
+    public static function sanitizeUrl($url)
+    {
+        return filter_var($url, FILTER_SANITIZE_URL);
     }
 
     // Validate and sanitize an array of inputs
@@ -104,6 +109,12 @@ class InputValidator
                     case 'integer':
                         if ($ruleValue && !self::isValidInteger($value)) {
                             $errors[$field][] = 'Must be a valid integer.';
+                        }
+                        break;
+
+                    case 'regex':
+                        if ($ruleValue && !preg_match($ruleValue, $value)) {
+                            $errors[$field][] = 'Invalid format.';
                         }
                         break;
                 }

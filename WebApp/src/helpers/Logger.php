@@ -2,7 +2,7 @@
 
 class Logger
 {
-    private static $logFile = '../logs/app.log'; // Default log file path
+    private static $logFile = __DIR__ . '/../../logs/app.log'; // Default log file path
 
     // Set a custom log file (optional)
     public static function setLogFile($filePath)
@@ -37,15 +37,28 @@ class Logger
     // Generic method to write to the log file
     private static function writeLog($level, $message)
     {
-        $date = date('Y-m-d H:i:s'); // Current timestamp
-        $logEntry = "[$date] [$level] $message" . PHP_EOL;
+        self::rotateLogFile();
 
-        // Write to the log file
+        $date = date('Y-m-d H:i:s'); // Current timestamp
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $file = $backtrace[0]['file'] ?? 'unknown';
+        $line = $backtrace[0]['line'] ?? 'unknown';
+
+        $logEntry = "[$date] [$level] $message [in $file:$line]" . PHP_EOL;
+
         try {
             file_put_contents(self::$logFile, $logEntry, FILE_APPEND | LOCK_EX);
         } catch (Exception $e) {
-            // If writing to the log fails, output a fallback error (optional)
             error_log("Logger error: Unable to write to log file. " . $e->getMessage());
+        }
+    }
+
+    // Rotate the log file if it exceeds a certain size
+    private static function rotateLogFile()
+    {
+        if (file_exists(self::$logFile) && filesize(self::$logFile) > 5 * 1024 * 1024) { // 5 MB
+            $newFileName = self::$logFile . '.' . date('Y-m-d_H-i-s');
+            rename(self::$logFile, $newFileName);
         }
     }
 }
