@@ -73,6 +73,7 @@ class ApiHelper
     public static function getJsonInput()
     {
         $input = file_get_contents('php://input');
+        Logger::info("Raw JSON input: " . ($input ?: 'EMPTY'));
 
         if (empty($input)) {
             self::sendError(400, 'Empty JSON input.');

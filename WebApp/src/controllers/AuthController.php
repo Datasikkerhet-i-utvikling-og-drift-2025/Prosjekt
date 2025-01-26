@@ -24,13 +24,27 @@ class AuthController
     {
         $input = ApiHelper::getJsonInput();
 
-        // Validate input
+        // Combine first_name and last_name into a single name field
+        if (!empty($input['first_name']) && !empty($input['last_name'])) {
+            $input['name'] = $input['first_name'] . ' ' . $input['last_name'];
+        } else {
+            $input['name'] = ''; // Ensure the name field exists for validation
+        }
+
+        // Validation rules
         $validationRules = [
-            'name' => ['required' => true, 'min' => 3, 'max' => 50],
+            'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
+            'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
+            'name' => ['required' => true, 'min' => 3, 'max' => 100], // Added name validation
             'email' => ['required' => true, 'email' => true],
             'password' => ['required' => true, 'password' => true],
+            'repeat_password' => ['required' => true], // Optional: Add match validation below
             'role' => ['required' => true],
+            'study_program' => ['required' => false, 'max' => 100],
+            'cohort_year' => ['required' => false, 'integer' => true],
         ];
+
+        // Validate inputs
         $validation = InputValidator::validateInputs($input, $validationRules);
 
         if (!empty($validation['errors'])) {
@@ -39,6 +53,12 @@ class AuthController
         }
 
         $sanitized = $validation['sanitized'];
+
+        // Check if passwords match
+        if ($sanitized['password'] !== $sanitized['repeat_password']) {
+            Logger::error("Registration failed: Passwords do not match.");
+            ApiHelper::sendError(400, 'Passwords do not match.');
+        }
 
         // Check if the email already exists
         if ($this->userModel->getUserByEmail($sanitized['email'])) {
@@ -49,10 +69,12 @@ class AuthController
         // Hash password and create user
         $hashedPassword = AuthHelper::hashPassword($sanitized['password']);
         if ($this->userModel->createUser(
-            $sanitized['name'],
+            $sanitized['name'], // Pass validated and sanitized name
             $sanitized['email'],
             $hashedPassword,
-            $sanitized['role']
+            $sanitized['role'],
+            $sanitized['study_program'] ?? null,
+            $sanitized['cohort_year'] ?? null
         )) {
             Logger::info("User registered successfully: " . $sanitized['email']);
             ApiHelper::sendResponse(201, [], 'User registered successfully.');
@@ -61,6 +83,8 @@ class AuthController
             ApiHelper::sendError(500, 'Failed to register user.');
         }
     }
+
+
 
     // User Login
     public function login()

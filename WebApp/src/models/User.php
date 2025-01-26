@@ -1,5 +1,7 @@
 <?php
 
+use helpers\AuthHelper;
+
 require_once __DIR__ . '/../helpers/InputValidator.php';
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../helpers/Logger.php';

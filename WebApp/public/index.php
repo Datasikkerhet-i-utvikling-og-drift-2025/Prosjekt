@@ -22,12 +22,16 @@ header('Access-Control-Allow-Origin: *');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
-    exit(0);
+    http_response_code(204); // No Content
+    exit;
 }
 
 // Get HTTP method and requested URI
 $method = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query parameters
+
+// Log the request
+Logger::info("Request received: $method $requestUri");
 
 // Define view routes
 $views = [
@@ -88,6 +92,7 @@ foreach ($routes as $route) {
 if ($matchedRoute) {
     try {
         // Execute matched route callback
+        Logger::info("Matched route: $method $requestUri");
         call_user_func($matchedRoute);
     } catch (Exception $e) {
         Logger::error('Error handling request: ' . $e->getMessage());
