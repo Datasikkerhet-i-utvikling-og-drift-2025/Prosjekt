@@ -1,22 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Message - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
+<?php include '../src/views/partials/header.php'; ?>
+
 <div class="container">
     <h1>Report a Message</h1>
 
-    <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
-    <div id="success-message" style="color: green; display: none;"></div>
+    <!-- Error or Success Message -->
+    <?php if (!empty($_GET['error'])): ?>
+        <div id="error-message" style="color: red;">
+            <?= htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php elseif (!empty($_GET['success'])): ?>
+        <div id="success-message" style="color: green;">
+            <?= htmlspecialchars($_GET['success'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Report Message Form -->
-    <form id="report-message-form" action="/guest/messages/report" method="POST">
-        <input type="hidden" id="message_id" name="message_id" value="<?php echo htmlspecialchars($_GET['message_id'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
+    <form action="/guest/messages/report" method="POST">
+        <input type="hidden" name="message_id" value="<?= htmlspecialchars($_GET['message_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" />
 
         <div class="form-group">
             <label for="report_reason">Reason for Reporting</label>
@@ -27,45 +27,4 @@
     </form>
 </div>
 
-<script>
-    // Handle form submission
-    const form = document.getElementById('report-message-form');
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent default form submission
-
-        const messageId = document.getElementById('message_id').value;
-        const reportReason = document.getElementById('report_reason').value;
-
-        try {
-            const response = await fetch('/guest/messages/report', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message_id: messageId, report_reason: reportReason }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                const successMessage = document.getElementById('success-message');
-                successMessage.textContent = 'Report submitted successfully!';
-                successMessage.style.display = 'block';
-
-                // Clear the form
-                form.reset();
-            } else {
-                const errorMessage = document.getElementById('error-message');
-                errorMessage.textContent = result.message || 'An error occurred while submitting your report.';
-                errorMessage.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = 'Unable to connect to the server. Please try again later.';
-            errorMessage.style.display = 'block';
-        }
-    });
-</script>
-</body>
-</html>
+<?php include '../src/views/partials/footer.php'; ?>

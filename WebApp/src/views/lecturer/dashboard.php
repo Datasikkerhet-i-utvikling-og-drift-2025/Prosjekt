@@ -9,6 +9,42 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
 
 // Get the lecturer's name for display
 $lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
+
+// Fetch courses and messages from the database
+$courses = [];
+$messages = [];
+$errorMessage = '';
+
+try {
+    require_once '../../helpers/Database.php';
+
+    $db = new \db\Database();
+    $pdo = $db->getConnection();
+
+    $lecturerId = $_SESSION['user']['id'];
+
+    // Fetch courses assigned to the lecturer
+    $stmt = $pdo->prepare("
+        SELECT id, code, name 
+        FROM courses 
+        WHERE lecturer_id = :lecturer_id
+    ");
+    $stmt->execute([':lecturer_id' => $lecturerId]);
+    $courses = $stmt->fetchAll();
+
+    // Fetch messages sent to the lecturer's courses
+    $stmt = $pdo->prepare("
+        SELECT m.id, m.content, c.name AS course_name 
+        FROM messages m
+        JOIN courses c ON m.course_id = c.id
+        WHERE c.lecturer_id = :lecturer_id
+        ORDER BY m.created_at DESC
+    ");
+    $stmt->execute([':lecturer_id' => $lecturerId]);
+    $messages = $stmt->fetchAll();
+} catch (Exception $e) {
+    $errorMessage = 'Failed to load courses and messages. Please try again later.';
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,118 +56,56 @@ $lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
     <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
 </head>
 <body>
-<?php include '../src/views/partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
 
 <div class="container">
     <h1>Welcome, <?php echo htmlspecialchars($lecturerName, ENT_QUOTES, 'UTF-8'); ?>!</h1>
     <p>This is your dashboard. Here you can manage your courses and view messages from students.</p>
 
     <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <?php if (!empty($errorMessage)): ?>
+        <div style="color: red;"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
 
     <!-- Courses Section -->
     <section>
         <h2>Your Courses</h2>
-        <div id="courses-container">
-            <p>Loading your courses...</p>
-        </div>
+        <?php if (empty($courses)): ?>
+            <p>No courses found.</p>
+        <?php else: ?>
+            <div id="courses-container">
+                <?php foreach ($courses as $course): ?>
+                    <div class="course-item">
+                        <p><strong>Course Code:</strong> <?php echo htmlspecialchars($course['code'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Course Name:</strong> <?php echo htmlspecialchars($course['name'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <a href="/lecturer/read-messages.php?course_id=<?php echo htmlspecialchars($course['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn">View Messages</a>
+                        <hr>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </section>
 
     <!-- Messages Section -->
     <section>
         <h2>Student Messages</h2>
-        <div id="messages-container">
-            <p>Loading messages...</p>
-        </div>
+        <?php if (empty($messages)): ?>
+            <p>No messages found.</p>
+        <?php else: ?>
+            <div id="messages-container">
+                <?php foreach ($messages as $message): ?>
+                    <div class="message-item">
+                        <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Course:</strong> <?php echo htmlspecialchars($message['course_name'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <a href="/lecturer/reply.php?message_id=<?php echo htmlspecialchars($message['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn">Reply</a>
+                        <hr>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </section>
 </div>
 
-<script>
-    // Load courses via API
-    async function loadCourses() {
-        try {
-            const response = await fetch('/lecturer/courses', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming JWT for authentication
-                }
-            });
-            const result = await response.json();
-
-            const coursesContainer = document.getElementById('courses-container');
-            coursesContainer.innerHTML = '';
-
-            if (response.ok) {
-                if (result.data.length === 0) {
-                    coursesContainer.innerHTML = '<p>No courses found.</p>';
-                    return;
-                }
-
-                result.data.forEach(course => {
-                    const courseDiv = document.createElement('div');
-                    courseDiv.classList.add('course-item');
-
-                    courseDiv.innerHTML = `
-                            <p><strong>Course Code:</strong> ${course.code}</p>
-                            <p><strong>Course Name:</strong> ${course.name}</p>
-                            <a href="/lecturer/read-messages.php?course_id=${course.id}" class="btn">View Messages</a>
-                            <hr>
-                        `;
-                    coursesContainer.appendChild(courseDiv);
-                });
-            } else {
-                coursesContainer.innerHTML = `<p>${result.message || 'Failed to load courses.'}</p>`;
-            }
-        } catch (error) {
-            console.error('Error loading courses:', error);
-            document.getElementById('error-message').textContent = 'Unable to load courses. Please try again later.';
-            document.getElementById('error-message').style.display = 'block';
-        }
-    }
-
-    // Load messages via API
-    async function loadMessages() {
-        try {
-            const response = await fetch('/lecturer/messages', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming JWT for authentication
-                }
-            });
-            const result = await response.json();
-
-            const messagesContainer = document.getElementById('messages-container');
-            messagesContainer.innerHTML = '';
-
-            if (response.ok) {
-                if (result.data.length === 0) {
-                    messagesContainer.innerHTML = '<p>No messages found.</p>';
-                    return;
-                }
-
-                result.data.forEach(message => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.classList.add('message-item');
-
-                    messageDiv.innerHTML = `
-                            <p><strong>Message:</strong> ${message.content}</p>
-                            <p><strong>Course:</strong> ${message.course_name}</p>
-                            <a href="/lecturer/reply.php?message_id=${message.id}" class="btn">Reply</a>
-                            <hr>
-                        `;
-                    messagesContainer.appendChild(messageDiv);
-                });
-            } else {
-                messagesContainer.innerHTML = `<p>${result.message || 'Failed to load messages.'}</p>`;
-            }
-        } catch (error) {
-            console.error('Error loading messages:', error);
-            document.getElementById('error-message').textContent = 'Unable to load messages. Please try again later.';
-            document.getElementById('error-message').style.display = 'block';
-        }
-    }
-
-    // Load courses and messages on page load
-    loadCourses();
-    loadMessages();
-</script>
+<?php include '../partials/footer.php'; ?> <!-- Include Footer -->
 </body>
 </html>

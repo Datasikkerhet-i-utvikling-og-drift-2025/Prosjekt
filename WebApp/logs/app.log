@@ -12,3 +12,38 @@
 [2025-01-25 17:13:00] [ERROR] Routes are not properly configured or empty.
 [2025-01-25 17:22:47] [ERROR] Routes are not properly configured or empty.
 [2025-01-25 17:22:50] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:02] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:02] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:09] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:09] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:11] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:11] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:23] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:23] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:39:24] [ERROR] Routes are not properly configured or empty.
+[2025-01-26 11:41:09] [ERROR] Route not found: GET /favicon.ico
+[2025-01-26 11:41:11] [ERROR] Route not found: GET /auth/register.php
+[2025-01-26 11:41:20] [ERROR] Route not found: GET /auth/register.php
+[2025-01-26 11:41:31] [ERROR] Route not found: GET /auth/register.php
+[2025-01-26 11:42:24] [ERROR] Route not found: GET /auth/login.php
+[2025-01-26 11:42:37] [ERROR] Route not found: GET /auth/login.php
+[2025-01-26 11:44:49] [ERROR] Route not found: GET /index.php
+[2025-01-26 11:48:06] [ERROR] Route not found: GET /assets/images/favicon.ico
+[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
+[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
+[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
+[2025-01-26 12:02:54] [ERROR] Route not found: GET /favicon.ico
+[2025-01-26 12:02:54] [ERROR] Route not found: GET /assets/images/favicon.ico
+[2025-01-26 12:02:59] [ERROR] Route not found: GET /auth/login.php
+[2025-01-26 12:07:24] [ERROR] View not found: /guest/view-messages
+[2025-01-26 12:07:30] [ERROR] View not found: /guest/report-message
+[2025-01-26 12:10:17] [ERROR] Route not found: GET /assets/images/favicon.ico
+[2025-01-26 12:10:23] [ERROR] Route not found: GET /about
+[2025-01-26 12:10:23] [ERROR] Route not found: GET /favicon.ico
+[2025-01-26 12:11:20] [ERROR] View not found: /guest/view-messages
+[2025-01-26 12:12:24] [ERROR] Route not found: GET /api

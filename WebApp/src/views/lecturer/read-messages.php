@@ -13,6 +13,29 @@ if (empty($courseId)) {
     echo 'Course ID is required.';
     exit;
 }
+
+// Initialize variables
+$messages = [];
+$errorMessage = '';
+
+try {
+    require_once '../../helpers/Database.php';
+
+    $db = new \db\Database();
+    $pdo = $db->getConnection();
+
+    // Fetch messages for the specified course
+    $stmt = $pdo->prepare("
+        SELECT m.id, m.content, m.created_at, m.reply
+        FROM messages m
+        WHERE m.course_id = :course_id
+        ORDER BY m.created_at DESC
+    ");
+    $stmt->execute([':course_id' => $courseId]);
+    $messages = $stmt->fetchAll();
+} catch (Exception $e) {
+    $errorMessage = 'Failed to load messages. Please try again later.';
+}
 ?>
 
 <!DOCTYPE html>
@@ -24,67 +47,35 @@ if (empty($courseId)) {
     <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
 </head>
 <body>
-<?php include '../src/views/partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
 
 <div class="container">
     <h1>Messages for Course ID: <?php echo $courseId; ?></h1>
     <p>Below are the messages sent by students for this course.</p>
 
     <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <?php if (!empty($errorMessage)): ?>
+        <div style="color: red;"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
 
     <!-- Messages Section -->
-    <div id="messages-container">
-        <p>Loading messages...</p>
-    </div>
+    <?php if (empty($messages)): ?>
+        <p>No messages found for this course.</p>
+    <?php else: ?>
+        <div id="messages-container">
+            <?php foreach ($messages as $message): ?>
+                <div class="message-item">
+                    <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Sent At:</strong> <?php echo htmlspecialchars($message['created_at'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Response:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No response yet', ENT_QUOTES, 'UTF-8'); ?></p>
+                    <a href="/lecturer/reply.php?message_id=<?php echo htmlspecialchars($message['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn">Reply</a>
+                    <hr>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 </div>
 
-<script>
-    // Load messages via API
-    async function loadMessages() {
-        try {
-            const response = await fetch(`/lecturer/messages?course_id=${<?php echo $courseId; ?>}`, {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming JWT for authentication
-                }
-            });
-            const result = await response.json();
-
-            const messagesContainer = document.getElementById('messages-container');
-            messagesContainer.innerHTML = '';
-
-            if (response.ok) {
-                if (result.data.length === 0) {
-                    messagesContainer.innerHTML = '<p>No messages found for this course.</p>';
-                    return;
-                }
-
-                result.data.forEach(message => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.classList.add('message-item');
-
-                    messageDiv.innerHTML = `
-                            <p><strong>Message:</strong> ${message.content}</p>
-                            <p><strong>Sent At:</strong> ${message.created_at}</p>
-                            <p><strong>Response:</strong> ${message.reply || 'No response yet'}</p>
-                            <a href="/lecturer/reply.php?message_id=${message.id}" class="btn">Reply</a>
-                            <hr>
-                        `;
-                    messagesContainer.appendChild(messageDiv);
-                });
-            } else {
-                messagesContainer.innerHTML = `<p>${result.message || 'Failed to load messages.'}</p>`;
-            }
-        } catch (error) {
-            console.error('Error loading messages:', error);
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = 'Unable to load messages. Please try again later.';
-            errorMessage.style.display = 'block';
-        }
-    }
-
-    // Load messages on page load
-    loadMessages();
-</script>
+<?php include '../partials/footer.php'; ?> <!-- Include Footer -->
 </body>
 </html>

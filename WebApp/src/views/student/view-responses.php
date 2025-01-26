@@ -9,6 +9,30 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
 
 // Get the student's name for display
 $studentName = $_SESSION['user']['name'] ?? 'Student';
+
+// Fetch messages with responses from the database
+$responses = [];
+$errorMessage = '';
+
+try {
+    require_once '../../helpers/Database.php';
+
+    $db = new \db\Database();
+    $pdo = $db->getConnection();
+
+    $studentId = $_SESSION['user']['id'];
+
+    $stmt = $pdo->prepare("
+        SELECT messages.content, messages.reply, messages.created_at 
+        FROM messages 
+        WHERE messages.student_id = :student_id 
+        ORDER BY messages.created_at DESC
+    ");
+    $stmt->execute([':student_id' => $studentId]);
+    $responses = $stmt->fetchAll();
+} catch (Exception $e) {
+    $errorMessage = 'Failed to load messages and responses. Please try again later.';
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,66 +44,34 @@ $studentName = $_SESSION['user']['name'] ?? 'Student';
     <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
 </head>
 <body>
-<?php include '../src/views/partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
 
 <div class="container">
     <h1>Responses to Your Messages</h1>
     <p>Here you can view all your messages and any responses from the lecturers.</p>
 
     <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <?php if (!empty($errorMessage)): ?>
+        <div style="color: red;"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
 
     <!-- Messages and Responses Section -->
     <div id="responses-container">
-        <p>Loading your messages and responses...</p>
+        <?php if (empty($responses)): ?>
+            <p>You have not sent any messages yet.</p>
+        <?php else: ?>
+            <?php foreach ($responses as $response): ?>
+                <div class="message-item">
+                    <p><strong>Message:</strong> <?php echo htmlspecialchars($response['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Response:</strong> <?php echo htmlspecialchars($response['reply'] ?? 'No response yet', ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Sent At:</strong> <?php echo htmlspecialchars($response['created_at'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <hr>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>
 
-<script>
-    // Load messages with responses via API
-    async function loadResponses() {
-        try {
-            const response = await fetch('/student/messages/responses', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming JWT for authentication
-                }
-            });
-            const result = await response.json();
-
-            const responsesContainer = document.getElementById('responses-container');
-            responsesContainer.innerHTML = '';
-
-            if (response.ok) {
-                if (result.data.length === 0) {
-                    responsesContainer.innerHTML = '<p>You have not sent any messages yet.</p>';
-                    return;
-                }
-
-                // Render messages with responses
-                result.data.forEach(message => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.classList.add('message-item');
-
-                    messageDiv.innerHTML = `
-                            <p><strong>Message:</strong> ${message.content}</p>
-                            <p><strong>Response:</strong> ${message.reply || 'No response yet'}</p>
-                            <p><strong>Sent At:</strong> ${message.created_at}</p>
-                            <hr>
-                        `;
-                    responsesContainer.appendChild(messageDiv);
-                });
-            } else {
-                responsesContainer.innerHTML = `<p>${result.message || 'Failed to load responses.'}</p>`;
-            }
-        } catch (error) {
-            console.error('Error loading responses:', error);
-            document.getElementById('error-message').textContent = 'Unable to connect to the server. Please try again later.';
-            document.getElementById('error-message').style.display = 'block';
-        }
-    }
-
-    // Load responses on page load
-    loadResponses();
-</script>
+<?php include '../partials/footer.php'; ?>
 </body>
 </html>

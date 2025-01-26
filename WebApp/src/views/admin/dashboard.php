@@ -20,14 +20,21 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
     <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
 </head>
 <body>
-<?php include '../src/views/partials/navbar.php'; ?> <!-- Include Navbar -->
+<?php include '../partials/navbar.php'; ?> <!-- Include Navbar -->
 
 <div class="container">
     <h1>Welcome, <?php echo htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8'); ?>!</h1>
     <p>This is your dashboard. Here you can manage users, messages, and reports.</p>
 
     <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div style="color: red;">
+            <?php
+            echo htmlspecialchars($_SESSION['error_message'], ENT_QUOTES, 'UTF-8');
+            unset($_SESSION['error_message']);
+            ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Manage Users Section -->
     <section>
@@ -48,38 +55,6 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
     </section>
 </div>
 
-<style>
-    .container {
-        max-width: 800px;
-        margin: 50px auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    section {
-        margin-bottom: 30px;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 10px 15px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 16px;
-    }
-
-    .btn:hover {
-        background-color: #0056b3;
-    }
-</style>
+<?php include '../partials/footer.php'; ?> <!-- Include Footer -->
 </body>
 </html>

@@ -6,21 +6,17 @@ require_once __DIR__ . '/../controllers/GuestController.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/LecturerController.php';
 require_once __DIR__ . '/../controllers/AdminController.php';
+require_once __DIR__ . '/Database.php';
 
-// Load database configuration
-$config = require_once __DIR__ . '/database.php';
+use db\Database;
 
-
+// Initialize database connection
 try {
-    // Initialize PDO connection
-    $pdo = new PDO(
-        "mysql:host={$config['host']};dbname={$config['dbname']}",
-        $config['username'],
-        $config['password']
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    $db = new Database();
+    $pdo = $db->getConnection();
+} catch (Exception $e) {
+    error_log('Error initializing database: ' . $e->getMessage(), 3, __DIR__ . '/../logs/error.log');
+    die('Internal server error');
 }
 
 // Create controller instances

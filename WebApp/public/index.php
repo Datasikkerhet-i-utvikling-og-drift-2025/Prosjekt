@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 // Load dependencies
 require_once '../src/config/app.php'; // Application config
 require_once '../src/helpers/ApiHelper.php'; // API helpers
-require_once '../src/config/database.php'; // Database connection
+require_once '../src/config/Database.php'; // Database connection
 require_once '../src/helpers/Logger.php'; // Logger for error tracking
 
 // Load application config

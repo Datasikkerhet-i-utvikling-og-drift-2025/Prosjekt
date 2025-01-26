@@ -1,76 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Messages - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
+<?php include '../src/views/partials/header.php'; ?>
+
 <div class="container">
     <h1>Messages for Course: <?php echo htmlspecialchars($_GET['course_code'] ?? 'Unknown', ENT_QUOTES, 'UTF-8'); ?></h1>
 
     <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <?php if (!empty($_GET['error'])): ?>
+        <div id="error-message" style="color: red;">
+            <?php echo htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Messages List -->
     <div id="messages-container">
-        <!-- Messages will be dynamically loaded here -->
+        <?php
+        // Get course code and pin from the query string
+        $courseCode = $_GET['course_code'] ?? null;
+        $pinCode = $_GET['pin_code'] ?? null;
+
+        if (!$courseCode || !$pinCode) {
+            echo '<p>Invalid course code or PIN.</p>';
+        } else {
+            try {
+                // Fetch messages from the database
+                $db = new \db\Database();
+                $pdo = $db->getConnection();
+
+                $stmt = $pdo->prepare("SELECT * FROM messages WHERE course_code = :course_code AND pin_code = :pin_code");
+                $stmt->execute([
+                    ':course_code' => $courseCode,
+                    ':pin_code' => $pinCode
+                ]);
+
+                $messages = $stmt->fetchAll();
+
+                if (empty($messages)) {
+                    echo '<p>No messages available for this course.</p>';
+                } else {
+                    foreach ($messages as $message) {
+                        ?>
+                        <div class="message-item">
+                            <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            <p><strong>Reply:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No reply yet', ENT_QUOTES, 'UTF-8'); ?></p>
+                            <div class="message-actions">
+                                <a href="/guest/report-message.php?message_id=<?php echo $message['id']; ?>">Report</a>
+                                <a href="/guest/comment.php?message_id=<?php echo $message['id']; ?>">Comment</a>
+                            </div>
+                            <hr>
+                        </div>
+                        <?php
+                    }
+                }
+            } catch (Exception $e) {
+                echo '<p style="color: red;">Error loading messages. Please try again later.</p>';
+            }
+        }
+        ?>
     </div>
 </div>
 
-<script>
-    // Get course code and PIN from the query string
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseCode = urlParams.get('course_code');
-    const pinCode = urlParams.get('pin_code');
-
-    // Load messages via API
-    async function loadMessages() {
-        try {
-            const response = await fetch(`/guest/messages/view?course_code=${courseCode}&pin_code=${pinCode}`);
-            const result = await response.json();
-
-            if (response.ok) {
-                const messagesContainer = document.getElementById('messages-container');
-                messagesContainer.innerHTML = '';
-
-                if (result.data.length === 0) {
-                    messagesContainer.innerHTML = '<p>No messages available for this course.</p>';
-                    return;
-                }
-
-                // Render messages
-                result.data.forEach(message => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.classList.add('message-item');
-
-                    messageDiv.innerHTML = `
-                            <p><strong>Message:</strong> ${message.content}</p>
-                            <p><strong>Reply:</strong> ${message.reply || 'No reply yet'}</p>
-                            <div class="message-actions">
-                                <a href="/guest/report-message.php?message_id=${message.id}">Report</a>
-                                <a href="/guest/comment.php?message_id=${message.id}">Comment</a>
-                            </div>
-                            <hr>
-                        `;
-                    messagesContainer.appendChild(messageDiv);
-                });
-            } else {
-                const errorMessage = document.getElementById('error-message');
-                errorMessage.textContent = result.message || 'Failed to load messages.';
-                errorMessage.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Error loading messages:', error);
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = 'Unable to connect to the server. Please try again later.';
-            errorMessage.style.display = 'block';
-        }
-    }
-
-    // Load messages on page load
-    loadMessages();
-</script>
-</body>
-</html>
+<?php include '../src/views/partials/footer.php'; ?>

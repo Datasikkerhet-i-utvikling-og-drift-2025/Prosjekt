@@ -7,8 +7,55 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
-// Get the admin's name for display
-$adminName = $_SESSION['user']['name'] ?? 'Administrator';
+// Include database connection
+require_once '../src/config/Database.php';
+
+// Function to sanitize output
+function sanitize($value) {
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+// Initialize variables
+$successMessage = '';
+$errorMessage = '';
+
+// Fetch reported messages from the database
+try {
+    $pdo = (new \db\Database())->getConnection();
+    $stmt = $pdo->query("SELECT r.id AS report_id, m.id AS message_id, m.content AS message_content, 
+                                r.reported_by, r.reason 
+                         FROM reports r 
+                         JOIN messages m ON r.message_id = m.id");
+    $reports = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $errorMessage = "Failed to fetch reports: " . sanitize($e->getMessage());
+    $reports = [];
+}
+
+// Handle dismiss report request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dismiss_report_id'])) {
+    $reportId = intval($_POST['dismiss_report_id']);
+    try {
+        $stmt = $pdo->prepare("DELETE FROM reports WHERE id = :id");
+        $stmt->execute(['id' => $reportId]);
+        $successMessage = "Report dismissed successfully.";
+    } catch (PDOException $e) {
+        $errorMessage = "Failed to dismiss report: " . sanitize($e->getMessage());
+    }
+}
+
+// Handle delete message request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_message_id'])) {
+    $messageId = intval($_POST['delete_message_id']);
+    try {
+        // Delete the message and associated reports
+        $stmt = $pdo->prepare("DELETE FROM messages WHERE id = :id");
+        $stmt->execute(['id' => $messageId]);
+        $successMessage = "Message deleted successfully.";
+    } catch (PDOException $e) {
+        $errorMessage = "Failed to delete message: " . sanitize($e->getMessage());
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,8 +73,17 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
     <h1>Manage Reports</h1>
     <p>Below is the list of reported messages. Review the reports and take appropriate actions.</p>
 
-    <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <!-- Success/Error Messages -->
+    <?php if ($successMessage): ?>
+        <div class="success-message" style="color: green; margin-bottom: 20px;">
+            <?php echo sanitize($successMessage); ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($errorMessage): ?>
+        <div class="error-message" style="color: red; margin-bottom: 20px;">
+            <?php echo sanitize($errorMessage); ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Reports Table -->
     <table class="table">
@@ -40,133 +96,34 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
             <th>Actions</th>
         </tr>
         </thead>
-        <tbody id="reports-container">
-        <tr>
-            <td colspan="5">Loading reports...</td>
-        </tr>
+        <tbody>
+        <?php if (empty($reports)): ?>
+            <tr>
+                <td colspan="5">No reports found.</td>
+            </tr>
+        <?php else: ?>
+            <?php foreach ($reports as $report): ?>
+                <tr>
+                    <td><?php echo sanitize($report['report_id']); ?></td>
+                    <td><?php echo sanitize($report['message_content']); ?></td>
+                    <td><?php echo sanitize($report['reported_by'] ?: 'Anonymous'); ?></td>
+                    <td><?php echo sanitize($report['reason']); ?></td>
+                    <td>
+                        <form action="" method="POST" style="display: inline;">
+                            <input type="hidden" name="dismiss_report_id" value="<?php echo sanitize($report['report_id']); ?>">
+                            <button type="submit" class="btn btn-dismiss">Dismiss</button>
+                        </form>
+                        <form action="" method="POST" style="display: inline;">
+                            <input type="hidden" name="delete_message_id" value="<?php echo sanitize($report['message_id']); ?>">
+                            <button type="submit" class="btn btn-delete">Delete Message</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
         </tbody>
     </table>
 </div>
-
-<script>
-    // Load all reports via API
-    async function loadReports() {
-        try {
-            const response = await fetch('/admin/reports', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming JWT for authentication
-                }
-            });
-            const result = await response.json();
-
-            const reportsContainer = document.getElementById('reports-container');
-            reportsContainer.innerHTML = '';
-
-            if (response.ok) {
-                if (result.data.length === 0) {
-                    reportsContainer.innerHTML = '<tr><td colspan="5">No reports found.</td></tr>';
-                    return;
-                }
-
-                // Render each report as a table row
-                result.data.forEach(report => {
-                    const row = document.createElement('tr');
-
-                    row.innerHTML = `
-                            <td>${report.id}</td>
-                            <td>${report.message_content}</td>
-                            <td>${report.reported_by || 'Anonymous'}</td>
-                            <td>${report.reason}</td>
-                            <td>
-                                <button class="btn btn-dismiss" data-id="${report.id}">Dismiss</button>
-                                <button class="btn btn-delete" data-id="${report.message_id}">Delete Message</button>
-                            </td>
-                        `;
-
-                    reportsContainer.appendChild(row);
-                });
-
-                // Attach dismiss event listeners
-                document.querySelectorAll('.btn-dismiss').forEach(button => {
-                    button.addEventListener('click', async (e) => {
-                        const reportId = e.target.dataset.id;
-                        if (confirm('Are you sure you want to dismiss this report?')) {
-                            await dismissReport(reportId);
-                            loadReports(); // Reload reports after dismissal
-                        }
-                    });
-                });
-
-                // Attach delete event listeners
-                document.querySelectorAll('.btn-delete').forEach(button => {
-                    button.addEventListener('click', async (e) => {
-                        const messageId = e.target.dataset.id;
-                        if (confirm('Are you sure you want to delete this message?')) {
-                            await deleteMessage(messageId);
-                            loadReports(); // Reload reports after deletion
-                        }
-                    });
-                });
-            } else {
-                reportsContainer.innerHTML = `<tr><td colspan="5">${result.message || 'Failed to load reports.'}</td></tr>`;
-            }
-        } catch (error) {
-            console.error('Error loading reports:', error);
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = 'Unable to load reports. Please try again later.';
-            errorMessage.style.display = 'block';
-        }
-    }
-
-    // Dismiss a report via API
-    async function dismissReport(reportId) {
-        try {
-            const response = await fetch(`/admin/reports/dismiss/${reportId}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'), // Assuming JWT
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                alert(result.message || 'Failed to dismiss the report.');
-            } else {
-                alert('Report dismissed successfully.');
-            }
-        } catch (error) {
-            console.error('Error dismissing report:', error);
-            alert('Unable to dismiss the report. Please try again later.');
-        }
-    }
-
-    // Delete a message via API
-    async function deleteMessage(messageId) {
-        try {
-            const response = await fetch(`/admin/messages/delete/${messageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'), // Assuming JWT
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                alert(result.message || 'Failed to delete the message.');
-            } else {
-                alert('Message deleted successfully.');
-            }
-        } catch (error) {
-            console.error('Error deleting message:', error);
-            alert('Unable to delete the message. Please try again later.');
-        }
-    }
-
-    // Load reports on page load
-    loadReports();
-</script>
 
 <style>
     .container {
@@ -215,6 +172,11 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
 
     .btn-dismiss {
         background-color: #28a745;
+        border: none;
+        padding: 5px 10px;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
     }
 
     .btn-dismiss:hover {
@@ -223,6 +185,11 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
 
     .btn-delete {
         background-color: #dc3545;
+        border: none;
+        padding: 5px 10px;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
     }
 
     .btn-delete:hover {

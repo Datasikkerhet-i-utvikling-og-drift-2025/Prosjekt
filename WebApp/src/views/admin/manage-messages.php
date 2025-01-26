@@ -7,8 +7,39 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
-// Get the admin's name for display
-$adminName = $_SESSION['user']['name'] ?? 'Administrator';
+// Include database connection
+require_once '../src/config/database.php';
+
+// Function to sanitize output
+function sanitize($value) {
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+// Fetch messages from the database
+try {
+    $pdo = (new \db\Database())->getConnection();
+    $stmt = $pdo->query("SELECT messages.id, courses.name AS course_name, messages.content, messages.reply 
+                         FROM messages 
+                         LEFT JOIN courses ON messages.course_id = courses.id");
+    $messages = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $error = "Failed to fetch messages: " . sanitize($e->getMessage());
+    $messages = [];
+}
+
+// Handle delete request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_message_id'])) {
+    $messageId = intval($_POST['delete_message_id']);
+
+    try {
+        $stmt = $pdo->prepare("DELETE FROM messages WHERE id = :id");
+        $stmt->execute(['id' => $messageId]);
+        header("Location: /admin/manage-messages.php?success=Message deleted successfully.");
+        exit;
+    } catch (PDOException $e) {
+        $error = "Failed to delete message: " . sanitize($e->getMessage());
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,8 +57,16 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
     <h1>Manage Messages</h1>
     <p>Below is the list of all messages in the system. You can delete messages or view details for further actions.</p>
 
-    <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <!-- Success/Error Message -->
+    <?php if (isset($_GET['success'])): ?>
+        <div class="success-message" style="color: green;">
+            <?php echo sanitize($_GET['success']); ?>
+        </div>
+    <?php elseif (isset($error)): ?>
+        <div class="error-message" style="color: red;">
+            <?php echo sanitize($error); ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Messages Table -->
     <table class="table">
@@ -40,99 +79,31 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
             <th>Actions</th>
         </tr>
         </thead>
-        <tbody id="messages-container">
-        <tr>
-            <td colspan="5">Loading messages...</td>
-        </tr>
+        <tbody>
+        <?php if (empty($messages)): ?>
+            <tr>
+                <td colspan="5">No messages found.</td>
+            </tr>
+        <?php else: ?>
+            <?php foreach ($messages as $message): ?>
+                <tr>
+                    <td><?php echo sanitize($message['id']); ?></td>
+                    <td><?php echo sanitize($message['course_name']); ?></td>
+                    <td><?php echo sanitize($message['content']); ?></td>
+                    <td><?php echo sanitize($message['reply'] ?? 'No reply yet'); ?></td>
+                    <td>
+                        <form action="" method="POST" style="display:inline;">
+                            <input type="hidden" name="delete_message_id" value="<?php echo sanitize($message['id']); ?>">
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                        <a href="/admin/view-message.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-view">View</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
         </tbody>
     </table>
 </div>
-
-<script>
-    // Load all messages via API
-    async function loadMessages() {
-        try {
-            const response = await fetch('/admin/messages', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming JWT for authentication
-                }
-            });
-            const result = await response.json();
-
-            const messagesContainer = document.getElementById('messages-container');
-            messagesContainer.innerHTML = '';
-
-            if (response.ok) {
-                if (result.data.length === 0) {
-                    messagesContainer.innerHTML = '<tr><td colspan="5">No messages found.</td></tr>';
-                    return;
-                }
-
-                // Render each message as a table row
-                result.data.forEach(message => {
-                    const row = document.createElement('tr');
-
-                    row.innerHTML = `
-                            <td>${message.id}</td>
-                            <td>${message.course_name}</td>
-                            <td>${message.content}</td>
-                            <td>${message.reply || 'No reply yet'}</td>
-                            <td>
-                                <a href="/admin/view-message.php?message_id=${message.id}" class="btn btn-view">View</a>
-                                <button class="btn btn-delete" data-id="${message.id}">Delete</button>
-                            </td>
-                        `;
-
-                    messagesContainer.appendChild(row);
-                });
-
-                // Attach delete event listeners
-                document.querySelectorAll('.btn-delete').forEach(button => {
-                    button.addEventListener('click', async (e) => {
-                        const messageId = e.target.dataset.id;
-                        if (confirm('Are you sure you want to delete this message?')) {
-                            await deleteMessage(messageId);
-                            loadMessages(); // Reload messages after deletion
-                        }
-                    });
-                });
-            } else {
-                messagesContainer.innerHTML = `<tr><td colspan="5">${result.message || 'Failed to load messages.'}</td></tr>`;
-            }
-        } catch (error) {
-            console.error('Error loading messages:', error);
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = 'Unable to load messages. Please try again later.';
-            errorMessage.style.display = 'block';
-        }
-    }
-
-    // Delete a message via API
-    async function deleteMessage(messageId) {
-        try {
-            const response = await fetch(`/admin/messages/delete/${messageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'), // Assuming JWT
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                alert(result.message || 'Failed to delete the message.');
-            } else {
-                alert('Message deleted successfully.');
-            }
-        } catch (error) {
-            console.error('Error deleting message:', error);
-            alert('Unable to delete the message. Please try again later.');
-        }
-    }
-
-    // Load messages on page load
-    loadMessages();
-</script>
 
 <style>
     .container {
@@ -181,6 +152,11 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
 
     .btn-delete {
         background-color: #dc3545;
+        border: none;
+        padding: 5px 10px;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
     }
 
     .btn-delete:hover {
@@ -193,6 +169,12 @@ $adminName = $_SESSION['user']['name'] ?? 'Administrator';
 
     .btn-view:hover {
         background-color: #117a8b;
+    }
+
+    .success-message, .error-message {
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 5px;
     }
 </style>
 </body>

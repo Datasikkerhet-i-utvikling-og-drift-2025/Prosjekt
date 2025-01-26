@@ -1,20 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Feedback System</title>
-    <link rel="stylesheet" href="/assets/css/style.css"> <!-- Include your CSS -->
-</head>
-<body>
+<?php include '../src/views/partials/header.php'; ?>
+
 <div class="container">
     <h1>Register</h1>
 
     <!-- Error Message Placeholder -->
-    <div id="error-message" style="color: red; display: none;"></div>
+    <?php if (!empty($_GET['error'])): ?>
+        <div id="error-message" style="color: red;">
+            <?= htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Registration Form -->
-    <form id="register-form" action="/auth/register" method="POST">
+    <form action="/auth/register" method="POST">
         <div class="form-group">
             <label for="name">Full Name</label>
             <input type="text" id="name" name="name" placeholder="Enter your full name" required>
@@ -32,89 +29,31 @@
 
         <div class="form-group">
             <label for="role">Role</label>
-            <select id="role" name="role" required>
+            <select id="role" name="role" onchange="this.form.submit()" required>
                 <option value="" disabled selected>Select your role</option>
-                <option value="student">Student</option>
-                <option value="lecturer">Lecturer</option>
+                <option value="student" <?= (isset($_POST['role']) && $_POST['role'] === 'student') ? 'selected' : '' ?>>Student</option>
+                <option value="lecturer" <?= (isset($_POST['role']) && $_POST['role'] === 'lecturer') ? 'selected' : '' ?>>Lecturer</option>
             </select>
         </div>
 
         <!-- Role-Specific Fields -->
-        <div id="student-fields" style="display: none;">
+        <?php if (!empty($_POST['role']) && $_POST['role'] === 'student'): ?>
             <div class="form-group">
                 <label for="study_program">Study Program</label>
-                <input type="text" id="study_program" name="study_program" placeholder="Enter your study program">
+                <input type="text" id="study_program" name="study_program" placeholder="Enter your study program" required>
             </div>
 
             <div class="form-group">
                 <label for="study_year">Study Year</label>
-                <input type="number" id="study_year" name="study_year" placeholder="Enter your study year">
+                <input type="number" id="study_year" name="study_year" placeholder="Enter your study year" required>
             </div>
-        </div>
+        <?php endif; ?>
 
         <button type="submit">Register</button>
     </form>
 
     <!-- Link to Login -->
-    <p>Already have an account? <a href="/index.php">Login here</a>.</p>
+    <p>Already have an account? <a href="/">Login here</a>.</p>
 </div>
 
-<script>
-    // Handle role-specific fields
-    const roleSelect = document.getElementById('role');
-    const studentFields = document.getElementById('student-fields');
-
-    roleSelect.addEventListener('change', () => {
-        if (roleSelect.value === 'student') {
-            studentFields.style.display = 'block';
-        } else {
-            studentFields.style.display = 'none';
-        }
-    });
-
-    // Handle form submission
-    const form = document.getElementById('register-form');
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent default form submission
-
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value,
-            role: document.getElementById('role').value,
-        };
-
-        if (formData.role === 'student') {
-            formData.study_program = document.getElementById('study_program').value;
-            formData.study_year = document.getElementById('study_year').value;
-        }
-
-        try {
-            const response = await fetch('/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Registration successful! You can now log in.');
-                window.location.href = '/index.php'; // Redirect to login page
-            } else {
-                const errorMessage = document.getElementById('error-message');
-                errorMessage.textContent = result.message || 'An error occurred during registration.';
-                errorMessage.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = 'Unable to connect to the server. Please try again later.';
-            errorMessage.style.display = 'block';
-        }
-    });
-</script>
-</body>
-</html>
+<?php include '../src/views/partials/footer.php'; ?>
