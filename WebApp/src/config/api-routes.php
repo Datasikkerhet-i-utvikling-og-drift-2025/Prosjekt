@@ -72,6 +72,7 @@ try {
         ['GET', '/admin/user/details', [$adminController, 'getUserDetails']],
 
         // Guest routes
+        ['GET', '/guest/messages', [$guestController, 'getMessages']],
         ['POST', '/guest/messages/view', [$guestController, 'viewMessages']],
         ['POST', '/guest/messages/report', [$guestController, 'reportMessage']],
         ['POST', '/guest/messages/comment', [$guestController, 'addComment']],

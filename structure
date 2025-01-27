@@ -95,19 +95,9 @@ Prosjekt/
 │    │       └── seed_initial_data.sql
 │    │
 │    ├── tests/                      # Automated tests
-│    │   ├── Unit/                   # Unit tests
-│    │   │   └── UserTest.php
-│    │   ├── Integration/            # Integration tests
-│    │   │   └── AuthFlowTest.php
-│    │   └── Functional/             # Functional tests
-│    │       └── ApiTest.php
 │    │
-│    ├── logs/                       # Log files for debugging
-│    │   └── app.log
-│    │
-│    ├── vendor/                     # Composer dependencies (if using Composer)
-│    │
-│    └── composer.json               # Composer dependencies configuration
+│    └── logs/                       # Log files for debugging
+│        └── app.log
 │
 ├── .env                        # Environment variables (e.g., DB credentials, API keys)
 ├── .gitignore                  # Git ignore file

@@ -1,6 +1,6 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
 
-<div class="container">
+<div class="form-container">
     <h1>Change Password</h1>
 
     <!-- Error or Success Message -->

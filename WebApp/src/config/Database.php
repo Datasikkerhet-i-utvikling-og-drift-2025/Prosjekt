@@ -20,14 +20,14 @@ class Database
         #$dotenv->load();
 
         // Set properties from .env or fallback defaults
-        #$this->host = $_ENV['DB_HOST'] ?? 'mysql';
-        #$this->dbName = $_ENV['DB_NAME'] ?? 'database';
-        #$this->username = $_ENV['DB_USER'] ?? 'admin';
-        #$this->password = $_ENV['DB_PASS'] ?? 'admin';
-        $this->host = 'mysql';
-        $this->dbName = 'database';
-        $this->username = 'admin';
-        $this->password = 'admin';
+        $this->host = $_ENV['DB_HOST']; # ?? 'mysql';
+        $this->dbName = $_ENV['DB_NAME']; # ?? 'database';
+        $this->username = $_ENV['DB_USER']; # ?? 'admin';
+        $this->password = $_ENV['DB_PASS']; # ?? 'admin';
+        #$this->host = 'mysql';
+        #$this->dbName = 'database';
+        #$this->username = 'admin';
+        #$this->password = 'admin';
     }
 
     public function getConnection(): PDO

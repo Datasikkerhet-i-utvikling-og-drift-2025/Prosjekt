@@ -34,24 +34,7 @@ $requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query parameters
 Logger::info("Request received: $method $requestUri");
 
 // Define view routes
-$views = [
-    '/' => __DIR__ . '/../src/views/auth/login.php',
-    '/register' => __DIR__ . '/../src/views/auth/register.php',
-    '/reset-password' => __DIR__ . '/../src/views/auth/reset-password.php',
-    '/change-password' => __DIR__ . '/../src/views/auth/change-password.php',
-    '/student/dashboard' => __DIR__ . '/../src/views/student/dashboard.php',
-    '/student/send-message' => __DIR__ . '/../src/views/student/send-message.php',
-    '/student/view-responses' => __DIR__ . '/../src/views/student/view-responses.php',
-    '/lecturer/dashboard' => __DIR__ . '/../src/views/lecturer/dashboard.php',
-    '/lecturer/read-messages' => __DIR__ . '/../src/views/lecturer/read-messages.php',
-    '/lecturer/reply' => __DIR__ . '/../src/views/lecturer/reply.php',
-    '/admin/dashboard' => __DIR__ . '/../src/views/admin/dashboard.php',
-    '/admin/manage-users' => __DIR__ . '/../src/views/admin/manage-users.php',
-    '/admin/manage-messages' => __DIR__ . '/../src/views/admin/manage-messages.php',
-    '/admin/reports' => __DIR__ . '/../src/views/admin/reports.php',
-    '/guest/view-messages' => __DIR__ . '/../src/views/guest/view-messages.php',
-    '/guest/report-message' => __DIR__ . '/../src/views/guest/report-message.php',
-];
+$views = require_once __DIR__ . '/../src/config/view-routes.php';
 
 // Handle view requests
 if (isset($views[$requestUri])) {

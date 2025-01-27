@@ -1,6 +1,6 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
 
-<div class="container">
+<div class="form-container">
     <h1>Login</h1>
 
     <!-- Error Message Placeholder -->
@@ -20,8 +20,7 @@
                     name="email"
                     placeholder="Enter your email"
                     required
-                    value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-            >
+                    value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
         </div>
 
         <div class="form-group">
@@ -40,6 +39,11 @@
             <a href="/guest/messages" class="btn btn-guest">Continue as Guest</a>
         </div>
     </form>
+
+    <!-- Forgot Password Link -->
+    <div class="forgot-password">
+        <p><a href="/reset-password">Forgot your password?</a></p>
+    </div>
 </div>
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>

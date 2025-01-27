@@ -7,6 +7,8 @@ require_once __DIR__ . '/../models/Course.php';
 require_once __DIR__ . '/../models/Comment.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
+use helpers\ApiHelper;
+
 class GuestController
 {
     private $messageModel;
@@ -19,6 +21,25 @@ class GuestController
         $this->courseModel = new Course($pdo);
         $this->commentModel = new Comment($pdo);
     }
+
+    public function getMessages()
+    {
+        try {
+            // Fetch public messages
+            $messages = $this->messageModel->getPublicMessages();
+
+            foreach ($messages as &$message) {
+                $message['comments'] = $this->commentModel->getCommentsByMessageId($message['message_id']);
+            }
+
+            Logger::info("Public messages retrieved successfully.");
+            ApiHelper::sendResponse(200, $messages, 'Public messages retrieved successfully.');
+        } catch (Exception $e) {
+            Logger::error("Error retrieving public messages: " . $e->getMessage());
+            ApiHelper::sendError(500, 'Failed to retrieve public messages.');
+        }
+    }
+
 
     // View messages for a course (requires PIN code)
     public function viewMessages()
