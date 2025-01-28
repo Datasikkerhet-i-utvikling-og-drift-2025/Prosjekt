@@ -43,6 +43,8 @@ Prosjekt/
 │    │   ├── models/                 # Models represent database entities
 │    │   │   ├── User.php
 │    │   │   ├── Message.php
+│    │   │   ├── Course.php
+│    │   │   ├── Comment.php
 │    │   │   ├── Lecturer.php
 │    │   │   ├── Student.php
 │    │   │   └── Admin.php
@@ -78,12 +80,14 @@ Prosjekt/
 │    │   │   ├── AuthHelper.php
 │    │   │   ├── InputValidator.php
 │    │   │   ├── Mailer.php
+│    │   │   ├── PHPMailer.php
 │    │   │   ├── Logger.php
 │    │   │   └── ApiHelper.php
 │    │   │
 │    │   └── config/                 # Configuration files
 │    │       ├── database.php        # Database connection setup
 │    │       ├── app.php             # General application config
+│    │       ├── view-routes.php
 │    │       └── api-routes.php      # API route definitions
 │    │
 │    ├── database/                   # Database schema and migrations

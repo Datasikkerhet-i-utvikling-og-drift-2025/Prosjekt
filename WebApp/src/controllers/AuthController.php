@@ -22,69 +22,41 @@ class AuthController
     // User Registration
     public function register()
     {
-        $input = ApiHelper::getJsonInput();
+        // Validate the form submission
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405); // Method Not Allowed
+            echo "Invalid request method.";
+            return;
+        }
+
+        $input = $_POST;
 
         // Combine first_name and last_name into a single name field
-        if (!empty($input['first_name']) && !empty($input['last_name'])) {
-            $input['name'] = $input['first_name'] . ' ' . $input['last_name'];
-        } else {
-            $input['name'] = ''; // Ensure the name field exists for validation
+        $input['name'] = trim(($input['first_name'] ?? '') . ' ' . ($input['last_name'] ?? ''));
+
+        // Validate input using the InputValidator
+        $validation = InputValidator::validateRegistration($input);
+
+        // Check for validation errors
+        $validation = $this->checkForError($validation);
+
+        // Hash password
+        $hashedPassword = AuthHelper::hashPassword($validation['sanitized']['password']);
+
+        // File upload validation if role is 'lecturer'
+        list($profilePicturePath, $validation) = $this->profilePictureUpload($validation);
+
+        // Check for existing email
+        if (empty($validation['errors']) && $this->userModel->getUserByEmail($validation['sanitized']['email'])) {
+            $validation['errors'][] = "Email is already registered.";
         }
 
-        // Validation rules
-        $validationRules = [
-            'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'name' => ['required' => true, 'min' => 3, 'max' => 100], // Added name validation
-            'email' => ['required' => true, 'email' => true],
-            'password' => ['required' => true, 'password' => true],
-            'repeat_password' => ['required' => true], // Optional: Add match validation below
-            'role' => ['required' => true],
-            'study_program' => ['required' => false, 'max' => 100],
-            'cohort_year' => ['required' => false, 'integer' => true],
-        ];
+        // If errors exist, return to the registration form with error messages
+        $validation = $this->checkForError($validation);
 
-        // Validate inputs
-        $validation = InputValidator::validateInputs($input, $validationRules);
-
-        if (!empty($validation['errors'])) {
-            Logger::error("Registration failed: Validation errors.", $validation['errors']);
-            ApiHelper::sendError(400, 'Validation failed.', $validation['errors']);
-        }
-
-        $sanitized = $validation['sanitized'];
-
-        // Check if passwords match
-        if ($sanitized['password'] !== $sanitized['repeat_password']) {
-            Logger::error("Registration failed: Passwords do not match.");
-            ApiHelper::sendError(400, 'Passwords do not match.');
-        }
-
-        // Check if the email already exists
-        if ($this->userModel->getUserByEmail($sanitized['email'])) {
-            Logger::error("Registration failed: Email already registered.");
-            ApiHelper::sendError(400, 'Email is already registered.');
-        }
-
-        // Hash password and create user
-        $hashedPassword = AuthHelper::hashPassword($sanitized['password']);
-        if ($this->userModel->createUser(
-            $sanitized['name'], // Pass validated and sanitized name
-            $sanitized['email'],
-            $hashedPassword,
-            $sanitized['role'],
-            $sanitized['study_program'] ?? null,
-            $sanitized['cohort_year'] ?? null
-        )) {
-            Logger::info("User registered successfully: " . $sanitized['email']);
-            ApiHelper::sendResponse(201, [], 'User registered successfully.');
-        } else {
-            Logger::error("Failed to create user in the database.");
-            ApiHelper::sendError(500, 'Failed to register user.');
-        }
+        // Create user in the database
+        $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
     }
-
-
 
     // User Login
     public function login()
@@ -168,5 +140,73 @@ class AuthController
             Logger::error("Failed to reset password for user ID: " . $user['id']);
             ApiHelper::sendError(500, 'Failed to reset password.');
         }
+    }
+
+    public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
+    {
+        if ($this->userModel->createUser(
+            $sanitized['name'],
+            $sanitized['email'],
+            $hashedPassword,
+            $sanitized['role'],
+            $sanitized['study_program'] ?? null,
+            $sanitized['cohort_year'] ?? null,
+            $profilePicturePath // Save file path if lecturer has uploaded a picture
+        )) {
+            // Redirect to login page
+            $_SESSION['success'] = "Registration successful. Please log in.";
+            header("Location: /login");
+            exit;
+        } else {
+            $_SESSION['errors'] = ["Failed to register user. Please try again."];
+            header("Location: /register");
+            exit;
+        }
+    }
+
+    /**
+     * @param array $validation
+     * @return array
+     */
+    public function profilePictureUpload(array $validation): array
+    {
+        $profilePicturePath = null;
+        if ($validation['sanitized']['role'] === 'lecturer' && isset($_FILES['profile_picture'])) {
+            $file = $_FILES['profile_picture'];
+            $uploadDir = __DIR__ . '/../../uploads/profile_pictures/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            // Check file type and size
+            if ($file['error'] === UPLOAD_ERR_OK) {
+                $allowedTypes = ['image/jpeg', 'image/png'];
+                if (!in_array($file['type'], $allowedTypes)) {
+                    $validation['errors'][] = "Invalid file type for profile picture. Only JPG and PNG are allowed.";
+                } elseif ($file['size'] > 2 * 1024 * 1024) { // 2MB limit
+                    $validation['errors'][] = "Profile picture size must not exceed 2MB.";
+                } else {
+                    $profilePicturePath = $uploadDir . basename($file['name']);
+                    move_uploaded_file($file['tmp_name'], $profilePicturePath);
+                }
+            } else {
+                $validation['errors'][] = "Profile picture is required for lecturers.";
+            }
+        }
+        return array($profilePicturePath, $validation);
+    }
+
+    /**
+     * @param array $validation
+     * @return array|void
+     */
+    public function checkForError(array $validation)
+    {
+        if (!empty($validation['errors'])) {
+            $_SESSION['errors'] = $validation['errors'];
+            header("Location: /register");
+            exit;
+        }
+        return $validation;
     }
 }

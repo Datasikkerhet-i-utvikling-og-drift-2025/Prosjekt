@@ -1,6 +1,8 @@
 <?php
 
 // Enable error reporting for debugging (disable in production)
+use helpers\ApiHelper;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -41,13 +43,12 @@ if (isset($views[$requestUri])) {
     $viewPath = $views[$requestUri];
     if (file_exists($viewPath)) {
         require_once $viewPath;
-        exit;
     } else {
         Logger::error("View not found: $requestUri");
         http_response_code(404);
         require_once __DIR__ . '/../public/errors/404.php';
-        exit;
     }
+    exit;
 }
 
 // Load API routes

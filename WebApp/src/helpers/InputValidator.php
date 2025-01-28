@@ -2,6 +2,53 @@
 
 class InputValidator
 {
+
+    // Validation method for registration
+    public static function validateRegistration($input)
+    {
+        $rules = self::getRegistrationRules();
+        $errors = [];
+        $sanitized = [];
+
+        foreach ($rules as $field => $ruleset) {
+            $value = $input[$field] ?? '';
+            $sanitized[$field] = self::sanitize($value);
+
+            foreach ($ruleset as $rule => $ruleValue) {
+                $validationMethod = 'validate' . ucfirst($rule);
+                if (method_exists(self::class, $validationMethod)) {
+                    $validationResult = self::$validationMethod($sanitized[$field], $ruleValue);
+                    if ($validationResult !== true) {
+                        $errors[$field][] = $validationResult;
+                    }
+                }
+            }
+        }
+
+        // Check if passwords match
+        if ($sanitized['password'] !== ($sanitized['repeat_password'] ?? '')) {
+            $errors[] = "Passwords do not match.";
+        }
+
+        return ['errors' => $errors, 'sanitized' => $sanitized];
+    }
+
+    // Define the validation rules for registration
+    private static function getRegistrationRules()
+    {
+        return [
+            'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
+            'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
+            'name' => ['required' => true, 'min' => 3, 'max' => 100],
+            'email' => ['required' => true, 'email' => true],
+            'password' => ['required' => true, 'min' => 8],
+            'repeat_password' => ['required' => true],
+            'role' => ['required' => true],
+            'study_program' => ['required' => false, 'max' => 100],
+            'cohort_year' => ['required' => false, 'integer' => true],
+        ];
+    }
+
     // Check if a field is not empty
     public static function isNotEmpty($value)
     {
@@ -24,6 +71,7 @@ class InputValidator
     // Validate password strength
     public static function isValidPassword($password)
     {
+        // TODO fix this regex
         return true;
         return preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/', $password);
     }
