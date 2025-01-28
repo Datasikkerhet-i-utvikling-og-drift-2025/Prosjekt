@@ -49,6 +49,36 @@ class InputValidator
         ];
     }
 
+    //__________________________
+    // Validation methods test
+    public static function sanitize($value)
+    {
+        return filter_var($value, FILTER_SANITIZE_STRING);
+    }
+
+    // Validation methods
+    private static function validateRequired($value, $ruleValue)
+    {
+        return $ruleValue && empty($value) ? 'This field is required.' : true;
+    }
+
+    private static function validateMin($value, $ruleValue)
+    {
+        return strlen($value) < $ruleValue ? "Must be at least $ruleValue characters." : true;
+    }
+
+    private static function validateMax($value, $ruleValue)
+    {
+        return strlen($value) > $ruleValue ? "Must be no more than $ruleValue characters." : true;
+    }
+
+    private static function validateEmail($value, $ruleValue)
+    {
+        return $ruleValue && !filter_var($value, FILTER_VALIDATE_EMAIL) ? 'Invalid email format.' : true;
+    }
+
+    // __________________________
+
     // Check if a field is not empty
     public static function isNotEmpty($value)
     {
