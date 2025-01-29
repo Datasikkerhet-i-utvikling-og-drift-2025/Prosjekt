@@ -25,15 +25,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Register</h1>
 
     <?php if (!empty($_SESSION['errors'])): ?>
-        <div id="error-message" class="error">
-            <ul>
-                <?php foreach ($_SESSION['errors'] as $error): ?>
-                    <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-        <?php unset($_SESSION['errors']); ?>
-    <?php endif; ?>
+    <div id="error-message" class="error">
+        <ul>
+            <?php 
+            foreach ($_SESSION['errors'] as $field => $fieldErrors): 
+                if (is_array($fieldErrors)):
+                    foreach ($fieldErrors as $error):
+            ?>
+                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
+            <?php 
+                    endforeach;
+                else:
+            ?>
+                    <li><?= htmlspecialchars($fieldErrors, ENT_QUOTES, 'UTF-8') ?></li>
+            <?php
+                endif;
+            endforeach; 
+            ?>
+        </ul>
+    </div>
+    <?php unset($_SESSION['errors']); ?>
+<?php endif; ?>
 
     <?php if (!empty($_SESSION['success'])): ?>
         <div id="success-message" class="success">

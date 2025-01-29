@@ -9,27 +9,27 @@ class InputValidator
         $rules = self::getRegistrationRules();
         $errors = [];
         $sanitized = [];
-
+    
         foreach ($rules as $field => $ruleset) {
             $value = $input[$field] ?? '';
             $sanitized[$field] = self::sanitize($value);
-
+    
             foreach ($ruleset as $rule => $ruleValue) {
                 $validationMethod = 'validate' . ucfirst($rule);
                 if (method_exists(self::class, $validationMethod)) {
                     $validationResult = self::$validationMethod($sanitized[$field], $ruleValue);
                     if ($validationResult !== true) {
-                        $errors[$field][] = $validationResult;
+                        $errors[] = "$field: $validationResult";  // Endret til flat array
                     }
                 }
             }
         }
-
+    
         // Check if passwords match
         if ($sanitized['password'] !== ($sanitized['repeat_password'] ?? '')) {
             $errors[] = "Passwords do not match.";
         }
-
+    
         return ['errors' => $errors, 'sanitized' => $sanitized];
     }
 
