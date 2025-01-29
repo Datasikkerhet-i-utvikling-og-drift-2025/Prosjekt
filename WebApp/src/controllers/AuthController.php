@@ -64,16 +64,34 @@ class AuthController
         // Validate input
         ApiHelper::validateRequest(['email', 'password'], $input);
 
+        //find user by email
         $user = $this->userModel->getUserByEmail($input['email']);
         if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
             Logger::error("Login failed for email: " . $input['email']);
             ApiHelper::sendError(401, 'Invalid email or password.');
         }
 
-        // Log in the user
+        // Log in the user by setting session or token
         AuthHelper::loginUser($user['id'], $user['role']);
         Logger::info("User logged in: " . $input['email']);
-        ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
+
+        // Redirect to the user page based on role
+        if ($user['role'] === 'student') {
+            ApiHelper::sendResponse(200, [
+                'redirect' => '/student/dashboard',
+                'message' => 'Welcome, student!'
+            ]);
+        } elseif ($user['role'] === 'lecturer') {
+            ApiHelper::sendResponse(200, [
+                'redirect' => '/lecturer/dashboard',
+                'message' => 'Welcome, lecturer!'
+            ]);
+        } else {
+            Logger::error("Unknown role for user ID: " . $user['id']);
+            ApiHelper::sendError(400, 'Unknown role for user.');
+        }
+        //ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
+
     }
 
     // User Logout
