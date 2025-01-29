@@ -54,6 +54,11 @@ class AuthController
 
         // Create user in the database
         $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
+
+        ApiHelper::sendResponse(200, [
+            'redirect' => '/',
+            'message' => 'Registration successful'
+        ]);
     }
 
     // User Login
@@ -171,11 +176,11 @@ class AuthController
         )) {
             // Redirect to login page
             $_SESSION['success'] = "Registration successful. Please log in.";
-            header("Location: /");
+            //header("Location: /");
             exit;
         } else {
             $_SESSION['errors'] = ["Failed to register user. Please try again."];
-            header("Location: /register");
+            //header("Location: /register");
             exit;
         }
     }
@@ -220,7 +225,7 @@ class AuthController
     {
         if (!empty($validation['errors'])) {
             $_SESSION['errors'] = $validation['errors'];
-            header("Location: /register");
+            //header("Location: /register");
             exit;
         }
         return $validation;
