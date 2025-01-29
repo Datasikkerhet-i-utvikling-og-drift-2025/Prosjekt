@@ -1,6 +1,6 @@
 <?php
 
-namespace models;
+
 
 // Course class
 class Course {

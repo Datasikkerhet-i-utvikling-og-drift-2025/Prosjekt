@@ -9,7 +9,7 @@ namespace api\controllers;
 /LoginUser.php
 <?php
 
-use database\DB;
+
 
 require_once __DIR__ . '/../database/Database.php';
 

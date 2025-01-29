@@ -1,7 +1,6 @@
 <?php
 
 // Enable error reporting for debugging (disable in production)
-use helpers\ApiHelper;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -15,8 +14,8 @@ require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger for error trackin
 require_once __DIR__ . '/../src/autoload.php';
 
 // Ensure logs directory exists
-if (!is_dir(__DIR__ . '/../logs')) {
-    mkdir(__DIR__ . '/../logs', 0777, true);
+if (!is_dir(__DIR__ . '/../logs') && !mkdir($concurrentDirectory = __DIR__ . '/../logs', 0777, true) && !is_dir($concurrentDirectory)) {
+    throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
 }
 
 // Handle CORS (Cross-Origin Resource Sharing) headers
@@ -36,7 +35,7 @@ $requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query parameters
 Logger::info("Request received: $method $requestUri");
 
 // Define view routes
-$views = require_once __DIR__ . '/../src/config/view-routes.php';
+$views = require __DIR__ . '/../src/config/view-routes.php';
 
 // Handle view requests
 if (isset($views[$requestUri])) {
@@ -52,7 +51,7 @@ if (isset($views[$requestUri])) {
 }
 
 // Load API routes
-$routes = require_once __DIR__ . '/../src/config/api-routes.php';
+$routes = require __DIR__ . '/../src/config/api-routes.php';
 
 // Validate API routes configuration
 if (!is_array($routes) || empty($routes)) {

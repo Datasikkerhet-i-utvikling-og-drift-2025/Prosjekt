@@ -1,9 +1,7 @@
 <?php
 
-namespace helpers;
+require_once __DIR__ . '/../helpers/Logger.php';
 
-use Exception;
-use Logger;
 
 class ApiHelper
 {
@@ -30,7 +28,7 @@ class ApiHelper
             'success' => $success,
             'message' => $message,
             'data' => $data
-        ]);
+        ], JSON_THROW_ON_ERROR);
         exit;
     }
 
@@ -143,8 +141,8 @@ class ApiHelper
      */
     private static function ensureLogDirectoryExists()
     {
-        if (!is_dir(self::$logDir)) {
-            mkdir(self::$logDir, 0777, true);
+        if (!is_dir(self::$logDir) && !mkdir($concurrentDirectory = self::$logDir, 0777, true) && !is_dir($concurrentDirectory)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
     }
 
