@@ -61,7 +61,7 @@ class AuthController
     // User Login
     public function login()
     {
-            // Validate the form submission
+        // Validate the form submission
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405); // Method Not Allowed
             echo "Invalid request method.";
@@ -95,18 +95,19 @@ class AuthController
         // Log in the user
         AuthHelper::loginUser($user['id'], $user['role']);
         Logger::info("User logged in successfully: " . $email);
-    
+
         // Redirect based on role
         if ($user['role'] === 'student') {
-            //ApiHelper::sendResponse(200, ['redirect' => '/student/dashboard'], 'Login successful.');
+            Logger::info("Redirecting to /student/dashboard");
             header('Location: /student/dashboard');
         } elseif ($user['role'] === 'lecturer') {
-            //ApiHelper::sendResponse(200, ['redirect' => '/lecturer/dashboard'], 'Login successful.');
+            Logger::info("Redirecting to /lecturer/dashboard");
             header('Location: /lecturer/dashboard');
         } else {
-            //ApiHelper::sendError(403, 'Unauthorized role.');
+            Logger::error("Unauthorized role: " . $user['role']);
             header('Location: /auth/login?error=Unauthorized role.');
         }
+        exit;
     }
 
     // User Logout
