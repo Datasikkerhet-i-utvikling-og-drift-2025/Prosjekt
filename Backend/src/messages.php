@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 $host = 'mysql';
 $db = 'database';
 $user = 'admin';
@@ -54,4 +54,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
-?>
+?> -->

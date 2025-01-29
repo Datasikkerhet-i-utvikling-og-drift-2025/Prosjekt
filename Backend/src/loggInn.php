@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $stmt = $conn->prepare("SELECT user_id, email, password_hash, user_type, created_at FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT user_id, email, password_hash, created_at FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -43,4 +43,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
+
 ?>

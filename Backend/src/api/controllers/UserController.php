@@ -1,10 +1,6 @@
 <?php
 
-namespace api\controllers;
 
-use models\user\User;
-use db\DB;
-use Exception;
 
 require_once __DIR__ . '/../../models/user/User.php';
 require_once __DIR__ . '/../../database/DB.php';
@@ -21,12 +17,11 @@ class UserController {
 
             $user = new User(
                 0,
-                $data['first_name'],
-                $data['last_name'],
                 $data['email'],
                 $data['password'],
-                $data['user_type'],
-                null
+                $data['created_at'] ?? null,
+                $data['first_name'],
+                $data['last_name'],
             );
 
             $userId = $user->saveToDB();
@@ -52,7 +47,7 @@ class UserController {
             $db = new DB();
             $conn = $db->getConnection();
 
-            $stmt = $conn->prepare("SELECT user_id, email, user_type, created_at FROM users");
+            $stmt = $conn->prepare("SELECT user_id, email, created_at, first_name, last_name FROM users");
             $stmt->execute();
 
             $users = $stmt->fetchAll();
@@ -68,5 +63,49 @@ class UserController {
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function loginUser()
+    {
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        if (empty($email) || empty($password)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Email and password are required']);
+            return;
+        }
+
+        $stmt = $this->dbConnection->prepare("SELECT user_id, email, password_hash, first_name, last_name, created_at FROM users WHERE email = ?");
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Database query preparation failed']);
+            return;
+        }
+
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        if ($user && password_verify($password, $user['password_hash'])) {
+            $userModel = new User(
+                $user['user_id'],
+                $user['email'],
+                $password, // Store unhashed password temporarily
+                $user['created_at'],
+                $user['first_name'],
+                $user['last_name']
+            );
+
+            http_response_code(200);
+            echo json_encode(['message' => 'Login successful', 'user' => $userModel]);
+        } else {
+            http_response_code(401);
+            echo json_encode(['error' => 'Invalid email or password']);
+        }
+
+        $stmt->close();
+        $this->dbConnection->close();
     }
 }
