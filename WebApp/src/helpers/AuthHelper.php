@@ -11,9 +11,9 @@ class AuthHelper
     }
 
     // Verify a password against a hash
-    public static function verifyPassword($password, $hashedPassword)
+    public static function verifyPassword($password, $hashPassword)
     {
-        return password_verify($password, $hashedPassword);
+        return password_verify($password, $hashPassword);
     }
 
     // Start a session (if not already started)

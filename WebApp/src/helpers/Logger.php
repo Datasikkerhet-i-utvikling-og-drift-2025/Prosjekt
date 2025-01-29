@@ -4,6 +4,31 @@ class Logger
 {
     private static $logFile = __DIR__ . '/../../logs/app.log'; // Default log file path
 
+
+
+    //More co-pilot logs...
+    // public static function debug($message)
+    // {
+    //     self::log('DEBUG', $message);
+    // }
+
+    // public static function error($message)
+    // {
+    //     self::log('ERROR', $message);
+    // }
+
+    // public static function info($message)
+    // {
+    //     self::log('INFO', $message);
+    // }
+
+    // private static function log($level, $message)
+    // {
+    //     $timestamp = date('Y-m-d H:i:s');
+    //     $logMessage = "[$timestamp] [$level] $message" . PHP_EOL;
+    //     file_put_contents('/var/www/html/logs/app.log', $logMessage, FILE_APPEND);
+    // }
+    //__________________________________________________________
     // Set a custom log file (optional)
     public static function setLogFile($filePath)
     {
