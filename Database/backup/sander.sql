@@ -101,4 +101,3 @@ CREATE INDEX idx_messages_course ON messages(course_id);
 CREATE INDEX idx_message_responses_message ON message_responses(message_id);
 CREATE INDEX idx_guest_comments_message ON guest_comments(message_id);
 CREATE INDEX idx_reported_messages_message ON reported_messages(message_id);
-

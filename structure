@@ -1,0 +1,109 @@
+Prosjekt/
+│
+├── Database/                       # Contains the setup of my MySQL database
+│    │
+│    └── .docker/
+│        ├── Dockerfile
+│        └── init.sql               # Creates the database and tables
+│
+├── Dokumentasjon
+│   └── *Project documentation*
+│
+├── MobilApp/
+│    └── *Mobile project*
+│
+├── WebApp/
+│    │
+│    ├── .docker
+│    │   └── Dockerfile
+│    │
+│    ├── public/                     # Publicly accessible files (served by the web server)
+│    │   ├── index.php               # Entry point for the application
+│    │   ├── api.php                 # API entry point for the mobile app
+│    │   ├── assets/                 # Static assets (CSS, JavaScript, images)
+│    │   │   ├── css/
+│    │   │   │   └── style.css       # Basic styles
+│    │   │   ├── js/
+│    │   │   │   └── app.js          # JavaScript functionality
+│    │   │   └── images/
+│    │   │       └── profile-placeholder.png
+│    │   ├── errors/
+│    │   │   ├── 404.php
+│    │   │   └── 500.php
+│    │   └── uploads/                # Directory for uploaded files (e.g., foreleser images)
+│    │
+│    ├── src/                        # Main application code
+│    │   ├── controllers/            # Controllers handle requests and responses
+│    │   │   ├── AuthController.php
+│    │   │   ├── StudentController.php
+│    │   │   ├── LecturerController.php
+│    │   │   ├── AdminController.php
+│    │   │   └── GuestController.php
+│    │   │
+│    │   ├── models/                 # Models represent database entities
+│    │   │   ├── User.php
+│    │   │   ├── Message.php
+│    │   │   ├── Course.php
+│    │   │   ├── Comment.php
+│    │   │   ├── Lecturer.php
+│    │   │   ├── Student.php
+│    │   │   └── Admin.php
+│    │   │
+│    │   ├── views/                  # Views for rendering HTML
+│    │   │   ├── auth/               # Views related to authentication
+│    │   │   │   ├── login.php
+│    │   │   │   ├── register.php
+│    │   │   │   ├── reset-password.php
+│    │   │   │   └── change-password.php
+│    │   │   ├── student/            # Views for student interactions
+│    │   │   │   ├── dashboard.php
+│    │   │   │   ├── send-message.php
+│    │   │   │   └── view-responses.php
+│    │   │   ├── lecturer/           # Views for lecturer interactions
+│    │   │   │   ├── dashboard.php
+│    │   │   │   ├── read-messages.php
+│    │   │   │   └── reply.php
+│    │   │   ├── admin/              # Views for admin interactions
+│    │   │   │   ├── dashboard.php
+│    │   │   │   ├── manage-users.php
+│    │   │   │   ├── manage-messages.php
+│    │   │   │   └── reports.php
+│    │   │   ├── guest/              # Views for guest interactions
+│    │   │   │   ├── view-messages.php
+│    │   │   │   └── report-message.php
+│    │   │   └── partials/           # Reusable components
+│    │   │       ├── header.php
+│    │   │       ├── footer.php
+│    │   │       └── navbar.php
+│    │   │
+│    │   ├── helpers/                # Helper functions or utilities
+│    │   │   ├── AuthHelper.php
+│    │   │   ├── InputValidator.php
+│    │   │   ├── Mailer.php
+│    │   │   ├── PHPMailer.php
+│    │   │   ├── Logger.php
+│    │   │   └── ApiHelper.php
+│    │   │
+│    │   └── config/                 # Configuration files
+│    │       ├── database.php        # Database connection setup
+│    │       ├── app.php             # General application config
+│    │       ├── view-routes.php
+│    │       └── api-routes.php      # API route definitions
+│    │
+│    ├── database/                   # Database schema and migrations
+│    │   ├── migrations/             # Database migrations
+│    │   │   ├── create_users_table.sql
+│    │   │   ├── create_messages_table.sql
+│    │   │   └── create_courses_table.sql
+│    │   └── seeds/                  # Seed data for initial setup
+│    │       └── seed_initial_data.sql
+│    │
+│    ├── tests/                      # Automated tests
+│    │
+│    └── logs/                       # Log files for debugging
+│        └── app.log
+│
+├── .env                        # Environment variables (e.g., DB credentials, API keys)
+├── .gitignore                  # Git ignore file
+├── docker-compose.yml          # Sets up the project environment using Docker
+└── README.md                   # Documentation for the project

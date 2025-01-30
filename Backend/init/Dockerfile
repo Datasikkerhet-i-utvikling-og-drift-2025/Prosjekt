@@ -8,10 +8,10 @@ COPY . /var/www/html/
 RUN a2enmod rewrite
 
 # Install additional PHP extensions (e.g., PDO for MySQL)
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN .docker-php-ext-install mysqli pdo pdo_mysql
 
 # Install and configure Xdebug
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install xdebug && .docker-php-ext-enable xdebug
 
 
 # Install phpDocumentor
