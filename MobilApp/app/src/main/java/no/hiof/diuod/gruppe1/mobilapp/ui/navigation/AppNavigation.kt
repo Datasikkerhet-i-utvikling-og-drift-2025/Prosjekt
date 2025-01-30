@@ -12,6 +12,8 @@ import no.hiof.diuod.gruppe1.mobilapp.ui.navigation.navBars.BottomNavBar
 import no.hiof.diuod.gruppe1.mobilapp.ui.navigation.navBars.TopBar
 import no.hiof.diuod.gruppe1.mobilapp.ui.navigation.navBars.getCurrentScreen
 import no.hiof.diuod.gruppe1.mobilapp.ui.screens.HomeScreen
+import no.hiof.diuod.gruppe1.mobilapp.ui.screens.LoginScreen
+import no.hiof.diuod.gruppe1.mobilapp.ui.viewModels.LoginViewModel
 
 @Composable
 fun AppNavigation() {
@@ -30,12 +32,16 @@ fun AppNavigation() {
 
         NavHost(
             navController = navController,
-            startDestination = AppScreens.HOME.name,
+            startDestination = AppScreens.LOGIN.name,
             modifier = Modifier.padding(innerPadding)
         ) {
 
             composable(AppScreens.HOME.name) {
                 HomeScreen()
+            }
+
+            composable(AppScreens.LOGIN.name) {
+                LoginScreen(navController = navController)
             }
 
         }
