@@ -11,7 +11,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
 $studentName = $_SESSION['user']['name'] ?? 'Student';
 
 // Include required files
-require_once __DIR__ . '/../../helpers/Database.php';
+require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../helpers/Logger.php';
 
 try {

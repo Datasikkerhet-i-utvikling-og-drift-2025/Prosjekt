@@ -62,45 +62,108 @@ class AuthController
     }
 
     // User Login
-    public function login()
-    {
+       // User Login
+       public function login()
+       {
+           session_start(); // Ensure the session is started
+           ob_start();
+           
+           // Validate the form submission
+           if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+               http_response_code(405); // Method Not Allowed
+               echo "Invalid request method.";
+               ob_end_flush();
+               return;
+           }
+   
+           $input = $_POST;
+   
+           // Validate input using the InputValidator
+           $validation = InputValidator::validateLogin($input);
+   
+           // Check for validation errors
+           if (!empty($validation['errors'])) {
+               $_SESSION['errors'] = $validation['errors'];
+               header("Location: /auth/login");
+               ob_end_flush();
+               exit;
+           }
+   
+           // Sanitize input
+           $sanitized = $validation['sanitized'];
+   
+           // Check user credentials
+           $user = $this->userModel->getUserByEmail($sanitized['email']);
+           if ($user && AuthHelper::verifyPassword($sanitized['password'], $user['password'])) {
+               // Set user session or token
+               $_SESSION['user'] = $user;
+               Logger::info("User logged in: " . $sanitized['email']);
+   
+               // Redirect based on role
+               if ($user['role'] === 'student') {
+                   header('Location: /student/dashboard');
+                   ob_end_flush();
+                   exit;
+               } elseif ($user['role'] === 'lecturer') {
+                   header('Location: /lecturer/dashboard');
+                   ob_end_flush();
+                   exit;
+               } else {
+                   Logger::error("Unknown role for user ID: " . $user['id']);
+                   $_SESSION['errors'] = ['Unknown role for user.'];
+                   header("Location: /auth/login");
+                   ob_end_flush();
+                   exit;
+               }
+           } else {
+               $_SESSION['errors'] = ['Invalid email or password.'];
+               header("Location: /auth/login");
+               ob_end_flush();
+               exit;
+           }
+       }
+   
+      
+        //ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
 
-        // Validate the form submission
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        http_response_code(405); // Method Not Allowed
-        echo "Invalid request method.";
-        return;
-    }
+        ///____________
 
-    $input = $_POST;
+    //     // Validate the form submission
+    // if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    //     http_response_code(405); // Method Not Allowed
+    //     echo "Invalid request method.";
+    //     return;
+    // }
 
-    // Validate input using the InputValidator
-    $validation = InputValidator::validateLogin($input);
+    // $input = $_POST;
 
-    // Check for validation errors
-    if (!empty($validation['errors'])) {
-        $_SESSION['errors'] = $validation['errors'];
-        header("Location: /auth/login");
-        exit;
-    }
+    // // Validate input using the InputValidator
+    // $validation = InputValidator::validateLogin($input);
 
-    // Sanitize input
-    $sanitized = $validation['sanitized'];
+    // // Check for validation errors
+    // if (!empty($validation['errors'])) {
+    //     $_SESSION['errors'] = $validation['errors'];
+    //     header("Location: /auth/login");
+    //     exit;
+    // }
 
-    // Check user credentials
-    $user = $this->userModel->getUserByEmail($sanitized['email']);
-    if ($user && AuthHelper::verifyPassword($sanitized['password'], $user['password'])) {
-        // Set user session or token
-        $_SESSION['user'] = $user;
-        header("Location: /dashboard");
-        exit;
-    } else {
-        $_SESSION['errors'] = ['Invalid email or password.'];
-        header("Location: /auth/login");
-        exit;
-    }
+    // // Sanitize input
+    // $sanitized = $validation['sanitized'];
 
-        // Validate the form submission
+    // // Check user credentials
+    // $user = $this->userModel->getUserByEmail($sanitized['email']);
+    // if ($user && AuthHelper::verifyPassword($sanitized['password'], $user['password'])) {
+    //     // Set user session or token
+    //     $_SESSION['user'] = $user;
+    //     header("Location: /dashboard");
+    //     exit;
+    // } else {
+    //     $_SESSION['errors'] = ['Invalid email or password.'];
+    //     header("Location: /auth/login");
+    //     exit;
+    // }
+
+        //Validate the form submission
         // if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         //     http_response_code(405); // Method Not Allowed
         //     echo "Invalid request method.";
@@ -163,7 +226,7 @@ class AuthController
         //     header('Location: /auth/login?error=Unauthorized role.');
         // }
         // exit;
-    }
+    
 
     // User Logout
     public function logout()

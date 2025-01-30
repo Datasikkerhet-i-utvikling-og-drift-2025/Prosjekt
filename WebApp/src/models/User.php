@@ -66,7 +66,7 @@ class User
     // Retrieve a user by email
     public function getUserByEmail($email)
     {
-        $sql = "SELECT `id`, `email`, `password` FROM users WHERE email = ?";
+        $sql = "SELECT * FROM users WHERE email = :email";
         $stmt = $this->pdo->prepare($sql);
 
         try {
