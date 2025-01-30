@@ -48,7 +48,7 @@ try {
         // Auth routes
         ['POST', '/auth/register', [$authController, 'register']],
         ['POST', '/auth/login', [$authController, 'login']],
-        ['POST', '/auth/logout', [$authController, 'logout']],
+        ['GET', '/auth/logout', [$authController, 'logout']],
         ['POST', '/auth/password-reset/request', [$authController, 'requestPasswordReset']],
         ['POST', '/auth/password-reset', [$authController, 'resetPassword']],
 

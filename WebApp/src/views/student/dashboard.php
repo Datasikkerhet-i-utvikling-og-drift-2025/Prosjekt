@@ -1,8 +1,10 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../helpers/Logger.php';
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
+    Logger::info("Unauthorized access attempt to student dashboard. Session data: " . var_export($_SESSION, true));
     header('Location: /');
     exit;
 }
@@ -11,8 +13,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
 $studentName = $_SESSION['user']['name'] ?? 'Student';
 
 // Include required files
-require_once __DIR__ . '/../../helpers/Database.php';
-require_once __DIR__ . '/../../helpers/Logger.php';
+require_once __DIR__ . '/../../config/Database.php';
 
 try {
     $db = new \db\Database();

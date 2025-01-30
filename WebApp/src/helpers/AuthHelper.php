@@ -25,12 +25,15 @@ class AuthHelper
     }
 
     // Log in a user (store user data in session)
-    public static function loginUser($userId, $role)
+    public static function loginUser($user)
     {
         self::startSession();
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['user_role'] = $role;
-        $_SESSION['last_activity'] = time(); // For session timeout
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'role' => $user['role']
+        ];
+        Logger::info("User session started: " . var_export($_SESSION, true));
     }
 
     // Check if a user is logged in
@@ -43,9 +46,17 @@ class AuthHelper
     // Log out the current user
     public static function logoutUser()
     {
+        Logger::info("something is happening");
         self::startSession();
         session_destroy();
         unset($_SESSION);
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
     }
 
     // Check if a user has a specific role

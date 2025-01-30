@@ -36,7 +36,7 @@
                         <li><a href="/admin/manage-messages">Manage Messages</a></li>
                         <li><a href="/admin/reports">View Reports</a></li>
                     <?php endif; ?>
-                    <li><a href="/auth/logout.php" class="logout-link">Logout</a></li>
+                    <li><a href="/auth/logout" class="logout-link">Logout</a></li>
                 <?php else: ?>
                     <li><a href="/">Login</a></li>
                     <li><a href="/register">Register</a></li>
