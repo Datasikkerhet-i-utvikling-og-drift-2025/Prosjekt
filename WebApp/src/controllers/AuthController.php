@@ -61,53 +61,105 @@ class AuthController
     // User Login
     public function login()
     {
+
         // Validate the form submission
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405); // Method Not Allowed
-            echo "Invalid request method.";
-            return;
-        }
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405); // Method Not Allowed
+        echo "Invalid request method.";
+        return;
+    }
 
-        $input = $_POST;
+    $input = $_POST;
 
-        // Sanitize input
-        $email = InputValidator::sanitizeEmail($input['email']);
-        $password = InputValidator::sanitizeString($input['password']);
+    // Validate input using the InputValidator
+    $validation = InputValidator::validateLogin($input);
 
-        // Validate input using the InputValidator
-        ApiHelper::validateRequest(['email', 'password'], ['email' => $email, 'password' => $password]);
-
-        // Check for existing email
-        $user = $this->userModel->getUserByEmail($email);
-        if (!$user) {
-            Logger::error("Login failed: Email not found.");
-            header('Location: /auth/login?error=Invalid email or password.');
-            exit;
-        }
-
-        // Verify password
-        if (!AuthHelper::verifyPassword($password, $user['password'])) {
-            Logger::error("Login failed: Incorrect password for email " . $email);
-            header('Location: /auth/login?error=Invalid email or password.');
-            exit;
-        }
-
-        // Log in the user
-        AuthHelper::loginUser($user['id'], $user['role']);
-        Logger::info("User logged in successfully: " . $email);
-
-        // Redirect based on role
-        if ($user['role'] === 'student') {
-            Logger::info("Redirecting to /student/dashboard");
-            header('Location: /student/dashboard');
-        } elseif ($user['role'] === 'lecturer') {
-            Logger::info("Redirecting to /lecturer/dashboard");
-            header('Location: /lecturer/dashboard');
-        } else {
-            Logger::error("Unauthorized role: " . $user['role']);
-            header('Location: /auth/login?error=Unauthorized role.');
-        }
+    // Check for validation errors
+    if (!empty($validation['errors'])) {
+        $_SESSION['errors'] = $validation['errors'];
+        header("Location: /auth/login");
         exit;
+    }
+
+    // Sanitize input
+    $sanitized = $validation['sanitized'];
+
+    // Check user credentials
+    $user = $this->userModel->getUserByEmail($sanitized['email']);
+    if ($user && AuthHelper::verifyPassword($sanitized['password'], $user['password'])) {
+        // Set user session or token
+        $_SESSION['user'] = $user;
+        header("Location: /dashboard");
+        exit;
+    } else {
+        $_SESSION['errors'] = ['Invalid email or password.'];
+        header("Location: /auth/login");
+        exit;
+    }
+
+        // Validate the form submission
+        // if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        //     http_response_code(405); // Method Not Allowed
+        //     echo "Invalid request method.";
+        //     return;
+        // }
+
+        // $input = $_POST;
+
+        // if (empty($input['email']) || empty($input['password'])) {
+        //     $_SESSION['errors'] = ['Email and password are required.'];
+        //     header("Location: /login");
+        //     exit;
+        // }
+        // if ($response !== false) {
+        //     $responseData = json_decode($response, true);
+        //     if ($responseData['success'] ?? false) {
+        //         // Redirect or handle success
+        //     } else {
+        //         $error = $responseData['error'] ?? 'An unknown error occurred.';
+        //     }
+        // } else {
+        //     $error = "Error connecting to the backend. " . error_get_last()['message'];
+        // }
+
+        // // Sanitize input
+        // $email = InputValidator::sanitizeEmail($input['email']);
+        // $password = InputValidator::sanitizeString($input['password']);
+
+        // // Validate input using the InputValidator
+        // ApiHelper::validateRequest(['email', 'password'], ['email' => $email, 'password' => $password]);
+
+        // // Check for existing email
+        // $user = $this->userModel->getUserByEmail($email);
+        // if (!$user) {
+        //     Logger::error("Login failed: Email not found.");
+        //     header('Location: /auth/login?error=Invalid email or password.');
+        //     exit;
+        // }
+
+        // // Verify password
+        // if (!AuthHelper::verifyPassword($password, $user['password'])) {
+        //     Logger::error("Login failed: Incorrect password for email " . $email);
+        //     header('Location: /auth/login?error=Invalid email or password.');
+        //     exit;
+        // }
+
+        // // Log in the user
+        // AuthHelper::loginUser($user['id'], $user['role']);
+        // Logger::info("User logged in successfully: " . $email);
+
+        // // Redirect based on role
+        // if ($user['role'] === 'student') {
+        //     Logger::info("Redirecting to /student/dashboard");
+        //     header('Location: /student/dashboard');
+        // } elseif ($user['role'] === 'lecturer') {
+        //     Logger::info("Redirecting to /lecturer/dashboard");
+        //     header('Location: /lecturer/dashboard');
+        // } else {
+        //     Logger::error("Unauthorized role: " . $user['role']);
+        //     header('Location: /auth/login?error=Unauthorized role.');
+        // }
+        // exit;
     }
 
     // User Logout
