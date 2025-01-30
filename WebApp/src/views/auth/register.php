@@ -1,24 +1,23 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 require_once __DIR__ . '/../../config/Database.php';
 
-use db\Database;
+use db\Database;  // Flytt use statement til toppen
 
-
-// Initialize database connection
-$db = new Database();
-$pdo = $db->getConnection();
-
-// Initialize AuthController
-$authController = new AuthController($pdo);
-
-// Handle form submission
+// Prosesser form submission først
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $db = new Database();
+    $pdo = $db->getConnection();
+    $authController = new AuthController($pdo);
     $authController->register();
+    // Hvis registreringen feiler, vil den redirecte tilbake hit
 }
+
+// Hvis vi kommer hit, er det enten en GET request eller registreringen feilet
+// Nå er det trygt å inkludere header og vise HTML
+require_once __DIR__ . '/../partials/header.php';
 ?>
 
 <div class="form-container">
@@ -109,6 +108,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const role = this.value;
         document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
         document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
+    });
+
+      // Eksisterende kode for role-endring
+      document.getElementById('role').addEventListener('change', function () {
+        const role = this.value;
+        document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
+        document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
+    });
+
+    // Funksjon for å vise feilmelding
+    function showError(input, message) {
+        // Fjern eksisterende feilmelding hvis den finnes
+        const existingError = input.parentElement.querySelector('.error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Opprett og vis ny feilmelding
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.style.color = 'red';
+        errorDiv.style.fontSize = '0.8em';
+        errorDiv.style.marginTop = '5px';
+        errorDiv.textContent = message;
+        input.parentElement.appendChild(errorDiv);
+    }
+
+    // Funksjon for å fjerne feilmelding
+    function removeError(input) {
+        const errorDiv = input.parentElement.querySelector('.error-message');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
+    // Valider passordet mens brukeren skriver
+    document.getElementById('password').addEventListener('input', function() {
+        if (this.value.length < 8) {
+            showError(this, 'Password must be at least 8 characters long');
+        } else {
+            removeError(this);
+        }
+    });
+
+    // Valider før innsending
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        
+        if (password.length < 8) {
+            e.preventDefault();
+            showError(document.getElementById('password'), 'Password must be at least 8 characters long');
+            return false;
+        }
     });
 </script>
 
