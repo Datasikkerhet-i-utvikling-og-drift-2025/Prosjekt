@@ -51,7 +51,7 @@ class User
             return $stmt->execute([
                 ':name' => InputValidator::sanitizeString($name),
                 ':email' => InputValidator::sanitizeEmail($email),
-                ':password' => AuthHelper::hashPassword($password),
+                ':password' => $password,
                 ':role' => $role,
                 ':studyProgram' => $studyProgram,
                 ':studyYear' => $studyYear,

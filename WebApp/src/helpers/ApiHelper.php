@@ -68,25 +68,16 @@ class ApiHelper
     /**
      * Parse JSON input and return it as an array
      */
-    public static function getJsonInput()
-    {
+    public static function getJsonInput() {
+        // Leser rådata fra php://input
         $input = file_get_contents('php://input');
-        Logger::info("Raw JSON input: " . ($input ?: 'EMPTY'));
-
-        if (empty($input)) {
-            self::sendError(400, 'Empty JSON input.');
-        }
-
-        $data = json_decode($input, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            Logger::error("JSON parsing failed: " . json_last_error_msg() . ". Raw input: $input");
-            self::sendError(400, 'Invalid JSON input.', ['error' => json_last_error_msg()]);
-        }
-
-        // Log the parsed input
-        Logger::info('Parsed JSON input: ' . json_encode($data));
-
+        
+        // Initialiserer en tom array for å lagre dekodet data
+        $data = [];
+        
+        // Dekoder URL-encoded data til en PHP-array
+        parse_str($input, $data);
+        // Returnerer dekodet data
         return $data;
     }
 
