@@ -64,39 +64,53 @@ class AuthController
     // User Login
     public function login()
     {
-        $input = ApiHelper::getJsonInput();
-
-        // Validate input
-        ApiHelper::validateRequest(['email', 'password'], $input);
-
-        //find user by email
-        $user = $this->userModel->getUserByEmail($input['email']);
-        if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
-            Logger::error("Login failed for email: " . $input['email']);
-            ApiHelper::sendError(401, 'Invalid email or password.');
+        // Validate the form submission
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405); // Method Not Allowed
+            echo "Invalid request method.";
+            return;
         }
 
-        // Log in the user by setting session or token
+        $input = $_POST;
+
+        // Sanitize input
+        $email = InputValidator::sanitizeEmail($input['email']);
+        $password = InputValidator::sanitizeString($input['password']);
+
+        // Validate input using the InputValidator
+        ApiHelper::validateRequest(['email', 'password'], ['email' => $email, 'password' => $password]);
+
+        // Check for existing email
+        $user = $this->userModel->getUserByEmail($email);
+        if (!$user) {
+            Logger::error("Login failed: Email not found.");
+            header('Location: /auth/login?error=Invalid email or password.');
+            exit;
+        }
+
+        // Verify password
+        if (!AuthHelper::verifyPassword($password, $user['password'])) {
+            Logger::error("Login failed: Incorrect password for email " . $email);
+            header('Location: /auth/login?error=Invalid email or password.');
+            exit;
+        }
+
+        // Log in the user
         AuthHelper::loginUser($user['id'], $user['role']);
-        Logger::info("User logged in: " . $input['email']);
+        Logger::info("User logged in successfully: " . $email);
 
-        // Redirect to the user page based on role
+        // Redirect based on role
         if ($user['role'] === 'student') {
-            ApiHelper::sendResponse(200, [
-                'redirect' => '/student/dashboard',
-                'message' => 'Welcome, student!'
-            ]);
+            Logger::info("Redirecting to /student/dashboard");
+            header('Location: /student/dashboard');
         } elseif ($user['role'] === 'lecturer') {
-            ApiHelper::sendResponse(200, [
-                'redirect' => '/lecturer/dashboard',
-                'message' => 'Welcome, lecturer!'
-            ]);
+            Logger::info("Redirecting to /lecturer/dashboard");
+            header('Location: /lecturer/dashboard');
         } else {
-            Logger::error("Unknown role for user ID: " . $user['id']);
-            ApiHelper::sendError(400, 'Unknown role for user.');
+            Logger::error("Unauthorized role: " . $user['role']);
+            header('Location: /auth/login?error=Unauthorized role.');
         }
-        //ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
-
+        exit;
     }
 
     // User Logout

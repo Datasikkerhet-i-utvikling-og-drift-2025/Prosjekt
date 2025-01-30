@@ -137,6 +137,21 @@ class InputValidator
     {
         return filter_var($url, FILTER_SANITIZE_URL);
     }
+    // Validate and sanitize an array of inputs
+    public static function validateRequest($requiredFields, $inputs)
+    {
+        $errors = [];
+        foreach ($requiredFields as $field) {
+            if (empty($inputs[$field])) {
+                $errors[] = "$field is required.";
+            }
+        }
+        if (!empty($errors)) {
+            http_response_code(400);
+            echo json_encode(['errors' => $errors]);
+            exit;
+        }
+    }
 
     // Validate and sanitize an array of inputs
     public static function validateInputs($inputs, $rules)

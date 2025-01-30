@@ -71,9 +71,21 @@ class ApiHelper
     public static function getJsonInput()
     {
         $input = file_get_contents('php://input');
+        $data = json_decode($input, true);
+
         Logger::info("Raw JSON input: " . ($input ?: 'EMPTY'));
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Logger::error("JSON parsing failed: " . json_last_error_msg() . ". Raw input: " . $input);
+            return null;
+        }
+
         if (empty($input)) {
+            self::sendError(400, 'Empty JSON input.');
+            if(!empty($input)) {
+                Logger::info('Recieved form-urlencoded data: ' . json_encode($_POST));
+                return $_POST;
+            }
             self::sendError(400, 'Empty JSON input.');
         }
 
