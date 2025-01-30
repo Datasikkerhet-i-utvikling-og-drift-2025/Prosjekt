@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/controllers/UserController.php';
 
-use api\controllers\UserController;
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 $route = $_GET['route'] ?? null; // Get the 'route' query parameter

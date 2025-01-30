@@ -1,10 +1,6 @@
 <?php
 
-namespace api\controllers;
 
-use models\user\User;
-use db\DB;
-use Exception;
 
 require_once __DIR__ . '/../../models/user/User.php';
 require_once __DIR__ . '/../../database/DB.php';

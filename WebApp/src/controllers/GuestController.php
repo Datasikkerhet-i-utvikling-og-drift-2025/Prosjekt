@@ -7,8 +7,6 @@ require_once __DIR__ . '/../models/Course.php';
 require_once __DIR__ . '/../models/Comment.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
-use helpers\ApiHelper;
-
 class GuestController
 {
     private $messageModel;

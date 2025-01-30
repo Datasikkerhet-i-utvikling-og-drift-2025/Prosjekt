@@ -7,8 +7,6 @@ require_once __DIR__ . '/../helpers/Logger.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
 
-use helpers\ApiHelper;
-use helpers\AuthHelper;
 
 class AuthController
 {
@@ -56,6 +54,11 @@ class AuthController
 
         // Create user in the database
         $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
+
+        ApiHelper::sendResponse(200, [
+            'redirect' => '/',
+            'message' => 'Registration successful'
+        ]);
     }
 
     // User Login
@@ -66,16 +69,34 @@ class AuthController
         // Validate input
         ApiHelper::validateRequest(['email', 'password'], $input);
 
+        //find user by email
         $user = $this->userModel->getUserByEmail($input['email']);
         if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
             Logger::error("Login failed for email: " . $input['email']);
             ApiHelper::sendError(401, 'Invalid email or password.');
         }
 
-        // Log in the user
+        // Log in the user by setting session or token
         AuthHelper::loginUser($user['id'], $user['role']);
         Logger::info("User logged in: " . $input['email']);
-        ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
+
+        // Redirect to the user page based on role
+        if ($user['role'] === 'student') {
+            ApiHelper::sendResponse(200, [
+                'redirect' => '/student/dashboard',
+                'message' => 'Welcome, student!'
+            ]);
+        } elseif ($user['role'] === 'lecturer') {
+            ApiHelper::sendResponse(200, [
+                'redirect' => '/lecturer/dashboard',
+                'message' => 'Welcome, lecturer!'
+            ]);
+        } else {
+            Logger::error("Unknown role for user ID: " . $user['id']);
+            ApiHelper::sendError(400, 'Unknown role for user.');
+        }
+        //ApiHelper::sendResponse(200, ['user_id' => $user['id'], 'role' => $user['role']], 'Login successful.');
+
     }
 
     // User Logout
@@ -155,11 +176,11 @@ class AuthController
         )) {
             // Redirect to login page
             $_SESSION['success'] = "Registration successful. Please log in.";
-            header("Location: /login");
+            //header("Location: /");
             exit;
         } else {
             $_SESSION['errors'] = ["Failed to register user. Please try again."];
-            header("Location: /register");
+            //header("Location: /register");
             exit;
         }
     }
@@ -174,8 +195,8 @@ class AuthController
         if ($validation['sanitized']['role'] === 'lecturer' && isset($_FILES['profile_picture'])) {
             $file = $_FILES['profile_picture'];
             $uploadDir = __DIR__ . '/../../uploads/profile_pictures/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $uploadDir));
             }
 
             // Check file type and size
@@ -204,7 +225,7 @@ class AuthController
     {
         if (!empty($validation['errors'])) {
             $_SESSION['errors'] = $validation['errors'];
-            header("Location: /register");
+            //header("Location: /register");
             exit;
         }
         return $validation;

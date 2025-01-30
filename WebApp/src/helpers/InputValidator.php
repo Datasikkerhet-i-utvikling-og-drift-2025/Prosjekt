@@ -53,7 +53,7 @@ class InputValidator
     // Validation methods test
     public static function sanitize($value)
     {
-        return filter_var($value, FILTER_SANITIZE_STRING);
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
     // Validation methods

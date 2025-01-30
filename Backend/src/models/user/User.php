@@ -1,10 +1,6 @@
 <?php
 
-namespace models\user;
 
-use DateTime;
-use db\DB;
-use Exception;
 
 require_once __DIR__ . '/../../database/DB.php';
 

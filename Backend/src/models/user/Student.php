@@ -1,9 +1,8 @@
 <?php
 
-namespace models\user;
 
-use db\DB;
-use Exception;
+
+
 
 require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/../../database/DB.php';

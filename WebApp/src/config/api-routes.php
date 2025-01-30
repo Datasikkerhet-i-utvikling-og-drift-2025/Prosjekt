@@ -88,14 +88,14 @@ try {
 // Optional: Add a debug route for development
 $routes[] = ['GET', '/debug/routes', function () use ($routes) {
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(array_map(function ($route) {
+    echo json_encode(array_map(static function ($route) {
         return [
             'method' => $route[0],
             'uri' => $route[1],
             'controller' => is_array($route[2]) ? get_class($route[2][0]) : 'Closure',
             'action' => is_array($route[2]) ? $route[2][1] : null,
         ];
-    }, $routes), JSON_PRETTY_PRINT);
+    }, $routes), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
     Logger::info('Debug route accessed.');
     exit;
 }];
@@ -103,7 +103,7 @@ $routes[] = ['GET', '/debug/routes', function () use ($routes) {
 // Log all routes to a file
 $logFile = __DIR__ . '/../../logs/routes.log';
 try {
-    file_put_contents($logFile, json_encode($routes, JSON_PRETTY_PRINT));
+    file_put_contents($logFile, json_encode($routes, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     Logger::info('Routes logged successfully to ' . $logFile);
 } catch (Exception $e) {
     Logger::error('Failed to write routes log: ' . $e->getMessage());
