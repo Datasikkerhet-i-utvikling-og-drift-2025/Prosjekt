@@ -239,7 +239,7 @@ class InputValidator
         if (empty($input['password'])) {
             $errors[] = 'Password is required.';
         } else {
-            $sanitized['password'] = filter_var($input['password'], FILTER_SANITIZE_STRING);
+            $sanitized['password'] = filter_var($input['password'], FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         return [
