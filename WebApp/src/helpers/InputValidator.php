@@ -222,4 +222,29 @@ class InputValidator
 
         return ['errors' => $errors, 'sanitized' => $sanitized];
     }
+
+    public static function validateLogin($input)
+    {
+        $errors = [];
+        $sanitized = [];
+
+        // Check if email is provided and valid
+        if (empty($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Invalid email address.';
+        } else {
+            $sanitized['email'] = filter_var($input['email'], FILTER_SANITIZE_EMAIL);
+        }
+
+        // Check if password is provided
+        if (empty($input['password'])) {
+            $errors[] = 'Password is required.';
+        } else {
+            $sanitized['password'] = filter_var($input['password'], FILTER_SANITIZE_STRING);
+        }
+
+        return [
+            'errors' => $errors,
+            'sanitized' => $sanitized
+        ];
+    }
 }
