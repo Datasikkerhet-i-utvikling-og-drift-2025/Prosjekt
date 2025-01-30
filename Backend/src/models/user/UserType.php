@@ -1,6 +1,6 @@
 <?php
 
-namespace models\user;
+
 
 enum UserType: string {
     case STUDENT = 'student';

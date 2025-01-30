@@ -1,6 +1,5 @@
 <?php
 
-use api\controllers\LoginUser;
 
 header("Content-Type: application/json; charset=UTF-8");
 require_once __DIR__ . '/controllers/LoginUser.php';

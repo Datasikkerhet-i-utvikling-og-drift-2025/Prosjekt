@@ -7,8 +7,6 @@ require_once __DIR__ . '/../helpers/Logger.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
 
-use helpers\ApiHelper;
-use helpers\AuthHelper;
 
 class AuthController
 {
@@ -56,6 +54,11 @@ class AuthController
 
         // Create user in the database
         $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
+
+        ApiHelper::sendResponse(200, [
+            'redirect' => '/',
+            'message' => 'Registration successful'
+        ]);
     }
 
     // User Login
@@ -239,11 +242,11 @@ class AuthController
         )) {
             // Redirect to login page
             $_SESSION['success'] = "Registration successful. Please log in.";
-            header("Location: /login");
+            //header("Location: /");
             exit;
         } else {
             $_SESSION['errors'] = ["Failed to register user. Please try again."];
-            header("Location: /register");
+            //header("Location: /register");
             exit;
         }
     }
@@ -258,8 +261,8 @@ class AuthController
         if ($validation['sanitized']['role'] === 'lecturer' && isset($_FILES['profile_picture'])) {
             $file = $_FILES['profile_picture'];
             $uploadDir = __DIR__ . '/../../uploads/profile_pictures/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $uploadDir));
             }
 
             // Check file type and size
@@ -288,7 +291,7 @@ class AuthController
     {
         if (!empty($validation['errors'])) {
             $_SESSION['errors'] = $validation['errors'];
-            header("Location: /register");
+            //header("Location: /register");
             exit;
         }
         return $validation;

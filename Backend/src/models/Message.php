@@ -1,6 +1,5 @@
 <?php
 
-namespace models;
 
 // Message class
 class Message {
