@@ -51,7 +51,7 @@ class User
             return $stmt->execute([
                 ':name' => InputValidator::sanitizeString($name),
                 ':email' => InputValidator::sanitizeEmail($email),
-                ':password' => AuthHelper::hashPassword($password),
+                ':password' => $password,
                 ':role' => $role,
                 ':studyProgram' => $studyProgram,
                 ':studyYear' => $studyYear,
@@ -66,7 +66,7 @@ class User
     // Retrieve a user by email
     public function getUserByEmail($email)
     {
-        $sql = "SELECT * FROM users WHERE email = :email";
+        $sql = "SELECT `id`, `email`, `password` FROM users WHERE email = ?";
         $stmt = $this->pdo->prepare($sql);
 
         try {
