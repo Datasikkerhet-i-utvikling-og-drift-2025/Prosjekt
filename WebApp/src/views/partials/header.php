@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><?php echo htmlspecialchars($pageTitle ?? 'Feedback System', ENT_QUOTES, 'UTF-8'); ?></title>
     <link rel="stylesheet" href="/assets/css/style.css"> <!-- Global CSS -->
-    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="https://img.icons8.com/color/96/anonymous-mask.png" type="image/x-icon">
 </head>
 <body>
 <header class="header">
@@ -26,10 +26,11 @@
                     <li><a href="<?php echo ($_SESSION['user']['role'] === 'student') ? '/student/dashboard' : (($_SESSION['user']['role'] === 'lecturer') ? '/lecturer/dashboard' : '/admin/dashboard'); ?>">Dashboard</a></li>
 
                     <?php if ($_SESSION['user']['role'] === 'student'): ?>
+                        <li><a href="/student/dashboard">Dashboard</a></li>
                         <li><a href="/student/view-responses">My Messages</a></li>
                         <li><a href="/student/send-message">Send Message</a></li>
                     <?php elseif ($_SESSION['user']['role'] === 'lecturer'): ?>
-                        <li><a href="/lecturer/dashboard">My Courses</a></li>
+                        <li><a href="/lecturer/dashboard">Dashboard</a></li>
                         <li><a href="/lecturer/read-messages">Messages</a></li>
                     <?php elseif ($_SESSION['user']['role'] === 'admin'): ?>
                         <li><a href="/admin/manage-users">Manage Users</a></li>
