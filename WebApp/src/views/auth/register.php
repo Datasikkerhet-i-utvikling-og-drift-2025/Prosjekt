@@ -152,15 +152,33 @@ require_once __DIR__ . '/../partials/header.php';
         }
     });
 
+    document.getElementById('repeat_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const repeatPassword = document.getElementById('repeat_password').value;
+        if (repeatPassword !== password) {
+            showError(this, 'Passwords must match');
+        } else {
+            removeError(this);
+        }
+    });
+
     // Valider før innsending
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
-        
+        const repeatPassword = document.getElementById('repeat_password').value;
+
         if (password.length < 8) {
             e.preventDefault();
             showError(document.getElementById('password'), 'Password must be at least 8 characters long');
             return false;
         }
+
+        if (repeatPassword !== password) {
+            e.preventDefault();
+            showError(document.getElementById('repeat_password'), 'Passwords must match');
+            return false;
+        }
+
     });
 </script>
 
