@@ -54,7 +54,7 @@ class User
                 ':password' => $password,
                 ':role' => $role,
                 ':studyProgram' => $studyProgram,
-                ':studyYear' => $studyYear,
+                ':studyYear' => ($studyYear === "" || $studyYear === null) ? null : (int)$studyYear,
                 ':imagePath' => $imagePath,
             ]);
         } catch (Exception $e) {

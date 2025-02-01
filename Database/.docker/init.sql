@@ -6,7 +6,7 @@ CREATE TABLE users (
                        password VARCHAR(255) NOT NULL,
                        role ENUM('student', 'lecturer', 'admin') NOT NULL,
                        study_program VARCHAR(100),
-                       study_year INT,
+                       study_year INT NULL,
                        image_path VARCHAR(255),
                        reset_token VARCHAR(255), -- Added for storing reset tokens
                        reset_token_created_at TIMESTAMP NULL, -- Added for tracking token creation time

@@ -87,13 +87,35 @@ require_once __DIR__ . '/../partials/header.php';
                 <input type="number" id="cohort_year" name="cohort_year" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
             </div>
         </div>
-
         <div id="lecturer-fields" style="display: <?= ($_POST['role'] ?? '') === 'lecturer' ? 'block' : 'none' ?>;">
-            <div class="form-group">
-                <label for="profile_picture">Profile Picture</label>
-                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-            </div>
-        </div>
+    <div class="form-group">
+        <label for="profile_picture">Profile Picture</label>
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    </div>
+    
+    <div class="form-group">
+        <label for="course_code">Course Code</label>
+        <input type="text" id="course_code" name="course_code" 
+               placeholder="ITF12345" 
+               value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+    </div>
+
+    <div class="form-group">
+        <label for="course_name">Course Name</label>
+        <input type="text" id="course_name" name="course_name" 
+               placeholder="Datasikkerhet i utvikling og drift" 
+               value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+    </div>
+
+    <div class="form-group">
+        <label for="course_pin">Course PIN</label>
+        <input type="text" id="course_pin" name="course_pin" 
+               placeholder="1337" 
+               pattern="[0-9]{4}" 
+               title="Please enter a 4-digit PIN code"
+               value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+    </div>
+</div>
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Register</button>

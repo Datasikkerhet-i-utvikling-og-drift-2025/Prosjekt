@@ -46,6 +46,10 @@ class InputValidator
             'role' => ['required' => true],
             'study_program' => ['required' => false, 'max' => 100],
             'cohort_year' => ['required' => false, 'integer' => true],
+            // Nye regler for kurs
+            'course_code' => ['required' => false, 'max' => 10],
+            'course_name' => ['required' => false, 'max' => 100],
+            'course_pin' => ['required' => false, 'regex' => '/^[0-9]{4}$/']
         ];
     }
 
