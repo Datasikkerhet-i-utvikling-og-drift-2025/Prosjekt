@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/../../helpers/Logger.php';
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
     header('Location: /auth/login');
@@ -14,10 +14,10 @@ $lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
 $courses = [];
 $messages = [];
 $errorMessage = '';
-
+require_once __DIR__ . '/../../config/Database.php';
 try {
-    require_once __DIR__ . '/../../helpers/Database.php';
-    require_once __DIR__ . '/../../helpers/Logger.php';
+   
+   
 
     $db = new \db\Database();
     $pdo = $db->getConnection();

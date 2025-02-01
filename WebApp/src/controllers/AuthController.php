@@ -6,14 +6,17 @@ require_once __DIR__ . '/../helpers/InputValidator.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
+require_once __DIR__ . '/../models/Course.php';
 
 
 class AuthController
 {
     private $userModel;
+    private $pdo;
 
     public function __construct($pdo)
     {
+        $this->pdo = $pdo;  // Lagre PDO-tilkoblingen
         $this->userModel = new User($pdo);
     }
 
@@ -162,25 +165,59 @@ class AuthController
 
     public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
     {
-        if ($this->userModel->createUser(
-            $sanitized['name'],
-            $sanitized['email'],
-            $hashedPassword,
-            $sanitized['role'],
-            $sanitized['study_program'] ?? null,
-            $sanitized['cohort_year'] ?? null,
-            $profilePicturePath // Save file path if lecturer has uploaded a picture
-        )) {
-            // Redirect to login page
+        try {
+            $this->pdo->beginTransaction();
+
+            // Opprett bruker
+            $userCreated = $this->userModel->createUser(
+                $sanitized['name'],
+                $sanitized['email'],
+                $hashedPassword,
+                $sanitized['role'],
+                $sanitized['study_program'] ?? null,
+                $sanitized['cohort_year'] ?? null,
+                $profilePicturePath
+            );
+
+            if (!$userCreated) {
+                throw new Exception("Failed to create user");
+            }
+
+            // Hvis det er en foreleser og kursinformasjon er gitt, opprett kurs
+            if ($sanitized['role'] === 'lecturer' && 
+                isset($sanitized['course_code']) && 
+                isset($sanitized['course_name']) && 
+                isset($sanitized['course_pin'])) {
+                
+                $courseModel = new Course($this->pdo);
+                $userId = $this->pdo->lastInsertId();
+                
+                $courseCreated = $courseModel->createCourse(
+                    $sanitized['course_code'],
+                    $sanitized['course_name'],
+                    $userId,
+                    $sanitized['course_pin']
+                );
+
+                if (!$courseCreated) {
+                    throw new Exception("Failed to create course");
+                }
+            }
+
+            $this->pdo->commit();
             $_SESSION['success'] = "Registration successful. Please log in.";
             header("Location: /");
             exit;
-        } else {
-            $_SESSION['errors'] = ["Failed to register user. Please try again."];
+
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            $_SESSION['errors'] = [$e->getMessage()];
             header("Location: /register");
             exit;
         }
     }
+
+
 
     /**
      * @param array $validation
