@@ -72,11 +72,22 @@ class AuthController
     // Validate input
     ApiHelper::validateRequest(['email', 'password'], $input);
 
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    // Enkel sjekk for at e-post og passord er sendt med
+    if (empty($email) || empty($password)) {
+        header("Location: /login?error=" . urlencode("Email and password are required."));
+        exit;
+    }
+
     // Find user by email
     $user = $this->userModel->getUserByEmail($input['email']);
     if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
         Logger::error("Login failed for email: " . $input['email']);
-        ApiHelper::sendError(401, 'Invalid email or password.');
+        //ApiHelper::sendError(401, 'Invalid email or password.');
+        header("Location: /?error=" . urlencode("Invalid email or password."));
+        exit;
     }
 
     // Log in the user by setting session or token

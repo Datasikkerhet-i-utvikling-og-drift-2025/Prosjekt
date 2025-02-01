@@ -78,9 +78,9 @@ body {
 
 /* Container */
 .container {
-    max-width: 1000px;
-    min-width: 600px;
-    margin: auto;
+    /*max-width: 1000px;
+    min-width: 900px;*/
+    margin: 20px;
     padding: 20px;
     background: white;
     border-radius: 12px;

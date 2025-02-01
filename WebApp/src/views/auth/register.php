@@ -1,5 +1,19 @@
 <?php
 session_start();
+if (isset($_SESSION['user'])) {
+    $role = $_SESSION['user']['role'] ?? '';
+    if ($role === 'student') {
+        header('Location: /student/dashboard');
+        exit;
+    } elseif ($role === 'lecturer') {
+        header('Location: /lecturer/dashboard');
+        exit;
+    } elseif ($role === 'admin') {
+        header('Location: /admin/dashboard');
+        exit;
+    }
+}
+
 
 require_once __DIR__ . '/../../controllers/AuthController.php';
 require_once __DIR__ . '/../../config/Database.php';
