@@ -2,7 +2,7 @@
 session_start();
 
 // Include required files using __DIR__
-require_once __DIR__ . '/../../helpers/Database.php';
+require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 

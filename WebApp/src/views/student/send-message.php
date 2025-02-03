@@ -18,37 +18,34 @@ if (empty($courseId)) {
 $messageSent = false;
 $errorMessage = '';
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/../../helpers/Database.php';
+    require_once __DIR__ . '/../../config/Database.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
-
+    require_once __DIR__ . '/../../models/Message.php';
+    
     try {
         $db = new \db\Database();
         $pdo = $db->getConnection();
 
         $messageContent = trim($_POST['message_content'] ?? '');
         $studentId = $_SESSION['user']['id'];
+        
+        // Generer anonymous_id (UUID)
+        $anonymousId = bin2hex(random_bytes(16));
 
         if (empty($messageContent)) {
             $errorMessage = 'Message content cannot be empty.';
         } else {
-            // Insert the message into the database
-            $stmt = $pdo->prepare("
-                INSERT INTO messages (course_id, student_id, content, created_at)
-                VALUES (:course_id, :student_id, :content, NOW())
-            ");
-            $stmt->execute([
-                ':course_id' => $courseId,
-                ':student_id' => $studentId,
-                ':content' => htmlspecialchars($messageContent, ENT_QUOTES, 'UTF-8'),
-            ]);
-
-            $messageSent = true;
-            Logger::info("Message sent by student ID {$studentId} to course ID {$courseId}.");
+            $messageModel = new Message($pdo);
+            if ($messageModel->createMessage($studentId, $courseId, $anonymousId, $messageContent)) {
+                $messageSent = true;
+                Logger::info("Message sent successfully with anonymous ID");
+            } else {
+                $errorMessage = 'Failed to send message';
+            }
         }
     } catch (Exception $e) {
-        $errorMessage = 'An error occurred while sending the message. Please try again later.';
+        $errorMessage = 'An error occurred while sending the message.';
         Logger::error('Error sending message: ' . $e->getMessage());
     }
 }

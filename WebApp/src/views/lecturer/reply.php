@@ -20,7 +20,7 @@ $errorMessage = '';
 $successMessage = '';
 
 try {
-    require_once __DIR__ . '/../../helpers/Database.php';
+    require_once __DIR__ . '/../../config/Database.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
 
     $db = new \db\Database();
