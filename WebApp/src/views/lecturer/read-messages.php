@@ -8,18 +8,18 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
 }
 
 // Get course information from query parameters
-$courseId = htmlspecialchars($_GET['course_id'] ?? '', ENT_QUOTES, 'UTF-8');
-if (empty($courseId)) {
-    echo 'Course ID is required.';
-    exit;
-}
+// $courseId = htmlspecialchars($_GET['course_id'] ?? '', ENT_QUOTES, 'UTF-8');
+// if (empty($courseId)) {
+//     echo 'Course ID is required.';
+//     exit;
+// }
 
 // Initialize variables
 $messages = [];
 $errorMessage = '';
 
+require_once __DIR__ . '/../../config/Database.php';
 try {
-    require_once __DIR__ . '/../../config/Database.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
 
     $db = new \db\Database();
@@ -30,10 +30,10 @@ try {
     SELECT m.id, m.content, m.created_at, m.reply, c.code as course_code
     FROM messages m
     JOIN courses c ON m.course_id = c.id
-    WHERE m.course_id = :course_id
+    WHERE c.lecturer_id = :lecturer_id
     ORDER BY m.created_at DESC
 ");
-$stmt->execute([':course_id' => $courseId]);
+$stmt->execute([':lecturer_id' => $_SESSION['user']['id']]);
 $messages = $stmt->fetchAll();
 
 $courseCode = $messages[0]['course_code'] ?? 'Unknown Course';
