@@ -18,8 +18,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
 $messages = [];
 $errorMessage = '';
 
-require_once __DIR__ . '/../../config/Database.php';
+
 try {
+    require_once __DIR__ . '/../../config/Database.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
 
     $db = new \db\Database();

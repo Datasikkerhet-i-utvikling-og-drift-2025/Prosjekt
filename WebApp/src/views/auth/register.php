@@ -1,5 +1,19 @@
 <?php
 session_start();
+if (isset($_SESSION['user'])) {
+    $role = $_SESSION['user']['role'] ?? '';
+    if ($role === 'student') {
+        header('Location: /student/dashboard');
+        exit;
+    } elseif ($role === 'lecturer') {
+        header('Location: /lecturer/dashboard');
+        exit;
+    } elseif ($role === 'admin') {
+        header('Location: /admin/dashboard');
+        exit;
+    }
+}
+
 
 require_once __DIR__ . '/../../controllers/AuthController.php';
 require_once __DIR__ . '/../../config/Database.php';
@@ -79,7 +93,7 @@ require_once __DIR__ . '/../partials/header.php';
         <div id="student-fields" style="display: <?= ($_POST['role'] ?? '') === 'student' ? 'block' : 'none' ?>;">
             <div class="form-group">
                 <label for="study_program">Study Program</label>
-                <input type="text" id="study_program" name="study_program" placeholder="Information Security" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
             </div>
 
             <div class="form-group">
@@ -174,15 +188,33 @@ require_once __DIR__ . '/../partials/header.php';
         }
     });
 
+    document.getElementById('repeat_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const repeatPassword = document.getElementById('repeat_password').value;
+        if (repeatPassword !== password) {
+            showError(this, 'Passwords must match');
+        } else {
+            removeError(this);
+        }
+    });
+
     // Valider før innsending
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
-        
+        const repeatPassword = document.getElementById('repeat_password').value;
+
         if (password.length < 8) {
             e.preventDefault();
             showError(document.getElementById('password'), 'Password must be at least 8 characters long');
             return false;
         }
+
+        if (repeatPassword !== password) {
+            e.preventDefault();
+            showError(document.getElementById('repeat_password'), 'Passwords must match');
+            return false;
+        }
+
     });
 </script>
 
