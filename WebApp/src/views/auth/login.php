@@ -11,7 +11,7 @@ if (isset($_SESSION['user'])) {
     } elseif ($role === 'admin') {
         header('Location: /admin/dashboard');
         exit;
-    }
+    } 
 }
 ?>
 
@@ -53,7 +53,12 @@ if (isset($_SESSION['user'])) {
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Login</button>
             <a href="/register" class="btn btn-secondary">Register</a>
-            <a href="/guest/messages" class="btn btn-guest">Continue as Guest</a>
+        </div>
+    </form>
+
+    <form action="/guests/dashboard" method="POST" class="form">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-guest">Continue as Guest</button>
         </div>
     </form>
 
