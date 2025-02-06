@@ -15,6 +15,8 @@ return [
     '/admin/manage-users' => __DIR__ . '/../views/admin/manage-users.php',
     '/admin/manage-messages' => __DIR__ . '/../views/admin/manage-messages.php',
     '/admin/reports' => __DIR__ . '/../views/admin/reports.php',
-    '/guest/view-messages' => __DIR__ . '/../views/guest/view-messages.php',
-    '/guest/report-message' => __DIR__ . '/../views/guest/report-message.php',
+    '/guests/view-messages' => __DIR__ . '/../views/guests/view-messages.php',
+    '/guests/report-message' => __DIR__ . '/../views/guests/report-message.php',
+    '/guests/dashboard' => __DIR__ . '/../views/guests/dashboard.php',
+    '/auth/guest' => __DIR__ . '/../controllers/AuthController.php@guest', // Added route for guest handler
 ];

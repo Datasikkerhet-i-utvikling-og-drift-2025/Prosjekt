@@ -275,4 +275,19 @@ class AuthController
         }
         return $validation;
     }
+
+    public function guest()
+{
+    // Set session data for guest
+    $_SESSION['user'] = [
+        'role' => 'guest',
+        'name' => 'Guest'
+    ];
+
+    Logger::info("Guest user logged in. Session data: " . var_export($_SESSION, true));
+
+    // Redirect to guest dashboard
+    header('Location: /guests/dashboard');
+    exit;
+}
 }
