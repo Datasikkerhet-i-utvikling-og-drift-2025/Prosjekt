@@ -26,7 +26,7 @@ try {
 
     // Fetch courses assigned to the lecturer
     $stmtCourses = $pdo->prepare("
-        SELECT id, code, name 
+        SELECT id, code, name, pin_code
         FROM courses 
         WHERE lecturer_id = :lecturer_id
     ");
@@ -74,6 +74,7 @@ try {
                     <div class="course-item">
                         <p><strong>Course Code:</strong> <?php echo htmlspecialchars($course['code'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Course Name:</strong> <?php echo htmlspecialchars($course['name'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Pin code:</strong> <?php echo htmlspecialchars($course['pin_code'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <a href="/lecturer/read-messages?course_id=<?php echo htmlspecialchars($course['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">View Messages</a>
                         <hr>
                     </div>

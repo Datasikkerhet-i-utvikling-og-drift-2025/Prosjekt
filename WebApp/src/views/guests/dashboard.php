@@ -56,20 +56,102 @@ $messages = $stmt->fetchAll();
     <img src="<?= sanitize(preg_replace('/^.*?uploads\//', '/uploads/', $lecturer['image_path'] ?? 'uploads/profile_pictures/hiof.jpg')) ?>" alt="Lecturer Image" width="100" height="100">
 
     <?php foreach ($messages as $message): ?>
-        <div class="message-box">
-            <p><strong>Message:</strong> <?= sanitize($message['content']) ?></p>
-            <a href="report-message.php?message_id=<?= $message['id'] ?>" class="btn btn-danger">Report Message</a>
-            
-            <h3>Leave a Comment</h3>
-            <form action="" method="POST">
-                <input type="hidden" name="message_id" value="<?= $message['id'] ?>">
-                <label>Your Name (Optional):</label>
-                <input type="text" name="guest_name">
-                <label>Your Comment:</label>
-                <textarea name="comment" required></textarea>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-    <?php endforeach; ?>
+    <div class="message-box">
+        <p><strong>Message:</strong> <?= sanitize($message['content']) ?></p>
+        <button class="btn btn-danger" onclick="showReportModal(<?= $message['id'] ?>)">Report Message</button>
+        
+        <h3>Leave a Comment</h3>
+        <form action="" method="POST" class="comment-form">
+            <input type="hidden" name="message_id" value="<?= $message['id'] ?>">
+            <label>Your Name (Optional):</label>
+            <input type="text" name="guest_name">
+            <label>Your Comment:</label>
+            <textarea name="comment" required></textarea>
+            <button type="submit" class="btn btn-small">Send</button>
+        </form>
+    </div>
+<?php endforeach; ?>
 </div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeReportModal()">&times;</span>
+        <h2>Report Message</h2>
+        <form id="reportForm" action="/guest/messages/report" method="POST">
+            <input type="hidden" name="message_id" id="reportMessageId">
+            <label for="reported_by">Reported By (Optional):</label>
+            <input type="text" name="reported_by" id="reported_by">
+            <label for="report_reason">Reason for Reporting:</label>
+            <textarea name="report_reason" id="report_reason" required></textarea>
+            <button type="submit" class="btn btn-danger">Submit Report</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function showReportModal(messageId) {
+    document.getElementById('reportMessageId').value = messageId;
+    document.getElementById('reportModal').style.display = 'block';
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+}
+</script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.comment-form .btn-small {
+    align-self: flex-end;
+    padding: 5px 10px;
+    font-size: 14px;
+}
+</style>
+
 <?php include __DIR__ . '/../partials/footer.php'; ?>
