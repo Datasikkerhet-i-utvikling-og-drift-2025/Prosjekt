@@ -61,7 +61,7 @@ $messages = $stmt->fetchAll();
             <a href="report-message.php?message_id=<?= $message['id'] ?>" class="btn btn-danger">Report Message</a>
             
             <h3>Leave a Comment</h3>
-            <form action="" method="POST">
+            <form action="/guest/messages/comment" method="POST">
                 <input type="hidden" name="message_id" value="<?= $message['id'] ?>">
                 <label>Your Name (Optional):</label>
                 <input type="text" name="guest_name">

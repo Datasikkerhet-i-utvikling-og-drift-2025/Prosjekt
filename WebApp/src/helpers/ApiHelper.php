@@ -71,6 +71,7 @@ class ApiHelper
     public static function getJsonInput() {
         // Leser rådata fra php://input
         $input = file_get_contents('php://input');
+        Logger::info("Input: " . var_export($input, true));
         
         // Initialiserer en tom array for å lagre dekodet data
         $data = [];

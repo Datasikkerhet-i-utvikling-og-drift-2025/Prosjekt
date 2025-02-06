@@ -145,6 +145,7 @@ class InputValidator
     // Validate and sanitize an array of inputs
     public static function validateInputs($inputs, $rules)
     {
+        Logger::info("Validating inputs: " . var_export($inputs, true));
         $errors = [];
         $sanitized = [];
 
