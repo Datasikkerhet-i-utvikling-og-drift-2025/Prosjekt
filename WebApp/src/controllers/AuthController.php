@@ -239,7 +239,7 @@ class AuthController
         $profilePicturePath = null;
         if ($validation['sanitized']['role'] === 'lecturer' && isset($_FILES['profile_picture'])) {
             $file = $_FILES['profile_picture'];
-            $uploadDir = __DIR__ . '/../../uploads/profile_pictures/';
+            $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
             if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $uploadDir));
             }
