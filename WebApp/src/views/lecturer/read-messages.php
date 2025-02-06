@@ -8,18 +8,19 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
 }
 
 // Get course information from query parameters
-$courseId = htmlspecialchars($_GET['course_id'] ?? '', ENT_QUOTES, 'UTF-8');
-if (empty($courseId)) {
-    echo 'Course ID is required.';
-    exit;
-}
+// $courseId = htmlspecialchars($_GET['course_id'] ?? '', ENT_QUOTES, 'UTF-8');
+// if (empty($courseId)) {
+//     echo 'Course ID is required.';
+//     exit;
+// }
 
 // Initialize variables
 $messages = [];
 $errorMessage = '';
 
+
 try {
-    require_once __DIR__ . '/../../helpers/Database.php';
+    require_once __DIR__ . '/../../config/Database.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
 
     $db = new \db\Database();
@@ -27,13 +28,16 @@ try {
 
     // Fetch messages for the specified course
     $stmt = $pdo->prepare("
-        SELECT m.id, m.content, m.created_at, m.reply
-        FROM messages m
-        WHERE m.course_id = :course_id
-        ORDER BY m.created_at DESC
-    ");
-    $stmt->execute([':course_id' => $courseId]);
-    $messages = $stmt->fetchAll();
+    SELECT m.id, m.content, m.created_at, m.reply, c.code as course_code
+    FROM messages m
+    JOIN courses c ON m.course_id = c.id
+    WHERE c.lecturer_id = :lecturer_id
+    ORDER BY m.created_at DESC
+");
+$stmt->execute([':lecturer_id' => $_SESSION['user']['id']]);
+$messages = $stmt->fetchAll();
+
+$courseCode = $messages[0]['course_code'] ?? 'Unknown Course';
 } catch (Exception $e) {
     $errorMessage = 'Failed to load messages. Please try again later.';
     Logger::error('Error fetching messages for course ID ' . $courseId . ': ' . $e->getMessage());
@@ -44,7 +48,7 @@ try {
 <?php include __DIR__ . '/../partials/navbar.php'; ?>
 
 <div class="container">
-    <h1>Messages for Course ID: <?php echo htmlspecialchars($courseId, ENT_QUOTES, 'UTF-8'); ?></h1>
+<h1>Messages for Course: <?php echo htmlspecialchars($courseCode, ENT_QUOTES, 'UTF-8'); ?></h1>
     <p>Below are the messages sent by students for this course.</p>
 
     <!-- Error Message -->
