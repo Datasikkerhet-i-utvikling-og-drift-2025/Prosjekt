@@ -92,8 +92,8 @@ class GuestController
         // Validate input
         $validationRules = [
             'message_id' => ['required' => true],
-            'guest_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'content' => ['required' => true, 'min' => 1]
+            'guest_name' => ['required' => false, 'max' => 50],
+            'comment' => ['required' => true, 'min' => 1]
         ];
         $validation = InputValidator::validateInputs($input, $validationRules);
 
@@ -108,12 +108,12 @@ class GuestController
         $result = $this->commentModel->addComment(
             $sanitized['message_id'],
             $sanitized['guest_name'],
-            $sanitized['content']
+            $sanitized['comment']
         );
 
         if ($result) {
             Logger::info("Comment added successfully to message ID: {$sanitized['message_id']}");
-            ApiHelper::sendResponse(201, [], 'Comment added successfully.');
+            header('Location: /guests/dashboard');
         } else {
             Logger::error("Failed to add comment to message ID: {$sanitized['message_id']}");
             ApiHelper::sendError(500, 'Failed to add comment.');

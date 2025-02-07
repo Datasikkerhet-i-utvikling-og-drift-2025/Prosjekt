@@ -200,19 +200,22 @@ class User
         }
     }
 
-    // Update user password
-    public function updatePassword($userId, $newPassword)
+    public function updatePassword($userId, $newHashedPassword)
     {
-        $sql = "UPDATE users SET password = :newPassword, reset_token = NULL, reset_token_created_at = NULL WHERE id = :userId";
-        $stmt = $this->pdo->prepare($sql);
-
         try {
-            return $stmt->execute([
-                ':newPassword' => AuthHelper::hashPassword($newPassword),
-                ':userId' => $userId,
+            Logger::info("Attempting to update password for user ID: " . $userId);
+            
+            $sql = "UPDATE users SET password = :password WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute([
+                ':password' => $newHashedPassword,
+                ':id' => $userId
             ]);
+            
+            Logger::info("Password update result: " . ($result ? "success" : "failed"));
+            return $result;
         } catch (Exception $e) {
-            Logger::error("Failed to update user password: " . $e->getMessage());
+            Logger::error("Failed to update password: " . $e->getMessage());
             return false;
         }
     }
