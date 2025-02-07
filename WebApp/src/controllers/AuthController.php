@@ -223,35 +223,45 @@ public function resetPassword()
         exit;
     }
 
-    $email = $_POST['email'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
+    try {
+        $email = $_POST['email'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    // Sjekk at passordene matcher
-    if ($newPassword !== $confirmPassword) {
-        $_SESSION['errors'] = 'Passwords do not match';
-        header('Location: /reset-password');
-        exit;
-    }
+        // Validere input
+        if (empty($email)) {
+            throw new Exception('Email is required');
+        }
 
-    // Finn bruker med email
-    $user = $this->userModel->getUserByEmail($email);
-    if (!$user) {
-        $_SESSION['errors'] = 'Email not found';
-        header('Location: /reset-password');
-        exit;
-    }
+        if (strlen($newPassword) < 8) {
+            throw new Exception('Password must be at least 8 characters long');
+        }
 
-    // Oppdater passord
-    $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+        if ($newPassword !== $confirmPassword) {
+            throw new Exception('Passwords do not match');
+        }
+
+        // Sjekk om brukeren eksisterer
+        $user = $this->userModel->getUserByEmail($email);
+        if (!$user) {
+            throw new Exception('Email not found');
+        }
+
+        // Oppdater passord
+        $hashedPassword = AuthHelper::hashPassword($newPassword);
+        if (!$this->userModel->updatePassword($user['id'], $hashedPassword)) {
+            throw new Exception('Failed to reset password');
+        }
+
         $_SESSION['success'] = 'Password has been reset successfully. Please login.';
         header('Location: /');
-    } else {
-        $_SESSION['errors'] = 'Failed to reset password';
+        exit;
+
+    } catch (Exception $e) {
+        $_SESSION['errors'] = $e->getMessage();
         header('Location: /reset-password');
+        exit;
     }
-    exit;
 }
 
     public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void

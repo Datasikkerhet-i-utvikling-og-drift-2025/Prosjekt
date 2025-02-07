@@ -63,9 +63,9 @@ if (isset($_SESSION['user'])) {
     </form>
 
     <!-- Forgot Password Link -->
-    <div class="forgot-password">
-        <p><a href="/reset-password">Forgot your password?</a></p>
-    </div>
+    <div class="additional-links">
+    <p><a href="/reset-password">Forgot your password?</a></p>
+</div>
 </div>
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>
