@@ -16,6 +16,7 @@ class User
     // Create a new user
     public function createUser($name, $email, $password, $role, $studyProgram = null, $studyYear = null, $imagePath = null)
     {
+
         // Validate inputs
         $validationRules = [
             'name' => ['required' => true, 'sanitize' => true, 'min' => 3, 'max' => 100],
