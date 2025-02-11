@@ -1,5 +1,7 @@
 <?php
 
+namespace controllers;
+
 require_once __DIR__ . '/../helpers/ApiHelper.php';
 require_once __DIR__ . '/../helpers/InputValidator.php';
 require_once __DIR__ . '/../models/Message.php';

@@ -12,10 +12,10 @@ if (!isset($_SESSION['user'])) {
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 
-use db\Database;
+use helpers\Database;
 
 $db = new Database();
-$pdo = $db->getConnection();
+$pdo = $db->pdo;
 $authController = new AuthController($pdo);
 
 // Get user data

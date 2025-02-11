@@ -18,12 +18,14 @@ if (isset($_SESSION['user'])) {
 require_once __DIR__ . '/../../controllers/AuthController.php';
 require_once __DIR__ . '/../../config/Database.php';
 
-use db\Database;  // Flytt use statement til toppen
+use helpers\Database;
+
+// Flytt use statement til toppen
 
 // Prosesser form submission først
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = new Database();
-    $pdo = $db->getConnection();
+    $pdo = $db->pdo;
     $authController = new AuthController($pdo);
     $authController->register();
     // Hvis registreringen feiler, vil den redirecte tilbake hit

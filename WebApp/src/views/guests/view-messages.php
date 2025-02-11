@@ -27,8 +27,8 @@ $errorMessage = '';
 
 try {
     // Fetch messages from the database
-    $db = new \db\Database();
-    $pdo = $db->getConnection();
+    $db = new helpers\Database();
+    $pdo = $db->pdo;
 
     $stmt = $pdo->prepare("
         SELECT m.id, m.content, m.reply, m.created_at 

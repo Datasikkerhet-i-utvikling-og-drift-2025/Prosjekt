@@ -15,8 +15,8 @@ $errorMessage = '';
 
 try {
     // Fetch available courses
-    $db = new \db\Database();
-    $pdo = $db->getConnection();
+    $db = new helpers\Database();
+    $pdo = $db->pdo;
 
     $stmtCourses = $pdo->query("SELECT id, code, name FROM courses");
     $courses = $stmtCourses->fetchAll();

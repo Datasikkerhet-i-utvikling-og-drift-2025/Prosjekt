@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/../../models/Message.php';
     
     try {
-        $db = new \db\Database();
-        $pdo = $db->getConnection();
+        $db = new helpers\Database();
+        $pdo = $db->pdo;
 
         $messageContent = trim($_POST['message_content'] ?? '');
         $studentId = $_SESSION['user']['id'];

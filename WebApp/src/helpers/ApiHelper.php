@@ -1,5 +1,7 @@
 <?php
 
+namespace helpers;
+
 require_once __DIR__ . '/../helpers/Logger.php';
 
 

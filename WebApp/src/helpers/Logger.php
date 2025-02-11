@@ -1,5 +1,9 @@
 <?php
 
+namespace helpers;
+
+use Exception;
+
 class Logger
 {
     private static $logFile = __DIR__ . '/../../logs/app.log'; // Default log file path
@@ -32,6 +36,12 @@ class Logger
     public static function critical($message)
     {
         self::writeLog('CRITICAL', $message);
+    }
+
+    // Log an error message
+    public static function success($message)
+    {
+        self::writeLog('SUCCESS', $message);
     }
 
     // Generic method to write to the log file

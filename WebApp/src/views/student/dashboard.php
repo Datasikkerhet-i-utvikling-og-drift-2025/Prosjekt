@@ -16,8 +16,8 @@ $studentName = $_SESSION['user']['name'] ?? 'Student';
 require_once __DIR__ . '/../../config/Database.php';
 
 try {
-    $db = new \db\Database();
-    $pdo = $db->getConnection();
+    $db = new helpers\Database();
+    $pdo = $db->pdo;
 
     // Fetch student messages
     $stmtMessages = $pdo->prepare("SELECT id, content, reply FROM messages WHERE student_id = :student_id");

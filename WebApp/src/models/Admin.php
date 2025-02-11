@@ -1,16 +1,41 @@
 <?php
 
-require_once 'User.php';
+namespace models;
+
+use PDO;
+use PDOStatement;
+
 require_once __DIR__ . '/../helpers/InputValidator.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
 class Admin extends User
 {
-    public function __construct($pdo)
+    public function __construct(array $userData)
     {
-        parent::__construct($pdo);
+        parent::__construct($userData);
     }
 
+    /**
+     * Binds the user's properties as parameters for a prepared PDO statement.
+     *
+     * This method ensures that all relevant user attributes are securely bound to a
+     * prepared SQL statement before execution, reducing the risk of SQL injection.
+     *
+     * @param PDOStatement $stmt The prepared statement to which user attributes will be bound.
+     *
+     * @return void
+     */
+    public function bindUserDataForDbStmt(PDOStatement $stmt): void
+    {
+        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
+        $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
+        $stmt->bindValue(':full_name', $this->fullName, PDO::PARAM_STR);
+        $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+        $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
+        $stmt->bindValue(':role', $this->role->value, PDO::PARAM_STR);
+    }
+}
     // Delete a user by ID
     public function deleteUserById($id)
     {

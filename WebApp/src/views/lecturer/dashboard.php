@@ -19,8 +19,8 @@ try {
    
    
 
-    $db = new \db\Database();
-    $pdo = $db->getConnection();
+    $db = new helpers\Database();
+    $pdo = $db->pdo;
 
     $lecturerId = $_SESSION['user']['id'];
 

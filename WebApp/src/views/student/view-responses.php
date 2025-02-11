@@ -18,8 +18,8 @@ try {
     require_once __DIR__ . '/../../config/Database.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
 
-    $db = new \db\Database();
-    $pdo = $db->getConnection();
+    $db = new helpers\Database();
+    $pdo = $db->pdo;
 
     $studentId = $_SESSION['user']['id'];
 

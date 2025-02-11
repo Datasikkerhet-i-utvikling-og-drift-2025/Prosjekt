@@ -1,12 +1,14 @@
 -- Users Table
 CREATE TABLE users (
                        id INT AUTO_INCREMENT PRIMARY KEY,
-                       name VARCHAR(100) NOT NULL,
+                       first_name VARCHAR(100) NOT NULL,
+                       last_name VARCHAR(100) NOT NULL,
+                       full_name VARCHAR(100) NOT NULL,
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
                        role ENUM('student', 'lecturer', 'admin') NOT NULL,
                        study_program VARCHAR(100),
-                       study_year INT NULL,
+                       enrollment_year INT NULL,
                        image_path VARCHAR(255),
                        reset_token VARCHAR(255), -- Added for storing reset tokens
                        reset_token_created_at TIMESTAMP NULL, -- Added for tracking token creation time

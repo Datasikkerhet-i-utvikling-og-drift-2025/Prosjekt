@@ -1,5 +1,7 @@
 <?php
 
+namespace config;
+
 require_once __DIR__ . '/app.php';
 require_once __DIR__ . '/../controllers/StudentController.php';
 require_once __DIR__ . '/../controllers/GuestController.php';
@@ -9,14 +11,16 @@ require_once __DIR__ . '/../controllers/AdminController.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
-use db\Database;
+use Exception;
+use helpers\Database;
+use helpers\Logger;
 
 Logger::info('Initializing application...');
 
 // Initialize database connection
 try {
     $db = new Database();
-    $pdo = $db->getConnection();
+    $pdo = $db->connectToDb();
     Logger::info('Database connection initialized successfully.');
 } catch (Exception $e) {
     Logger::error('Error initializing database: ' . $e->getMessage());

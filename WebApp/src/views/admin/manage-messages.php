@@ -24,7 +24,7 @@ $successMessage = $_GET['success'] ?? '';
 
 // Fetch messages from the database
 try {
-    $pdo = (new \db\Database())->getConnection();
+    $pdo = (new helpers\Database())->pdo;
     $stmt = $pdo->query("
         SELECT messages.id, courses.name AS course_name, messages.content, messages.reply 
         FROM messages 

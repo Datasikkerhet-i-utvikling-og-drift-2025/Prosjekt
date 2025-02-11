@@ -1,5 +1,7 @@
 <?php
 
+namespace controllers;
+
 require_once __DIR__ . '/../helpers/ApiHelper.php';
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../models/Course.php';

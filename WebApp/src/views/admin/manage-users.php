@@ -21,7 +21,7 @@ $errorMessage = '';
 
 // Fetch users from the database
 try {
-    $pdo = (new \db\Database())->getConnection();
+    $pdo = (new helpers\Database())->pdo;
     $stmt = $pdo->query("SELECT id, name, email, role FROM users");
     $users = $stmt->fetchAll();
 } catch (PDOException $e) {

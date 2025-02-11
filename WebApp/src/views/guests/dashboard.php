@@ -9,7 +9,7 @@ function sanitize($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$pdo = (new \db\Database())->getConnection();
+$pdo = (new helpers\Database())->pdo;
 $pin = $_POST['pin'] ?? null;
 $authorized = false;
 $course = null;

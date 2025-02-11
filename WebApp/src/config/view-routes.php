@@ -1,5 +1,7 @@
 <?php
 
+namespace config;
+
 return [
     '/' => __DIR__ . '/../views/auth/login.php',
     '/register' => __DIR__ . '/../views/auth/register.php',

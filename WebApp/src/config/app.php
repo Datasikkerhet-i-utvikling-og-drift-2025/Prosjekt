@@ -1,5 +1,7 @@
 <?php
 
+namespace config;
+
 return [
     // Application Settings
     'app_name' => 'Feedback System',

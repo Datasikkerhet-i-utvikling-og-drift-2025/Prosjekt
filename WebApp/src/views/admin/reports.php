@@ -21,7 +21,7 @@ $errorMessage = '';
 
 // Fetch reported messages from the database
 try {
-    $pdo = (new \db\Database())->getConnection();
+    $pdo = (new helpers\Database())->pdo;
     $stmt = $pdo->query("
         SELECT r.id AS report_id, m.id AS message_id, m.content AS message_content, 
                r.reported_by, r.reason 

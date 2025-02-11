@@ -1,5 +1,6 @@
 <?php
 
+namespace helpers;
 
 
 class AuthHelper
@@ -15,6 +16,14 @@ class AuthHelper
     {
         return password_verify($password, $hashedPassword);
     }
+
+
+    public static function ensurePasswordHashed(string $password): string
+    {
+        // Check if password is already hashed (PHP stores algorithm metadata)
+        return password_get_info($password)['algo'] !== null ? $password : password_hash($password, PASSWORD_DEFAULT);
+    }
+
 
     // Start a session (if not already started)
     public static function startSession()
@@ -46,7 +55,7 @@ class AuthHelper
     // Log out the current user
     public static function logoutUser()
     {
-        Logger::info("something is happening");
+        Logger::info("Logging out: " . var_export($_SESSION, true));
         self::startSession();
         session_destroy();
         unset($_SESSION);

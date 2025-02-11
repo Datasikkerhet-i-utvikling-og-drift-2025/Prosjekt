@@ -1,10 +1,12 @@
 <?php
 
+namespace helpers;
+
 class InputValidator
 {
 
     // Validation method for registration
-    public static function validateRegistration($input)
+    public static function validateRegistration($input): array
     {
         $rules = self::getRegistrationRules();
         $errors = [];
@@ -34,19 +36,17 @@ class InputValidator
     }
 
     // Define the validation rules for registration
-    private static function getRegistrationRules()
+    private static function getRegistrationRules(): array
     {
         return [
             'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
             'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'name' => ['required' => true, 'min' => 3, 'max' => 100],
             'email' => ['required' => true, 'email' => true],
             'password' => ['required' => true, 'min' => 8],
             'repeat_password' => ['required' => true],
             'role' => ['required' => true],
             'study_program' => ['required' => false, 'max' => 100],
-            'cohort_year' => ['required' => false, 'integer' => true],
-            // Nye regler for kurs
+            'enrollment_year' => ['required' => false, 'integer' => true],
             'course_code' => ['required' => false, 'max' => 10],
             'course_name' => ['required' => false, 'max' => 100],
             'course_pin' => ['required' => false, 'regex' => '/^[0-9]{4}$/']
@@ -125,7 +125,7 @@ class InputValidator
     }
 
     // Sanitize a string to remove harmful characters
-    public static function sanitizeString($value)
+    public static function sanitizeString($value): string
     {
         return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
     }
@@ -143,7 +143,7 @@ class InputValidator
     }
 
     // Validate and sanitize an array of inputs
-    public static function validateInputs($inputs, $rules)
+    public static function validateInputs($inputs, $rules): array
     {
         Logger::info("Validating inputs: " . var_export($inputs, true));
         $errors = [];
