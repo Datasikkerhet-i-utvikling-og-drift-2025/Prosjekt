@@ -259,7 +259,7 @@ class AuthController
                 $validation['errors'][] = "Profile picture is required for lecturers.";
             }
         }
-        return array($profilePicturePath, $validation);
+        return array('/uploads/profile_pictures/'.$file['name'], $validation);
     }
 
     /**
