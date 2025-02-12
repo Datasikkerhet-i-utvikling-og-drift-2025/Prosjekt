@@ -120,149 +120,127 @@ class AuthController
         header('Location: /');
     }
 
-    
-
     public function getUserById($userId)
     {
         return $this->userModel->getUserById($userId);
     }
-
+    
     public function changePassword()
     {
-
-
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Logger::error("Invalid request method: " . $_SERVER['REQUEST_METHOD']);
             $_SESSION['errors'] = 'Invalid request method';
             header('Location: /profile');
             exit;
         }
-
+    
         $currentPassword = $_POST['current_password'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
         $userId = $_SESSION['user']['id'] ?? null;
-
-        Logger::info("Attempting to change password for user ID: " . $userId);
-
-        // Valider input
+    
+        // Validate input
         if (!$userId) {
             $_SESSION['errors'] = 'User not logged in';
             header('Location: /profile');
             exit;
         }
-
+    
         if (strlen($newPassword) < 8) {
             $_SESSION['errors'] = 'New password must be at least 8 characters long';
             header('Location: /profile');
             exit;
         }
-
+    
         if ($newPassword !== $confirmPassword) {
             $_SESSION['errors'] = 'New passwords do not match';
             header('Location: /profile');
             exit;
         }
-
-        // Verifiser nåværende passord
+    
+        // Verify current password
         $user = $this->userModel->getUserById($userId);
         if (!$user || !AuthHelper::verifyPassword($currentPassword, $user['password'])) {
             $_SESSION['errors'] = 'Current password is incorrect';
             header('Location: /profile');
             exit;
         }
-
-        // Oppdater passord
+    
+        // Update password
         $hashedPassword = AuthHelper::hashPassword($newPassword);
         if ($this->userModel->updatePassword($userId, $hashedPassword)) {
             $_SESSION['success'] = 'Password updated successfully';
         } else {
             $_SESSION['errors'] = 'Failed to update password';
         }
-
+    
         header('Location: /profile');
         exit;
     }
 
-    public function requestPasswordReset()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /reset-password');
-            exit;
-        }
-
-        $email = $_POST['email'] ?? '';
-
-        // Find user by email
-        $user = $this->userModel->getUserByEmail($email);
-        if (!$user) {
-            header('Location: /reset-password?error=' . urlencode('Email not found'));
-            exit;
-        }
-
-        // Generate reset token
-        $resetToken = bin2hex(random_bytes(32));
-
-        // Save token to database
-        if ($this->userModel->savePasswordResetToken($user['id'], $resetToken)) {
-            // Send reset email
-            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
-            // Her bør du implementere email-sending
-
-            header('Location: /login?success=' . urlencode('Password reset instructions sent to your email'));
-        } else {
-            header('Location: /reset-password?error=' . urlencode('Failed to process reset request'));
-        }
+public function requestPasswordReset()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: /reset-password');
         exit;
     }
 
-    public function resetPassword()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /reset-password');
-            exit;
-        }
-
-        try {
-            $email = $_POST['email'] ?? '';
-            $newPassword = $_POST['new_password'] ?? '';
-            $confirmPassword = $_POST['confirm_password'] ?? '';
-
-            // Validere input
-            if (empty($email)) {
-                throw new Exception('Email is required');
-            }
-
-            if (strlen($newPassword) < 8) {
-                throw new Exception('Password must be at least 8 characters long');
-            }
-
-            if ($newPassword !== $confirmPassword) {
-                throw new Exception('Passwords do not match');
-            }
-
-            // Sjekk om brukeren eksisterer
-            $user = $this->userModel->getUserByEmail($email);
-            if (!$user) {
-                throw new Exception('Email not found');
-            }
-
-            // Oppdater passord
-            $hashedPassword = AuthHelper::hashPassword($newPassword);
-            if (!$this->userModel->updatePassword($user['id'], $hashedPassword)) {
-                throw new Exception('Failed to reset password');
-            }
-
-            $_SESSION['success'] = 'Password has been reset successfully. Please login.';
-            header('Location: /');
-            exit;
-
-        } catch (Exception $e) {
-            $_SESSION['errors'] = $e->getMessage();
-            header('Location: /reset-password');
-            exit;
-        }
+    $email = $_POST['email'] ?? '';
+    
+    // Find user by email
+    $user = $this->userModel->getUserByEmail($email);
+    if (!$user) {
+        header('Location: /reset-password?error=' . urlencode('Email not found'));
+        exit;
     }
+
+    // Generate reset token
+    $resetToken = bin2hex(random_bytes(32));
+    
+    // Save token to database
+    if ($this->userModel->savePasswordResetToken($user['id'], $resetToken)) {
+        // Send reset email
+        $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
+        // Her bør du implementere email-sending
+        
+        header('Location: /login?success=' . urlencode('Password reset instructions sent to your email'));
+    } else {
+        header('Location: /reset-password?error=' . urlencode('Failed to process reset request'));
+    }
+    exit;
+}
+
+public function resetPassword()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: /reset-password');
+        exit;
+    }
+
+    $token = $_POST['token'] ?? '';
+    $newPassword = $_POST['new_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    if ($newPassword !== $confirmPassword) {
+        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match'));
+        exit;
+    }
+
+    // Verify token and get user
+    $user = $this->userModel->getUserByResetToken($token);
+    if (!$user) {
+        header('Location: /reset-password?error=' . urlencode('Invalid or expired reset token'));
+        exit;
+    }
+
+    // Update password
+    $hashedPassword = AuthHelper::hashPassword($newPassword);
+    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+        header('Location: /login?success=' . urlencode('Password has been reset successfully'));
+    } else {
+        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Failed to reset password'));
+    }
+    exit;
+}
 
     public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
     {
@@ -349,7 +327,7 @@ class AuthController
                 $validation['errors'][] = "Profile picture is required for lecturers.";
             }
         }
-        return array($profilePicturePath, $validation);
+        return array('/uploads/profile_pictures/'.$file['name'], $validation);
     }
 
     /**

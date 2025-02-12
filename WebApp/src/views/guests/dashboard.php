@@ -53,7 +53,7 @@ $messages = $stmt->fetchAll();
     <h1>Course Messages</h1>
     <p><strong>Course:</strong> <?= sanitize($course['code']) ?> - <?= sanitize($course['name']) ?></p>
     <p><strong>Lecturer:</strong> <?= sanitize($lecturer['name'] ?? 'Unknown') ?></p>
-    <img src="<?= sanitize(preg_replace('/^.*?uploads\//', '/uploads/', $lecturer['image_path'] ?? 'uploads/profile_pictures/hiof.jpg')) ?>" alt="Lecturer Image" width="100" height="100">
+    <img src="<?= sanitize($lecturer['image_path'] ?? 'uploads/profile_pictures/hiof.jpg') ?>" alt="Lecturer Image" width="100" height="100">
 
     <?php foreach ($messages as $message): ?>
         <div class="message-box">
