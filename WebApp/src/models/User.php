@@ -167,36 +167,56 @@ class User
             return [];
         }
     }
-
-    // Save a password reset token
-    public function savePasswordResetToken($userId, $resetToken)
-    {
-        $sql = "UPDATE users SET reset_token = :resetToken, reset_token_created_at = NOW() WHERE id = :userId";
-        $stmt = $this->pdo->prepare($sql);
-
+    public function savePasswordResetToken($userId, $token) {
         try {
+            $sql = "UPDATE users 
+                    SET reset_token = :token,
+                        reset_token_created_at = CURRENT_TIMESTAMP
+                    WHERE id = :id";
+                    
+            $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
-                ':resetToken' => $resetToken,
-                ':userId' => $userId,
+                ':token' => $token,
+                ':id' => $userId
             ]);
         } catch (Exception $e) {
-            Logger::error("Failed to save password reset token: " . $e->getMessage());
+            Logger::error("Failed to save reset token: " . $e->getMessage());
             return false;
         }
     }
 
-    // Retrieve a user by reset token
-    public function getUserByResetToken($resetToken)
-    {
-        $sql = "SELECT * FROM users WHERE reset_token = :resetToken AND reset_token_created_at >= (NOW() - INTERVAL 1 HOUR)";
-        $stmt = $this->pdo->prepare($sql);
-
+    public function getUserByResetToken($token) {
         try {
-            $stmt->execute([':resetToken' => $resetToken]);
+            // Sjekk om token eksisterer og ikke er eldre enn 1 time
+            $sql = "SELECT * FROM users 
+                    WHERE reset_token = :token 
+                    AND reset_token_created_at >= NOW() - INTERVAL 1 HOUR";
+                    
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':token' => $token]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            Logger::error("Failed to retrieve user by reset token: " . $e->getMessage());
+            Logger::error("Failed to get user by reset token: " . $e->getMessage());
             return null;
+        }
+    }
+
+    public function updatePasswordAndClearToken($userId, $hashedPassword) {
+        try {
+            $sql = "UPDATE users 
+                    SET password = :password,
+                        reset_token = NULL,
+                        reset_token_created_at = NULL
+                    WHERE id = :id";
+                    
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([
+                ':password' => $hashedPassword,
+                ':id' => $userId
+            ]);
+        } catch (Exception $e) {
+            Logger::error("Failed to update password and clear token: " . $e->getMessage());
+            return false;
         }
     }
 
