@@ -21,11 +21,6 @@ class Comment
             return false;
         }
 
-        if (!InputValidator::isNotEmpty($guestName)) {
-            Logger::error("Failed to add comment: Guest name is empty");
-            return false;
-        }
-
         if (!InputValidator::isNotEmpty($content)) {
             Logger::error("Failed to add comment: Content is empty");
             return false;
