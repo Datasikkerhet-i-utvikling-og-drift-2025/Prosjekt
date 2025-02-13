@@ -177,12 +177,21 @@ class MessageRepository
      */
     public function deleteMessageById(int $messageId): bool
     {
-        $sql = "DELETE FROM messages WHERE id = :messageId";
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':messageId', $messageId);
+        // Validate input
+        if (!InputValidator::isValidInteger($messageId)) {
+            Logger::error("Invalid message ID: $messageId");
+            return false;
+        }
 
-        $loggerMessage = "Deleting message ID: $messageId";
-        return $this->db->executeSql($stmt, $loggerMessage);
+        // Prepare SQL query
+        $sql = "DELETE FROM messages WHERE id = :message_id";
+        $stmt = $this->db->prepareSql($sql);
+
+        // Bind parameters and execute query
+        $this->db->bindSingleValueToSqlStmt($stmt, ':message_id', $messageId);
+        $logger = "Deleting message with ID: $messageId";
+
+        return $this->db->executeSql($stmt, $logger);
     }
 
 
@@ -199,4 +208,39 @@ class MessageRepository
         $loggerMessage = "Fetching all public messages";
         return $this->db->fetchAll($stmt, $loggerMessage);
     }
+
+    /**
+     * Updates the content of a message.
+     *
+     * @param int $message_id The ID of the message to update.
+     * @param string $content The new content for the message.
+     * @return bool Returns true if the update was successful, false otherwise.
+     */
+    public function updateMessage(int $message_id, string $content): bool
+    {
+        // Validate input
+        if (!InputValidator::isValidInteger($message_id)) {
+            Logger::error("Invalid message ID: $message_id");
+            return false;
+        }
+
+        if (!InputValidator::isNotEmpty($content)) {
+            Logger::error("Message update failed: Content is empty for message ID: $message_id");
+            return false;
+        }
+
+        // Sanitize input
+        $sanitizedContent = InputValidator::sanitizeString($content);
+
+        // Prepare SQL query
+        $sql = "UPDATE messages SET content = :content, updated_at = NOW() WHERE id = :message_id";
+        $stmt = $this->db->prepareSql($sql);
+
+        // Bind parameters and execute query
+        $this->db->bindArrayToSqlStmt($stmt, [':message_id', ':content'], [$message_id, $sanitizedContent]);
+        $logger = "Updating message content for message ID: $message_id";
+
+        return $this->db->executeSql($stmt, $logger);
+    }
+
 }

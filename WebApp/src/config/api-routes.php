@@ -8,83 +8,80 @@ require_once __DIR__ . '/../controllers/GuestController.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/LecturerController.php';
 require_once __DIR__ . '/../controllers/AdminController.php';
-require_once __DIR__ . '/DatabaseService.php';
+require_once __DIR__ . '/../services/DatabaseService.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
+use controllers\AdminController;
+use controllers\AuthController;
+use controllers\GuestController;
+use controllers\LecturerController;
+use controllers\StudentController;
 use Exception;
 use helpers\Logger;
+use repositories\UserRepository;
 use service\DatabaseService;
 
+// Log application startup
 Logger::info('Initializing application...');
 
-// Initialize database connection
 try {
+    // Initialize database service and repository
     $db = new DatabaseService();
     $pdo = $db->connectToDb();
-    Logger::info('DatabaseService connection initialized successfully.');
-} catch (Exception $e) {
-    Logger::error('Error initializing database: ' . $e->getMessage());
-    http_response_code(500);
-    die('Internal server error. Please check logs.');
-}
 
-// Create controller instances
-try {
-    $authController = new AuthController($pdo);
-    $studentController = new StudentController($pdo);
-    $lecturerController = new LecturerController($pdo);
-    $adminController = new AdminController($pdo);
-    $guestController = new GuestController($pdo);
+    Logger::info('DatabaseService connection initialized successfully.');
+
+    // Create controller instances
+    $authController = new AuthController($db);
+    //$studentController = new StudentController($pdo);
+    //$lecturerController = new LecturerController($pdo);
+    $adminController = new AdminController($db);
+    //$guestController = new GuestController($pdo);
 
     Logger::info('Controllers initialized successfully.');
 } catch (Exception $e) {
-    Logger::error('Error initializing controllers: ' . $e->getMessage());
+    Logger::error('Error initializing components: ' . $e->getMessage());
     http_response_code(500);
-    die('Internal server error while initializing controllers.');
+    die('Internal server error. Check logs for details.');
 }
 
-// Initialize routes array
+// Initialize API routes
 $routes = [];
 
 try {
-    // Define routes
     $routes = [
         // Auth routes
-        ['POST', '/auth/register', [$authController, 'register']],
-        ['POST', '/auth/login', [$authController, 'login']],
-        ['GET', '/auth/logout', [$authController, 'logout']],
-        ['POST', '/auth/change-password', [$authController, 'changePassword']],
-        ['POST', '/auth/password-reset/request', [$authController, 'requestPasswordReset']],
-        ['POST', '/auth/password-reset', [$authController, 'resetPassword']],
-        ['POST', '/auth/change-password', [$authController, 'changePassword']],
-    
-    
+        ['POST', '/api/auth/register', [$authController, 'register']],
+        ['POST', '/api/auth/login', [$authController, 'login']],
+        ['GET', '/api/auth/logout', [$authController, 'logout']],
+        ['POST', '/api/auth/change-password', [$authController, 'changePassword']],
+        ['POST', '/api/auth/password-reset/request', [$authController, 'requestPasswordReset']],
+        ['POST', '/api/auth/password-reset', [$authController, 'resetPassword']],
 
         // Student routes
-        ['GET', '/student/courses', [$studentController, 'getCourses']],
-        ['GET', '/student/messages', [$studentController, 'getMyMessages']],
-        ['POST', '/student/message/send', [$studentController, 'sendMessage']],
+        ['GET', '/api/student/courses', [$studentController, 'getCourses']],
+        ['GET', '/api/student/messages', [$studentController, 'getMyMessages']],
+        ['POST', '/api/student/message/send', [$studentController, 'sendMessage']],
 
         // Lecturer routes
-        ['GET', '/lecturer/courses', [$lecturerController, 'getCourses']],
-        ['POST', '/lecturer/courses', [$lecturerController, 'getCourses']],
-        ['POST', '/lecturer/messages', [$lecturerController, 'getMessagesForCourse']],
-        ['POST', '/lecturer/message/reply', [$lecturerController, 'replyToMessage']],
-        ['POST', '/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
+        ['GET', '/api/lecturer/courses', [$lecturerController, 'getCourses']],
+        ['GET', '/api/lecturer/messages', [$lecturerController, 'getMessagesForCourse']],
+        ['POST', '/api/lecturer/message/reply', [$lecturerController, 'replyToMessage']],
+        ['POST', '/api/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
 
         // Admin routes
-        ['GET', '/admin/users', [$adminController, 'getAllUsers']],
-        ['POST', '/admin/user/delete', [$adminController, 'deleteUser']],
-        ['GET', '/admin/messages/reported', [$adminController, 'getReportedMessages']],
-        ['POST', '/admin/message/delete', [$adminController, 'deleteMessage']],
-        ['POST', '/admin/message/update', [$adminController, 'updateMessage']],
-        ['GET', '/admin/user/details', [$adminController, 'getUserDetails']],
+        ['GET', '/api/admin/users', [$adminController, 'getAllUsers']],
+        ['POST', '/api/admin/user/delete', [$adminController, 'deleteUser']],
+        ['GET', '/api/admin/messages/reported', [$adminController, 'getReportedMessages']],
+        ['POST', '/api/admin/message/delete', [$adminController, 'deleteMessage']],
+        ['POST', '/api/admin/message/update', [$adminController, 'updateMessage']],
+        ['GET', '/api/admin/user/details', [$adminController, 'getUserDetails']],
 
         // Guest routes
-        ['GET', '/guest/messages', [$guestController, 'getMessages']],
-        ['POST', '/guest/messages/view', [$guestController, 'viewMessages']],
-        ['POST', '/guest/messages/report', [$guestController, 'reportMessage']],
-        ['POST', '/guest/messages/comment', [$guestController, 'addComment']],
+        ['GET', '/api/guest/messages', [$guestController, 'getMessages']],
+        ['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
+        ['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
     ];
 
     Logger::info('Routes initialized successfully.');
@@ -94,7 +91,7 @@ try {
     die('Internal server error while initializing routes.');
 }
 
-// Optional: Add a debug route for development
+// Debug route (only for development)
 $routes[] = ['GET', '/debug/routes', function () use ($routes) {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(array_map(static function ($route) {
@@ -109,7 +106,7 @@ $routes[] = ['GET', '/debug/routes', function () use ($routes) {
     exit;
 }];
 
-// Log all routes to a file
+// Log routes to a file
 $logFile = __DIR__ . '/../../logs/routes.log';
 try {
     file_put_contents($logFile, json_encode($routes, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));

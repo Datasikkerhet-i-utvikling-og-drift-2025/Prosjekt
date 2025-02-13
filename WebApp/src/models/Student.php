@@ -61,8 +61,8 @@ class Student extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->studyProgram = $userData['studyProgram'];
-        $this->enrollmentYear = $userData['enrollmentYear'] ?? (int)date("Y");
+        $this->studyProgram = $userData['study_program'];
+        $this->enrollmentYear = $userData['cohort_year'] ?? (int)date("Y");
     }
 
 
@@ -82,6 +82,8 @@ class Student extends User
 
         $stmt->bindValue(':studyProgram', $this->studyProgram, PDO::PARAM_STR);
         $stmt->bindValue(':studyYear', $this->enrollmentYear, PDO::PARAM_INT);
+
+        $stmt->bindValue(':imagePath', $this->imagePath ?? null, isset($this->imagePath) ? PDO::PARAM_STR : PDO::PARAM_NULL);
     }
 
 }

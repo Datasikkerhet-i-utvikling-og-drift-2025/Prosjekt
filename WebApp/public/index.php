@@ -1,21 +1,27 @@
 <?php
 
 // Enable error reporting for debugging (disable in production)
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+use helpers\ApiHelper;
+use helpers\Logger;
+use service\DatabaseService;
+use repositories\UserRepository;
+
 // Autoload required files
 require_once __DIR__ . '/../src/config/app.php'; // Application config
 require_once __DIR__ . '/../src/helpers/ApiHelper.php'; // API helpers
-require_once __DIR__ . '/../src/config/DatabaseService.php'; // DatabaseService connection
 require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger for error tracking
-require_once __DIR__ . '/../src/autoload.php';
+require_once __DIR__ . '/../src/services/DatabaseService.php'; // Database connection
+require_once __DIR__ . '/../src/repositories/UserRepository.php'; // User repository
+require_once __DIR__ . '/../src/autoload.php'; // Autoloader for PSR-4 compliance
 
 // Ensure logs directory exists
-if (!is_dir(__DIR__ . '/../logs') && !mkdir($concurrentDirectory = __DIR__ . '/../logs', 0777, true) && !is_dir($concurrentDirectory)) {
-    throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+$logDir = __DIR__ . '/../logs';
+if (!is_dir($logDir) && !mkdir($logDir, 0777, true) && !is_dir($logDir)) {
+    throw new RuntimeException(sprintf('Failed to create logs directory: "%s"', $logDir));
 }
 
 // Handle CORS (Cross-Origin Resource Sharing) headers
@@ -27,20 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Initialize database connection
+$dbService = new DatabaseService();
+$userRepo = new UserRepository($dbService);
+
 // Get HTTP method and requested URI
 $method = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query parameters
 
 // Log the request
-Logger::info("Request received: $method $requestUri");
+Logger::info("Incoming Request: $method $requestUri");
 
-// Define view routes
+// Load view routes
 $views = require __DIR__ . '/../src/config/view-routes.php';
 
 // Handle view requests
 if (isset($views[$requestUri])) {
     $viewPath = $views[$requestUri];
     if (file_exists($viewPath)) {
+        Logger::info("Serving view: $requestUri");
         require_once $viewPath;
     } else {
         Logger::error("View not found: $requestUri");
@@ -55,9 +66,8 @@ $routes = require __DIR__ . '/../src/config/api-routes.php';
 
 // Validate API routes configuration
 if (!is_array($routes) || empty($routes)) {
-    Logger::error('No API routes configured.');
-    http_response_code(500);
-    ApiHelper::sendError(500, 'Internal Server Error: No routes configured.');
+    Logger::error('API routes configuration is empty.');
+    ApiHelper::sendError(500, 'Internal Server Error: No API routes configured.');
     exit;
 }
 
@@ -65,7 +75,7 @@ if (!is_array($routes) || empty($routes)) {
 $matchedRoute = null;
 foreach ($routes as $route) {
     [$routeMethod, $routeUri, $callback] = $route;
-    if ($method === $routeMethod && $requestUri === $routeUri) {
+    if ($method === $routeMethod && preg_match("#^$routeUri$#", $requestUri)) {
         $matchedRoute = $callback;
         break;
     }
@@ -74,19 +84,17 @@ foreach ($routes as $route) {
 // Handle API requests
 if ($matchedRoute) {
     try {
-        // Execute matched route callback
-        Logger::info("Matched route: $method $requestUri");
+        Logger::info("Matched API route: $method $requestUri");
         call_user_func($matchedRoute);
     } catch (Exception $e) {
-        Logger::error('Error handling request: ' . $e->getMessage());
-        http_response_code(500);
+        Logger::error('API request handling failed: ' . $e->getMessage());
         ApiHelper::sendError(500, 'Internal Server Error', [
             'error' => $e->getMessage(),
         ]);
     }
 } else {
     // Log unmatched routes
-    Logger::error("Route not found: $method $requestUri");
+    Logger::error("No matching route found: $method $requestUri");
     http_response_code(404);
     require_once __DIR__ . '/../public/errors/404.php';
 }

@@ -41,7 +41,7 @@ class Lecturer extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->imagePath = $userData['imagePath'];
+        $this->imagePath = $userData['image_path'];
     }
 
 
@@ -60,6 +60,9 @@ class Lecturer extends User
         parent::bindUserDataForDbStmt($stmt);
 
         $stmt->bindValue(':imagePath', $this->imagePath, PDO::PARAM_STR );
+
+        $stmt->bindValue(':studyProgram', $this->studyProgram ?? null, isset($this->studyProgram) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':enrollmentYear', $this->enrollmentYear ?? null, isset($this->enrollmentYear) ? PDO::PARAM_INT : PDO::PARAM_NULL);
     }
 
 }

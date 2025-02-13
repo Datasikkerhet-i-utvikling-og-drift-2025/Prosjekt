@@ -148,12 +148,12 @@ abstract class User
      */
     public function __construct(array $userData) {
         $this->id = $userData['id'] ?? null;
-        $this->firstName = InputValidator::sanitizeString($userData['firstName']);
-        $this->lastName = InputValidator::sanitizeString($userData['lastName']);
+        $this->firstName = InputValidator::sanitizeString($userData['first_name'] ?? '');
+        $this->lastName = InputValidator::sanitizeString($userData['last_name'] ?? '');
         $this->fullName = $this->firstName . " " . $this->lastName;
-        $this->email = InputValidator::sanitizeEmail($userData['email']);
-        $this->password = AuthHelper::ensurePasswordHashed($userData['password']);
-        $this->role = $userData['role'];
+        $this->email = isset($userData['email']) && InputValidator::isValidEmail($userData['email']) ? $userData['email'] : '';
+        $this->password = AuthHelper::ensurePasswordHashed($userData['password'] ?? '');
+        $this->role = UserRole::tryFrom($userData['role']) ?? UserRole::STUDENT;
         $this->resetToken = isset($userData['resetToken']) ? InputValidator::sanitizeString($userData['resetToken']) : null;
         $this->resetTokenCreatedAt = isset($userData['resetTokenCreatedAt']) ? new DateTime($userData['resetTokenCreatedAt']) : null;
         $this->createdAt = new DateTime($userData['createdAt'] ?? 'now');
@@ -176,13 +176,16 @@ abstract class User
      */
     protected function bindUserDataForDbStmt(PDOStatement $stmt): void
     {
-        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
         $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
         $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
         $stmt->bindValue(':full_name', $this->fullName, PDO::PARAM_STR);
         $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
         $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
         $stmt->bindValue(':role', $this->role->value, PDO::PARAM_STR);
+
+        $stmt->bindValue(':studyProgram', $this->studyProgram ?? null, isset($this->studyProgram) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':enrollmentYear', $this->enrollmentYear ?? null, isset($this->enrollmentYear) ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':imagePath', $this->imagePath ?? null, isset($this->imagePath) ? PDO::PARAM_STR : PDO::PARAM_NULL);
     }
 
 }

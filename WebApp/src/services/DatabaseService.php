@@ -28,6 +28,7 @@ class DatabaseService
         $this->dbName = $_ENV['DB_NAME'];
         $this->username = $_ENV['DB_USER'];
         $this->password = $_ENV['DB_PASS'];
+        $this->connectToDb();
     }
 
 
@@ -278,9 +279,6 @@ class DatabaseService
     {
         $result = $bindDataMethod($stmt);
 
-        if (!$result instanceof PDOStatement) {
-            throw new InvalidArgumentException("The provided bindDataMethod must return a PDOStatement.");
-        }
     }
 
 

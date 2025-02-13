@@ -33,6 +33,7 @@ class UserRepository
      */
     public function createUser(User $user): bool
     {
+        Logger::debug("Checking the users data: " . json_encode((array) $user, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
         $sql = "INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at) 
                 VALUES (:first_name, :last_name, :full_name, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
 
@@ -124,7 +125,7 @@ class UserRepository
     public function getUserById(string $userId): ?User
     {
         $sql = "SELECT * FROM users 
-                WHERE id = :id";
+                WHERE id = :id LIMIT 1";
 
         $stmt = $this->db->prepareSql($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $userId);
@@ -138,6 +139,31 @@ class UserRepository
 
         return UserFactory::createUser($userData);
     }
+
+    /**
+     * Retrieves a user from the database by their email address.
+     *
+     * @param string $email The email address of the user to retrieve.
+     * @return User|null Returns a User object if found, otherwise null.
+     * @throws DateMalformedStringException
+     */
+    public function getUserByEmail(string $email): ?User
+    {
+        $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
+
+        $stmt = $this->db->prepareSql($sql);
+        $this->db->bindSingleValueToSqlStmt($stmt, ":email", $email);
+        $logger = "Fetching user by email: " . $email;
+
+        $userData = $this->db->fetchSingle($stmt, $logger);
+
+        if (!$userData) {
+            return null;
+        }
+
+        return UserFactory::createUser($userData);
+    }
+
 
 
     /**

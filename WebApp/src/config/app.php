@@ -6,7 +6,9 @@ return [
     // Application Settings
     'app_name' => 'Feedback System',
     'base_url' => 'http://localhost:8080', // Change to your domain in production
+    //'base_url' => 'http://http://158.39.188.204/steg1/',
     'environment' => 'development', // Options: 'development', 'production'
+    //'environment' => 'production', // Options: 'development', 'production'
     'debug' => true, // Enable or disable debug mode
 
     // DatabaseService Settings

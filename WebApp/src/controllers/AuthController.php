@@ -6,419 +6,283 @@ require_once __DIR__ . '/../helpers/ApiHelper.php';
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../helpers/InputValidator.php';
 require_once __DIR__ . '/../helpers/Logger.php';
-require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
-require_once __DIR__ . '/../models/Course.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../models/User.php';
 
+use DateMalformedStringException;
+use Exception;
+use factories\UserFactory;
+use helpers\ApiHelper;
+use helpers\AuthHelper;
+use helpers\InputValidator;
+use helpers\Logger;
+use JetBrains\PhpStorm\NoReturn;
+use JsonException;
+use Mailer;
+use Random\RandomException;
+use repositories\UserRepository;
+use RuntimeException;
+use service\DatabaseService;
 
 class AuthController
 {
-    private $userModel;
-    private $pdo;
+    private UserRepository $userRepository;
 
-    public function __construct($pdo)
+    /**
+     * Constructor: Initializes the AuthController with a UserRepository instance.
+     *
+     * @param DatabaseService $db to handle the interaction with database
+     */
+    public function __construct(DatabaseService $db)
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        $this->pdo = $pdo;
-        $this->userModel = new User($pdo);
+        $this->userRepository = new UserRepository($db);
     }
-    // User Registration
-    public function register()
+
+    /**
+     * Register a new user.
+     *
+     * @return void
+     * @throws JsonException|DateMalformedStringException
+     */
+    #[NoReturn] public function register()
     {
-        // Validate the form submission
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405); // Method Not Allowed
-            echo "Invalid request method.";
-            return;
+            ApiHelper::sendError(405, 'Invalid request method.');
         }
 
         $input = $_POST;
-
-        // Combine first_name and last_name into a single name field
         $input['name'] = trim(($input['first_name'] ?? '') . ' ' . ($input['last_name'] ?? ''));
-
-        // Validate input using the InputValidator
         $validation = InputValidator::validateRegistration($input);
+        Logger::debug('Input Data: ' . json_encode($input, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+        Logger::debug('Validation Data: ' . json_encode($validation, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
         // Check for validation errors
-        $validation = $this->checkForError($validation);
-        
-        // Hash password
+        if (!empty($validation['errors'])) {
+            ApiHelper::sendError(400, 'Validation failed.', $validation['errors']);
+        }
+
+        // Hash the password securely
         $hashedPassword = AuthHelper::hashPassword($validation['sanitized']['password']);
 
-        // File upload validation if role is 'lecturer'
-        list($profilePicturePath, $validation) = $this->profilePictureUpload($validation);
+        // Handle profile picture upload if applicable
+        [$profilePicturePath, $validation] = $this->profilePictureUpload($validation);
+        $validation['sanitized']['image_path'] = $profilePicturePath ?? '';
 
-        // Check for existing email
-        if (empty($validation['errors']) && $this->userModel->getUserByEmail($validation['sanitized']['email'])) {
-            $validation['errors'][] = "Email is already registered.";
+        // Check if the email is already registered
+        if ($this->userRepository->getUserByEmail($validation['sanitized']['email'])) {
+            ApiHelper::sendError(409, 'Email is already registered.');
         }
 
-        // If errors exist, return to the registration form with error messages
-        $validation = $this->checkForError($validation);
+        $user = UserFactory::createUser($validation['sanitized']);
 
-        // Create user in the database
-        $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
-
-        ApiHelper::sendResponse(200, [
-            'redirect' => '/',
-            'message' => 'Registration successful'
-        ]);
-    }
-
-    // User Login
-    public function login()
-    {
-        $input = ApiHelper::getJsonInput();
-
-        // Validate input
-        ApiHelper::validateRequest(['email', 'password'], $input);
-
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-
-        // Enkel sjekk for at e-post og passord er sendt med
-        if (empty($email) || empty($password)) {
-            header("Location: /login?error=" . urlencode("Email and password are required."));
-            exit;
+        if (!$this->userRepository->createUser($user)) {
+            ApiHelper::sendError(500, 'Failed to create user.');
         }
 
-        // Find user by email
-        $user = $this->userModel->getUserByEmail($input['email']);
-        if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
-            Logger::error("Login failed for email: " . $input['email']);
-            //ApiHelper::sendError(401, 'Invalid email or password.');
-            header("Location: /?error=" . urlencode("Invalid email or password."));
-            exit;
-        }
-
-        // Log in the user by setting session or token
-        AuthHelper::loginUser($user);
-        Logger::info("User logged in: " . $input['email'] . ". Session data: " . var_export($_SESSION, true));
-
-        // Redirect to the user page based on role
-        if ($user['role'] === 'student') {
-            header('Location: /student/dashboard');
-            exit;
-        } elseif ($user['role'] === 'lecturer') {
-            header('Location: /lecturer/dashboard');
-            exit;
-        } elseif ($user['role'] === 'admin') {
-            header('Location: /admin/dashboard');
-            exit;
+        // **Handle Web vs API Request**
+        if (!empty($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+            // API request (mobile app)
+            ApiHelper::sendResponse(201, ['redirect' => '/'], 'Registration successful.');
         } else {
-            Logger::error("Unknown role for user ID: " . $user['id']);
-            ApiHelper::sendError(400, 'Unknown role for user.');
-        }
-    }
-
-    // User Logout
-    public function logout()
-    {
-        AuthHelper::logoutUser();
-        Logger::info("User logged out.");
-        header('Location: /');
-    }
-
-    public function getUserById($userId)
-    {
-        return $this->userModel->getUserById($userId);
-    }
-    
-    public function changePassword()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $_SESSION['errors'] = 'Invalid request method';
-            header('Location: /profile');
-            exit;
-        }
-    
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
-        $userId = $_SESSION['user']['id'] ?? null;
-    
-        // Validate input
-        if (!$userId) {
-            $_SESSION['errors'] = 'User not logged in';
-            header('Location: /profile');
-            exit;
-        }
-    
-        if (strlen($newPassword) < 8) {
-            $_SESSION['errors'] = 'New password must be at least 8 characters long';
-            header('Location: /profile');
-            exit;
-        }
-    
-        if ($newPassword !== $confirmPassword) {
-            $_SESSION['errors'] = 'New passwords do not match';
-            header('Location: /profile');
-            exit;
-        }
-    
-        // Verify current password
-        $user = $this->userModel->getUserById($userId);
-        if (!$user || !AuthHelper::verifyPassword($currentPassword, $user['password'])) {
-            $_SESSION['errors'] = 'Current password is incorrect';
-            header('Location: /profile');
-            exit;
-        }
-    
-        // Update password
-        $hashedPassword = AuthHelper::hashPassword($newPassword);
-        if ($this->userModel->updatePassword($userId, $hashedPassword)) {
-            $_SESSION['success'] = 'Password updated successfully';
-        } else {
-            $_SESSION['errors'] = 'Failed to update password';
-        }
-    
-        header('Location: /profile');
-        exit;
-    }
-
-    $currentPassword = $_POST['current_password'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
-    $userId = $_SESSION['user']['id'] ?? null;
-
-    Logger::info("Attempting to change password for user ID: " . $userId);
-
-    // Valider input
-    if (!$userId) {
-        $_SESSION['errors'] = 'User not logged in';
-        header('Location: /profile');
-        exit;
-    }
-
-    if (strlen($newPassword) < 8) {
-        $_SESSION['errors'] = 'New password must be at least 8 characters long';
-        header('Location: /profile');
-        exit;
-    }
-
-    if ($newPassword !== $confirmPassword) {
-        $_SESSION['errors'] = 'New passwords do not match';
-        header('Location: /profile');
-        exit;
-    }
-
-    // Verifiser nåværende passord
-    $user = $this->userModel->getUserById($userId);
-    if (!$user || !AuthHelper::verifyPassword($currentPassword, $user['password'])) {
-        $_SESSION['errors'] = 'Current password is incorrect';
-        header('Location: /profile');
-        exit;
-    }
-
-    // Oppdater passord
-    $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($userId, $hashedPassword)) {
-        $_SESSION['success'] = 'Password updated successfully';
-    } else {
-        $_SESSION['errors'] = 'Failed to update password';
-    }
-
-    header('Location: /profile');
-    exit;
-}
-
-public function requestPasswordReset() {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: /forgot-password');
-        exit;
-    }
-
-    try {
-        $email = $_POST['email'] ?? '';
-        
-        // Finn bruker
-        $user = $this->userModel->getUserByEmail($email);
-        if (!$user) {
-            throw new Exception('If this email exists in our system, you will receive a reset link.');
-        }
-
-        // Generer token
-        $resetToken = bin2hex(random_bytes(32));
-        $tokenExpiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-        
-        // Lagre token i databasen
-        if (!$this->userModel->savePasswordResetToken($user['id'], $resetToken, $tokenExpiry)) {
-            throw new Exception('Failed to process reset request');
-        }
-
-        // Send email
-        $mailer = new Mailer();
-        if (!$mailer->sendPasswordReset($email, $resetToken)) {
-            throw new Exception('Failed to send reset email');
-        }
-
-        $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
-        header('Location: /login');
-        exit;
-
-    } catch (Exception $e) {
-        $_SESSION['errors'] = $e->getMessage();
-        header('Location: /forgot-password');
-        exit;
-    }
-}
-
-public function resetPassword()
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: /reset-password');
-        exit;
-    }
-
-    $token = $_POST['token'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
-
-    if ($newPassword !== $confirmPassword) {
-        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match'));
-        exit;
-    }
-
-    // Verify token and get user
-    $user = $this->userModel->getUserByResetToken($token);
-    if (!$user) {
-        header('Location: /reset-password?error=' . urlencode('Invalid or expired reset token'));
-        exit;
-    }
-
-    // Update password
-    $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
-        header('Location: /login?success=' . urlencode('Password has been reset successfully'));
-    } else {
-        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Failed to reset password'));
-    }
-    exit;
-}
-
-    public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
-    {
-        try {
-            $this->pdo->beginTransaction();
-
-            // Opprett bruker
-            $userCreated = $this->userModel->createUser(
-                $sanitized['name'],
-                $sanitized['email'],
-                $hashedPassword,
-                $sanitized['role'],
-                $sanitized['study_program'] ?? null,
-                $sanitized['cohort_year'] ?? null,
-                $profilePicturePath
-            );
-
-            if (!$userCreated) {
-                throw new Exception("Failed to create user");
-            }
-
-            // Hvis det er en foreleser og kursinformasjon er gitt, opprett kurs
-            if ($sanitized['role'] === 'lecturer' && 
-                isset($sanitized['course_code']) && 
-                isset($sanitized['course_name']) && 
-                isset($sanitized['course_pin'])) {
-                
-                $courseModel = new Course($this->pdo);
-                $userId = $this->pdo->lastInsertId();
-                
-                $courseCreated = $courseModel->createCourse(
-                    $sanitized['course_code'],
-                    $sanitized['course_name'],
-                    $userId,
-                    $sanitized['course_pin']
-                );
-
-                if (!$courseCreated) {
-                    throw new Exception("Failed to create course");
-                }
-            }
-
-            $this->pdo->commit();
-            $_SESSION['success'] = "Registration successful. Please log in.";
+            // Web request (form submission)
+            $_SESSION['success'] = 'Registration successful.';
             header("Location: /");
-            exit;
-
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            $_SESSION['errors'] = [$e->getMessage()];
-            header("Location: /register");
-            exit;
+            exit();
         }
     }
-
 
 
     /**
-     * @param array $validation
-     * @return array
+     * Handles profile picture upload for lecturers.
+     *
+     * @param array $validation The validation array containing sanitized user input.
+     * @return array Returns an array containing the profile picture path (or null) and the validation array.
      */
     public function profilePictureUpload(array $validation): array
     {
         $profilePicturePath = null;
+
         if ($validation['sanitized']['role'] === 'lecturer' && isset($_FILES['profile_picture'])) {
             $file = $_FILES['profile_picture'];
             $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
+
+            // Ensure upload directory exists
             if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $uploadDir));
             }
 
-            // Check file type and size
-            if ($file['error'] === UPLOAD_ERR_OK) {
-                $allowedTypes = ['image/jpeg', 'image/png'];
-                if (!in_array($file['type'], $allowedTypes)) {
-                    $validation['errors'][] = "Invalid file type for profile picture. Only JPG and PNG are allowed.";
-                    Logger::error("Invalid file type for profile picture: " . $file['type']);
-                } elseif ($file['size'] > 2 * 1024 * 1024) { // 2MB limit
-                    $validation['errors'][] = "Profile picture size must not exceed 2MB.";
-                    Logger::error("Profile picture size exceeds limit: " . $file['size'] . " bytes");
-                } else {
-                    $profilePicturePath = $uploadDir . basename($file['name']);
-                    move_uploaded_file($file['tmp_name'], $profilePicturePath);
-                }
-            } else {
-                $validation['errors'][] = "Profile picture is required for lecturers.";
+            // Validate file type and size
+            $allowedTypes = ['image/jpeg', 'image/png'];
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $validation['errors'][] = "Profile picture upload failed.";
                 Logger::error("Profile picture upload error: " . var_export($file, true));
+            } elseif (!in_array($file['type'], $allowedTypes, true)) {
+                $validation['errors'][] = "Invalid file type for profile picture. Only JPG and PNG are allowed.";
+                Logger::error("Invalid profile picture type: " . $file['type']);
+            } elseif ($file['size'] > 2 * 1024 * 1024) { // 2MB limit
+                $validation['errors'][] = "Profile picture size must not exceed 2MB.";
+                Logger::error("Profile picture size exceeds limit: " . $file['size'] . " bytes");
+            } else {
+                // Generate a unique filename
+                $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $uniqueFileName = uniqid('profile_', true) . '.' . $fileExtension;
+                $profilePicturePath = $uploadDir . $uniqueFileName;
+
+                if (!move_uploaded_file($file['tmp_name'], $profilePicturePath)) {
+                    $validation['errors'][] = "Failed to save profile picture.";
+                    Logger::error("Failed to move uploaded file for profile picture.");
+                }
             }
-            return array('/uploads/profile_pictures/'.$file['name'], $validation);
+
+            return ['/uploads/profile_pictures/' . $uniqueFileName, $validation];
         }
-        else {
-            return array($profilePicturePath, $validation);
+
+        return [$profilePicturePath, $validation];
+    }
+
+
+    /**
+     * Authenticate and log in a user.
+     *
+     * @return void
+     * @throws JsonException|DateMalformedStringException
+     */
+    public function login()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            ApiHelper::sendError(405, 'Invalid request method.');
         }
+
+        $input = ApiHelper::getJsonInput();
+        ApiHelper::validateRequest(['email', 'password'], $input);
+
+        $user = $this->userRepository->getUserByEmail($input['email']);
+
+        if (!$user || !AuthHelper::verifyPassword($input['password'], $user->password)) {
+            Logger::error("Login failed for email: " . $input['email']);
+            ApiHelper::sendError(401, 'Invalid email or password.');
+        }
+
+        // Log the user in and create a session
+        AuthHelper::loginUser((array)$user);
+        Logger::info("User logged in: " . $input['email']);
+
+        // Redirect user based on their role
+        $redirectUrl = match ($user->role->value) {
+            'student' => '/student/dashboard',
+            'lecturer' => '/lecturer/dashboard',
+            'admin' => '/admin/dashboard',
+            default => '/' . ApiHelper::sendError(400, 'Unknown user role.')
+        };
+
+        ApiHelper::sendResponse(200, ['redirect' => $redirectUrl], 'Login successful.');
     }
 
     /**
-     * @param array $validation
-     * @return array|void
+     * Log out the current user.
+     *
+     * @return void
+     * @throws JsonException
      */
-    public function checkForError(array $validation)
+    public function logout()
     {
-        if (!empty($validation['errors'])) {
-            $_SESSION['errors'] = $validation['errors'];
-            header("Location: /register");
-            exit;
-        }
-        return $validation;
+        AuthHelper::logoutUser();
+        Logger::info("User logged out.");
+        ApiHelper::sendResponse(200, [], 'Logout successful.');
     }
 
-    public function guest()
+    /**
+     * Change the password of a logged-in user.
+     *
+     * @return void
+     * @throws JsonException|DateMalformedStringException
+     */
+    public function changePassword()
     {
-        // Set session data for guest
-        $_SESSION['user'] = [
-            'role' => 'guest',
-            'name' => 'Guest'
-        ];
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            ApiHelper::sendError(405, 'Invalid request method.');
+        }
 
-        Logger::info("Guest user logged in. Session data: " . var_export($_SESSION, true));
+        $input = ApiHelper::getJsonInput();
+        ApiHelper::validateRequest(['current_password', 'new_password', 'confirm_password'], $input);
 
-        // Redirect to guest dashboard
-        header('Location: /guests/dashboard');
-        exit;
+        $userId = AuthHelper::getUserId();
+        $user = $this->userRepository->getUserById($userId);
+
+        if (!$user || !AuthHelper::verifyPassword($input['current_password'], $user->password)) {
+            ApiHelper::sendError(403, 'Current password is incorrect.');
+        }
+
+        if ($input['new_password'] !== $input['confirm_password']) {
+            ApiHelper::sendError(400, 'New passwords do not match.');
+        }
+
+        $hashedPassword = AuthHelper::hashPassword($input['new_password']);
+        $this->userRepository->updatePassword($userId, $hashedPassword);
+
+        ApiHelper::sendResponse(200, [], 'Password updated successfully.');
+    }
+
+    /**
+     * Request a password reset link.
+     *
+     * @return void
+     * @throws JsonException|RandomException
+     * @throws DateMalformedStringException
+     */
+    public function requestPasswordReset()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            ApiHelper::sendError(405, 'Invalid request method.');
+        }
+
+        $email = $_POST['email'] ?? '';
+        $user = $this->userRepository->getUserByEmail($email);
+
+        if (!$user) {
+            ApiHelper::sendResponse(200, [], 'If this email exists, you will receive a reset link.');
+        }
+
+        $resetToken = bin2hex(random_bytes(32));
+        if (!$this->userRepository->savePasswordResetToken($user->id, $resetToken)) {
+            ApiHelper::sendError(500, 'Failed to process reset request.');
+        }
+
+        new Mailer()->sendPasswordReset($email, $resetToken);
+        ApiHelper::sendResponse(200, [], 'If this email exists, you will receive a reset link.');
+    }
+
+    /**
+     * Reset user password using a token.
+     *
+     * @return void
+     * @throws JsonException
+     */
+    public function resetPassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            ApiHelper::sendError(405, 'Invalid request method.');
+        }
+
+        $input = ApiHelper::getJsonInput();
+        ApiHelper::validateRequest(['token', 'new_password', 'confirm_password'], $input);
+
+        if ($input['new_password'] !== $input['confirm_password']) {
+            ApiHelper::sendError(400, 'Passwords do not match.');
+        }
+
+        $user = $this->userRepository->getUserByResetToken($input['token']);
+        if (!$user) {
+            ApiHelper::sendError(400, 'Invalid or expired reset token.');
+        }
+
+        $hashedPassword = AuthHelper::hashPassword($input['new_password']);
+        $this->userRepository->updatePasswordAndClearToken($user->id, $hashedPassword);
+
+        ApiHelper::sendResponse(200, [], 'Password reset successful.');
     }
 }
