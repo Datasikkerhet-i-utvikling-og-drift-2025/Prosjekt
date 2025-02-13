@@ -1,172 +1,129 @@
 <?php
 
-require_once __DIR__ . '/../helpers/Logger.php';
-require_once __DIR__ . '/../helpers/InputValidator.php';
+namespace models;
 
+use DateTime;
+use helpers\InputValidator;
+use helpers\Logger;
+
+use InvalidArgumentException;
+use PDO;
+use PDOStatement;
+
+/**
+ * Represents a course in the system.
+ */
 class Course
 {
-    private $pdo; // PDO instance
+    /** @var int|null $id Unique identifier for the course (auto-incremented in the database). */
+    private ?int $id {
+        get {
+            return $this->id;
+        }
+    }
 
-    // Properties
-    private $id;
-    private $code;
-    private $name;
-    private $lecturerId;
-    private $pinCode;
+    /** @var string $code Unique course code (e.g., "CS101"). */
+    private string $code {
+        get {
+            return $this->code;
+        }
+        set {
+            $this->code = InputValidator::sanitizeString($value);
+        }
+    }
 
-    // Constructor
-    public function __construct($pdo, $id = null, $code = null, $name = null, $lecturerId = null, $pinCode = null)
+    /** @var string $name Name of the course. */
+    private string $name {
+        get {
+            return $this->name;
+        }
+        set {
+            $this->name = InputValidator::sanitizeString($value);
+        }
+    }
+
+    /** @var int $lecturerId ID of the lecturer responsible for the course. */
+    private int $lecturerId {
+        get {
+            return $this->lecturerId;
+        }
+        set {
+            $this->lecturerId = $value;
+        }
+    }
+
+    /** @var string $pinCode 4-digit code for course access. */
+    private string $pinCode {
+        get {
+            return $this->pinCode;
+        }
+        set(string $newPinCode) {
+            if (!preg_match('/^\d{4}$/', $newPinCode)) {
+                Logger::error("Invalid PIN code: Must be exactly 4 digits.");
+                throw new InvalidArgumentException("PIN code must be exactly 4 digits.");
+            }
+            $this->pinCode = $newPinCode;
+        }
+    }
+
+    /** @var DateTime $createdAt Timestamp when the course was created. */
+    private DateTime $createdAt {
+        get {
+            return $this->createdAt;
+        }
+        set {
+            $this->createdAt = $value;
+        }
+    }
+
+    /**
+     * Constructs a new Course instance.
+     *
+     * @param array $courseData Associative array containing course data:
+     *   - `id` (int|null) Course ID.
+     *   - `code` (string) Unique course code.
+     *   - `name` (string) Course name.
+     *   - `lecturerId` (int) ID of the lecturer.
+     *   - `pinCode` (string) 4-digit course access code.
+     *   - `createdAt` (string|null) Course creation timestamp (defaults to 'now').
+     */
+    public function __construct(array $courseData)
     {
-        $this->pdo = $pdo;
-        $this->id = $id;
-        $this->code = $code;
-        $this->name = $name;
-        $this->lecturerId = $lecturerId;
+        $this->id = $courseData['id'] ?? null;
+        $this->code = InputValidator::sanitizeString($courseData['code']);
+        $this->name = InputValidator::sanitizeString($courseData['name']);
+        $this->lecturerId = (int) $courseData['lecturerId'];
+        $this->pinCode = InputValidator::sanitizeString($courseData['pinCode']);
+        $this->createdAt = new DateTime($courseData['createdAt'] ?? 'now');
+    }
+
+
+    /**
+     * Sets the course PIN code.
+     *
+     * @param string $pinCode The 4-digit PIN code.
+     */
+    public function setPinCode(string $pinCode): void
+    {
+        if (!preg_match('/^\d{4}$/', $pinCode)) {
+            Logger::error("Invalid PIN code: Must be exactly 4 digits.");
+            throw new \InvalidArgumentException("PIN code must be exactly 4 digits.");
+        }
         $this->pinCode = $pinCode;
     }
 
-    // Getters
-    public function getId() { return $this->id; }
-    public function getCode() { return $this->code; }
-    public function getName() { return $this->name; }
-    public function getLecturerId() { return $this->lecturerId; }
-    public function getPinCode() { return $this->pinCode; }
 
-    // Create a new course
-    public function createCourse($code, $name, $lecturerId, $pinCode)
+    /**
+     * Binds the course properties as parameters for a prepared PDO statement.
+     *
+     * @param PDOStatement $stmt The prepared statement to bind data to.
+     */
+    public function bindCourseDataForDbStmt(PDOStatement $stmt): void
     {
-        if (!InputValidator::isNotEmpty($code) || !InputValidator::isNotEmpty($name) || !InputValidator::isNotEmpty($pinCode)) {
-            Logger::error("Course creation failed: Missing required fields");
-            return false;
-        }
-
-        if (!InputValidator::isValidInteger($lecturerId)) {
-            Logger::error("Course creation failed: Invalid lecturer ID");
-            return false;
-        }
-
-        $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
-                VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([
-                ':code' => InputValidator::sanitizeString($code),
-                ':name' => InputValidator::sanitizeString($name),
-                ':lecturerId' => (int)$lecturerId,
-                ':pinCode' => InputValidator::sanitizeString($pinCode),
-            ]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to create course: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Retrieve a course by ID
-    public function getCourseById($courseId)
-    {
-        if (!InputValidator::isValidInteger($courseId)) {
-            Logger::error("Invalid course ID: $courseId");
-            return null;
-        }
-
-        $sql = "SELECT * FROM courses WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            $stmt->execute([':id' => (int)$courseId]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $data ? self::fromArray($data) : null;
-        } catch (PDOException $e) {
-            Logger::error("Failed to fetch course ID $courseId: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    // Retrieve all courses
-    public function getAllCourses()
-    {
-        $sql = "SELECT * FROM courses";
-        $stmt = $this->pdo->query($sql);
-
-        try {
-            $courses = [];
-            while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $courses[] = self::fromArray($data);
-            }
-            return $courses;
-        } catch (PDOException $e) {
-            Logger::error("Failed to fetch all courses: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Update a course
-    public function updateCourse($id, $code, $name, $lecturerId, $pinCode)
-    {
-        if (!InputValidator::isValidInteger($id)) {
-            Logger::error("Invalid course ID: $id");
-            return false;
-        }
-
-        if (!InputValidator::isValidInteger($lecturerId)) {
-            Logger::error("Invalid lecturer ID: $lecturerId");
-            return false;
-        }
-
-        if (!InputValidator::isNotEmpty($code) || !InputValidator::isNotEmpty($name) || !InputValidator::isNotEmpty($pinCode)) {
-            Logger::error("Course update failed: Missing required fields");
-            return false;
-        }
-
-        $sql = "UPDATE courses SET code = :code, name = :name, lecturer_id = :lecturerId, pin_code = :pinCode, updated_at = NOW()
-                WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([
-                ':id' => (int)$id,
-                ':code' => InputValidator::sanitizeString($code),
-                ':name' => InputValidator::sanitizeString($name),
-                ':lecturerId' => (int)$lecturerId,
-                ':pinCode' => InputValidator::sanitizeString($pinCode),
-            ]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to update course ID $id: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Delete a course
-    public function deleteCourse($courseId)
-    {
-        if (!InputValidator::isValidInteger($courseId)) {
-            Logger::error("Invalid course ID: $courseId");
-            return false;
-        }
-
-        $sql = "DELETE FROM courses WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([':id' => (int)$courseId]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to delete course ID $courseId: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Static method to create a Course instance from a database row
-    public static function fromArray(array $data)
-    {
-        return new self(
-            null,
-            $data['id'] ?? null,
-            $data['code'] ?? null,
-            $data['name'] ?? null,
-            $data['lecturer_id'] ?? null,
-            $data['pin_code'] ?? null
-        );
+        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':code', $this->code, PDO::PARAM_STR);
+        $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
+        $stmt->bindValue(':lecturerId', $this->lecturerId, PDO::PARAM_INT);
+        $stmt->bindValue(':pinCode', $this->pinCode, PDO::PARAM_STR);
     }
 }

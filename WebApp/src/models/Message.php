@@ -1,222 +1,156 @@
 <?php
 
-require_once __DIR__ . '/../helpers/InputValidator.php';
-require_once __DIR__ . '/../helpers/Logger.php';
+namespace models;
+
+use helpers\InputValidator;
+
+use DateTime;
+use DateMalformedStringException;
+use PDO;
+use PDOStatement;
 
 class Message
 {
-    private $pdo; // PDO instance
+    /** @var int|null $id Unique identifier for the message (auto-incremented in the database). */
+    public ?int $id {
+        get {
+            return $this->id;
+        }
+        set {
+            $this->id = $value;
+        }
+    }
 
-    public function __construct($pdo)
+    /** @var int $courseId ID of the course the message is related to. */
+    public int $courseId {
+        get {
+            return $this->courseId;
+        }
+        set {
+            $this->courseId = $value;
+        }
+    }
+
+    /** @var int $studentId ID of the student who sent the message. */
+    public int $studentId {
+        get {
+            return $this->studentId;
+        }
+        set {
+            $this->studentId = $value;
+        }
+    }
+
+    /** @var string $anonymousId A unique identifier for anonymous messages. */
+    public string $anonymousId {
+        get {
+            return $this->anonymousId;
+        }
+        set {
+            $this->anonymousId = $value;
+        }
+    }
+
+    /** @var string $content The content of the message. */
+    public string $content {
+        get {
+            return $this->content;
+        }
+        set {
+            $this->content = $value;
+        }
+    }
+
+    /** @var string|null $reply The lecturer's reply to the message, if any. */
+    public ?string $reply {
+        get {
+            return $this->reply;
+        }
+        set {
+            $this->reply = $value;
+        }
+    }
+
+    /** @var bool $isReported Whether the message has been reported for review. */
+    public bool $isReported {
+        get {
+            return $this->isReported;
+        }
+        set {
+            $this->isReported = $value;
+        }
+    }
+
+    /** @var DateTime $createdAt Timestamp when the message was created. */
+    public DateTime $createdAt {
+        get {
+            return $this->createdAt;
+        }
+        set {
+            $this->createdAt = $value;
+        }
+    }
+
+    /** @var DateTime $updatedAt Timestamp of the last modification of the message. */
+    public DateTime $updatedAt {
+        get {
+            return $this->updatedAt;
+        }
+        set {
+            $this->updatedAt = $value;
+        }
+    }
+
+    /**
+     * Constructs a new Message instance.
+     *
+     * This constructor initializes the message properties based on the provided message data array.
+     * It ensures that timestamps are set correctly and assigns default values where necessary.
+     *
+     * @param array $messageData Associative array containing message data with the following keys:<br>
+     *        - `id` (int|null) Message ID (auto-incremented in the database).<br>
+     *        - `courseId` (int) ID of the associated course.<br>
+     *        - `studentId` (int) ID of the student who sent the message.<br>
+     *        - `anonymousId` (string) Unique identifier for anonymous messages.<br>
+     *        - `content` (string) Message content.<br>
+     *        - `reply` (string|null) Lecturer's reply (if applicable).<br>
+     *        - `isReported` (bool) Whether the message is reported.<br>
+     *        - `createdAt` (string|null) Timestamp when the message was created (defaults to `now`).<br>
+     *        - `updatedAt` (string|null) Timestamp when the message was last updated (defaults to `now`).
+     *
+     * @throws DateMalformedStringException If any provided date string cannot be converted to a DateTime object.
+     */
+    public function __construct(array $messageData)
     {
-        $this->pdo = $pdo;
+        $this->id = $messageData['id'] ?? null;
+        $this->courseId = $messageData['courseId'];
+        $this->studentId = $messageData['studentId'];
+        $this->anonymousId = InputValidator::sanitizeString($messageData['anonymousId']);
+        $this->content = InputValidator::sanitizeString($messageData['content']);
+        $this->reply = isset($messageData['reply']) ? InputValidator::sanitizeString($messageData['reply']) : null;
+        $this->isReported = $messageData['isReported'] ?? false;
+        $this->createdAt = new DateTime($messageData['createdAt'] ?? 'now');
+        $this->updatedAt = new DateTime($messageData['updatedAt'] ?? 'now');
     }
 
-    // Create a new message
-    public function createMessage($studentId, $courseId, $anonymousId, $content)
+    /**
+     * Binds the message's properties as parameters for a prepared PDO statement.
+     *
+     * This method ensures that all relevant message attributes are securely bound to a
+     * prepared SQL statement before execution, reducing the risk of SQL injection.
+     *
+     * @param PDOStatement $stmt The prepared statement to which message attributes will be bound.
+     *
+     * @return void
+     */
+    public function bindMessageDataForDbStmt(PDOStatement $stmt): void
     {
-        if (!InputValidator::isNotEmpty($content)) {
-            Logger::error("Message content is empty for student ID $studentId and course ID $courseId");
-            return false;
-        }
-
-        $sql = "INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at, is_reported)
-                VALUES (:studentId, :courseId, :anonymousId, :content, NOW(), 0)";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([
-                ':studentId' => (int)$studentId,
-                ':courseId' => (int)$courseId,
-                ':anonymousId' => InputValidator::sanitizeString($anonymousId),
-                ':content' => InputValidator::sanitizeString($content),
-            ]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to create message: " . $e->getMessage());
-            return false;
-        }
+        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':courseId', $this->courseId, PDO::PARAM_INT);
+        $stmt->bindValue(':studentId', $this->studentId, PDO::PARAM_INT);
+        $stmt->bindValue(':anonymousId', $this->anonymousId, PDO::PARAM_STR);
+        $stmt->bindValue(':content', $this->content, PDO::PARAM_STR);
+        $stmt->bindValue(':reply', $this->reply ?? null, $this->reply !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':isReported', $this->isReported, PDO::PARAM_BOOL);
     }
-
-    // Retrieve all messages for a specific course
-    public function getMessagesByCourse($courseId)
-    {
-        if (!InputValidator::isValidInteger($courseId)) {
-            Logger::error("Invalid course ID: $courseId");
-            return [];
-        }
-
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, m.anonymous_id
-                FROM messages m
-                WHERE m.course_id = :courseId";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            $stmt->execute([':courseId' => (int)$courseId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            Logger::error("Failed to fetch messages for course ID $courseId: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Retrieve all messages sent by a specific student
-    public function getMessagesByStudent($studentId)
-    {
-        if (!InputValidator::isValidInteger($studentId)) {
-            Logger::error("Invalid student ID: $studentId");
-            return [];
-        }
-
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-                       c.code AS course_code, c.name AS course_name
-                FROM messages m
-                JOIN courses c ON m.course_id = c.id
-                WHERE m.student_id = :studentId";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            $stmt->execute([':studentId' => (int)$studentId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            Logger::error("Failed to fetch messages for student ID $studentId: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Retrieve a specific message by ID
-    public function getMessageById($messageId)
-    {
-        if (!InputValidator::isValidInteger($messageId)) {
-            Logger::error("Invalid message ID: $messageId");
-            return null;
-        }
-
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-                       c.code AS course_code, c.name AS course_name
-                FROM messages m
-                JOIN courses c ON m.course_id = c.id
-                WHERE m.id = :messageId";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            $stmt->execute([':messageId' => (int)$messageId]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            Logger::error("Failed to fetch message ID $messageId: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    // Update the reply to a message
-    public function updateMessageReply($messageId, $replyContent)
-    {
-        if (!InputValidator::isNotEmpty($replyContent)) {
-            Logger::error("Reply content is empty for message ID $messageId");
-            return false;
-        }
-
-        if (!InputValidator::isValidInteger($messageId)) {
-            Logger::error("Invalid message ID: $messageId");
-            return false;
-        }
-
-        $sql = "UPDATE messages SET reply = :replyContent, updated_at = NOW() WHERE id = :messageId";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([
-                ':messageId' => (int)$messageId,
-                ':replyContent' => InputValidator::sanitizeString($replyContent),
-            ]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to update reply for message ID $messageId: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Report a message as inappropriate
-    // is_reported lagt til i funksjonen!
-public function reportMessage($messageId, $reason)
-{
-    if (!InputValidator::isNotEmpty($reason)) {
-        Logger::error("Report reason is empty for message ID $messageId");
-        return false;
-    }
-
-    if (!InputValidator::isValidInteger($messageId)) {
-        Logger::error("Invalid message ID: $messageId");
-        return false;
-    }
-
-    // Check if the message has already been reported ISREPORTED
-    $checkSql = "SELECT is_reported FROM messages WHERE id = :messageId";
-    $checkStmt = $this->pdo->prepare($checkSql);
-    $checkStmt->execute([':messageId' => (int)$messageId]);
-    $message = $checkStmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($message && $message['is_reported'] == 1) {
-        Logger::error("Message ID $messageId has already been reported.");
-        return false;
-    }
-
-    // Begin transaction
-    $this->pdo->beginTransaction();
-
-    try {
-        // Insert the report
-        $sql = "INSERT INTO reports (message_id, report_reason, created_at)
-                VALUES (:messageId, :reason, NOW())";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':messageId' => (int)$messageId,
-            ':reason' => InputValidator::sanitizeString($reason),
-        ]);
-
-        // Update the is_reported column
-        $updateSql = "UPDATE messages SET is_reported = 1 WHERE id = :messageId";
-        $updateStmt = $this->pdo->prepare($updateSql);
-        $updateStmt->execute([':messageId' => (int)$messageId]);
-
-        // Commit transaction
-        $this->pdo->commit();
-        return true;
-    } catch (PDOException $e) {
-        // Rollback transaction
-        $this->pdo->rollBack();
-        Logger::error("Failed to report message ID $messageId: " . $e->getMessage());
-        return false;
-    }
-}
-
-    // Delete a message by ID
-    public function deleteMessage($messageId)
-    {
-        if (!InputValidator::isValidInteger($messageId)) {
-            Logger::error("Invalid message ID: $messageId");
-            return false;
-        }
-
-        $sql = "DELETE FROM messages WHERE id = :messageId";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([':messageId' => (int)$messageId]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to delete message ID $messageId: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function getPublicMessages()
-    {
-        try {
-            $sql = "SELECT id AS message_id, content, created_at FROM messages";
-            $stmt = $this->pdo->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::error("Error fetching public messages: " . $e->getMessage());
-            return [];
-        }
-    }
-
 }

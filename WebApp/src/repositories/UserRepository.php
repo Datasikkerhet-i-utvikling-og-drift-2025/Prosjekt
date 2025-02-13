@@ -1,16 +1,18 @@
 <?php
 
-namespace services;
+namespace repositories;
 
-use DateMalformedStringException;
 use factories\UserFactory;
 use helpers\Logger;
 use models\User;
 use service\DatabaseService;
 
+use DateMalformedStringException;
+
 class UserRepository
 {
     private DatabaseService $db;
+
 
     /**
      * Constructs a UserRepository instance.
@@ -21,6 +23,7 @@ class UserRepository
     {
         $this->db = $db;
     }
+
 
     /**
      * Creates a new user in the database.
@@ -38,6 +41,7 @@ class UserRepository
 
         return $this->db->executeSql($stmt, $loggerMessage);
     }
+
 
     /**
      * Updates an existing user's details in the database.
@@ -71,6 +75,7 @@ class UserRepository
         return $this->db->executeSql($stmt, $logger);
     }
 
+
     /**
      * Deletes a user from the database by their ID.
      *
@@ -89,6 +94,7 @@ class UserRepository
         return $this->db->executeSql($stmt, $logger);
     }
 
+
     /**
      * Deletes a user from the database by their email.
      *
@@ -106,6 +112,7 @@ class UserRepository
 
         return $this->db->executeSql($stmt, $logger);
     }
+
 
     /**
      * Retrieves a user from the database by their ID.
@@ -132,6 +139,7 @@ class UserRepository
         return UserFactory::createUser($userData);
     }
 
+
     /**
      * Retrieves all users from the database.
      *
@@ -155,6 +163,7 @@ class UserRepository
         return $users;
     }
 
+
     /**
      * Stores a password reset token for a user.
      *
@@ -175,6 +184,7 @@ class UserRepository
 
         return $this->db->executeSql($stmt, $logger);
     }
+
 
     /**
      * Retrieves a user by their password reset token.
@@ -201,6 +211,7 @@ class UserRepository
         return UserFactory::createUser($userData);
     }
 
+
     /**
      * Updates a user's password and clears the reset token.
      *
@@ -222,6 +233,7 @@ class UserRepository
         $logger = "Updating password and clearing reset token for user ID: " . $userId;
         return $this->db->executeSql($stmt, $logger);
     }
+
 
     /**
      * Updates a user's password.

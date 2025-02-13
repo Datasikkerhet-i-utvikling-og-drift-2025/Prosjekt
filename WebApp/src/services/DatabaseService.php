@@ -3,6 +3,7 @@
 namespace service;
 
 use helpers\Logger;
+
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -20,6 +21,7 @@ class DatabaseService
         }
     }
 
+
     public function __construct()
     {
         $this->host = $_ENV['DB_HOST'];
@@ -27,6 +29,7 @@ class DatabaseService
         $this->username = $_ENV['DB_USER'];
         $this->password = $_ENV['DB_PASS'];
     }
+
 
     /**
      * Establishes a connection to the database using PDO.
@@ -61,6 +64,7 @@ class DatabaseService
         return $this->pdo;
     }
 
+
     /**
      * Prepares an SQL statement for execution and optionally binds parameters using a callable method.
      *
@@ -82,6 +86,7 @@ class DatabaseService
 
         return $stmt;
     }
+
 
     /**
      * Executes a prepared SQL statement with transaction handling, error logging, and rollback on failure.
@@ -121,6 +126,7 @@ class DatabaseService
         }
     }
 
+
     /**
      * Combines SQL preparation and execution in a single method with optional parameter binding.
      *
@@ -140,6 +146,7 @@ class DatabaseService
         $this->prepareSql($sql, $bindDataMethod);
         return $this->executeSql($stmt, $loggerMessage);
     }
+
 
     /**
      * Executes a prepared SQL statement and fetches all results with logging and transaction handling.
@@ -174,6 +181,7 @@ class DatabaseService
             return [];
         }
     }
+
 
     /**
      * Executes a prepared SQL statement and fetches a single row with logging and transaction handling.
@@ -213,6 +221,7 @@ class DatabaseService
             return null;
         }
     }
+
 
     /**
      * Executes a prepared SQL statement and fetches a single column value with logging and transaction handling.
@@ -254,6 +263,7 @@ class DatabaseService
         }
     }
 
+
     /**
      * Binds data to a prepared PDO statement using a provided callable function.
      *
@@ -273,6 +283,19 @@ class DatabaseService
         }
     }
 
+
+    /**
+     * Binds an array of parameters to a prepared PDO statement.
+     *
+     * This method ensures that each parameter in the `$paramArray` is bound to the corresponding
+     * value in `$valueArray`. It throws an exception if the arrays do not have the same length.
+     *
+     * @param PDOStatement $stmt The prepared statement to which parameters will be bound.
+     * @param array $paramArray An array of named parameters (e.g., `[':name', ':email']`).
+     * @param array $valueArray An array of values corresponding to each parameter.
+     *
+     * @throws InvalidArgumentException If the parameter and value arrays do not have the same length.
+     */
     public function bindArrayToSqlStmt(PDOStatement $stmt, array $paramArray, array $valueArray): void
     {
         if (count($paramArray) !== count($valueArray)) {
@@ -285,7 +308,16 @@ class DatabaseService
     }
 
 
-    public function bindSingleValueToSqlStmt(PDOStatement $stmt, $param, $value): void
+    /**
+     * Binds a single parameter to a prepared PDO statement.
+     *
+     * This method binds a single named parameter to a value in a prepared SQL statement.
+     *
+     * @param PDOStatement $stmt The prepared statement to which the parameter will be bound.
+     * @param string $param The named parameter (e.g., `':email'`).
+     * @param mixed $value The value to bind to the parameter.
+     */
+    public function bindSingleValueToSqlStmt(PDOStatement $stmt, string $param, mixed $value): void
     {
         $stmt->bindValue($param, $value, PDO::PARAM_STR);
     }

@@ -2,11 +2,12 @@
 
 namespace models;
 
-use DateMalformedStringException;
-use DateTime;
 use helpers\AuthHelper;
 use helpers\InputValidator;
 use helpers\Logger;
+
+use DateMalformedStringException;
+use DateTime;
 use JsonException;
 use PDO;
 use PDOStatement;
@@ -124,6 +125,7 @@ abstract class User
         }
     }
 
+
     /**
      * Constructs a new User instance.
      *
@@ -157,6 +159,7 @@ abstract class User
         $this->createdAt = new DateTime($userData['createdAt'] ?? 'now');
         $this->updatedAt = new DateTime($userData['updatedAt'] ?? 'now');
     }
+
 
     /**
      * Binds the user's properties as parameters for a prepared PDO statement.

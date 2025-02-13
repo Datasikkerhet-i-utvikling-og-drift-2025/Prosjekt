@@ -1,88 +1,108 @@
 <?php
 
-require_once __DIR__ . '/../helpers/InputValidator.php';
-require_once __DIR__ . '/../helpers/Logger.php';
+namespace models;
 
+use helpers\InputValidator;
+
+use DateTime;
+use Exception;
+use PDO;
+use PDOStatement;
+
+/**
+ * Represents a comment made on a message.
+ */
 class Comment
 {
-    private $pdo;
-
-    public function __construct($pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
-    // Add a comment to the database
-    public function addComment($messageId, $guestName, $content)
-    {
-        // Validate inputs
-        if (!InputValidator::isValidInteger($messageId)) {
-            Logger::error("Invalid message ID: $messageId");
-            return false;
+    /** @var int|null $id Unique identifier for the comment (auto-incremented in the database). */
+    public ?int $id {
+        get {
+            return $this->id;
         }
-
-        if (!InputValidator::isNotEmpty($content)) {
-            Logger::error("Failed to add comment: Content is empty");
-            return false;
-        }
-
-        $sql = "INSERT INTO comments (message_id, guest_name, content, created_at)
-                VALUES (:message_id, :guest_name, :content, NOW())";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([
-                ':message_id' => (int)$messageId,
-                ':guest_name' => InputValidator::sanitizeString($guestName),
-                ':content' => InputValidator::sanitizeString($content),
-            ]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to add comment for message ID $messageId: " . $e->getMessage());
-            return false;
+        set {
+            $this->id = $value;
         }
     }
 
-    // Get all comments for a specific message
-    public function getCommentsByMessageId($messageId)
-    {
-        // Validate input
-        if (!InputValidator::isValidInteger($messageId)) {
-            Logger::error("Invalid message ID: $messageId");
-            return [];
+    /** @var int $messageId The ID of the message this comment is associated with. */
+    public int $messageId {
+        get {
+            return $this->messageId;
         }
-
-        $sql = "SELECT id, message_id, guest_name, content, created_at 
-                FROM comments 
-                WHERE message_id = :message_id 
-                ORDER BY created_at ASC";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            $stmt->execute([':message_id' => (int)$messageId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            Logger::error("Failed to fetch comments for message ID $messageId: " . $e->getMessage());
-            return [];
+        set {
+            $this->messageId = $value;
         }
     }
 
-    // Delete a comment by ID
-    public function deleteComment($commentId)
+    /** @var string $guestName The name of the guest who posted the comment. */
+    public string $guestName {
+        get {
+            return $this->guestName;
+        }
+        set {
+            $this->guestName = $value;
+        }
+    }
+
+    /** @var string $content The content of the comment. */
+    public string $content {
+        get {
+            return $this->content;
+        }
+        set {
+            $this->content = $value;
+        }
+    }
+
+    /** @var DateTime $createdAt Timestamp when the comment was created. */
+    public DateTime $createdAt {
+        get {
+            return $this->createdAt;
+        }
+        set {
+            $this->createdAt = $value;
+        }
+    }
+
+
+    /**
+     * Constructs a new Comment instance.
+     *
+     * @param array $commentData Associative array containing comment data:
+     *        - `id` (int|null) Unique ID (if null, assigned by database).
+     *        - `messageId` (int) ID of the associated message.
+     *        - `guestName` (string) Name of the commenter.
+     *        - `content` (string) Comment text.
+     *        - `createdAt` (string|null) Timestamp when the comment was created (defaults to `now`).
+     *
+     * @throws Exception If any provided date string cannot be converted to a DateTime object.
+     */
+    public function __construct(array $commentData)
     {
-        // Validate input
-        if (!InputValidator::isValidInteger($commentId)) {
-            Logger::error("Invalid comment ID: $commentId");
-            return false;
-        }
+        $this->id = $commentData['id'] ?? null;
+        $this->messageId = (int)$commentData['messageId'];
+        $this->guestName = InputValidator::sanitizeString($commentData['guestName']);
+        $this->content = InputValidator::sanitizeString($commentData['content']);
+        $this->createdAt = new DateTime($commentData['createdAt'] ?? 'now');
+    }
 
-        $sql = "DELETE FROM comments WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
 
-        try {
-            return $stmt->execute([':id' => (int)$commentId]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to delete comment ID $commentId: " . $e->getMessage());
-            return false;
-        }
+    /**
+     * Binds the comment properties as parameters for a prepared PDO statement.
+     *
+     * This method ensures that all relevant comment attributes are securely bound to
+     * a prepared SQL statement before execution, reducing the risk of SQL injection.
+     *
+     * @param PDOStatement $stmt The prepared statement to which comment attributes will be bound.
+     *
+     * @return void
+     */
+    public function bindCommentDataForDbStmt(PDOStatement $stmt): void
+    {
+        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':messageId', $this->messageId, PDO::PARAM_INT);
+        $stmt->bindValue(':guestName', $this->guestName, PDO::PARAM_STR);
+        $stmt->bindValue(':content', $this->content, PDO::PARAM_STR);
+        $stmt->bindValue(':createdAt', $this->createdAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
     }
 }
