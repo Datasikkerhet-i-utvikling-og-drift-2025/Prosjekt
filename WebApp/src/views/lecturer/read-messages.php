@@ -42,6 +42,10 @@ $courseCode = $messages[0]['course_code'] ?? 'Unknown Course';
     $errorMessage = 'Failed to load messages. Please try again later.';
     Logger::error('Error fetching messages for course ID ' . $courseId . ': ' . $e->getMessage());
 }
+
+//Fetch guest comments
+$stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
+$comments = $stmtComments->fetchAll();
 ?>
 
 <?php include __DIR__ . '/../partials/header.php'; ?>
@@ -68,6 +72,15 @@ $courseCode = $messages[0]['course_code'] ?? 'Unknown Course';
                     <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
                     <p><strong>Sent At:</strong> <?php echo htmlspecialchars($message['created_at'], ENT_QUOTES, 'UTF-8'); ?></p>
                     <p><strong>Response:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No response yet', ENT_QUOTES, 'UTF-8'); ?></p>
+                    <?php foreach ($comments as $comment): ?>
+                        <?php if ($comment['message_id'] === $message['id']): ?>
+                            <div class="guest-item">
+                                <p><strong>Guest name: </strong> <?php echo htmlspecialchars($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym', ENT_QUOTES, 'UTF-8'); ?></p>
+                                <p> <strong>comment: </strong> <?php echo htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            </div>
+                        <?php else: ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                     <a href="/lecturer/reply?message_id=<?php echo htmlspecialchars($message['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">Reply</a>
                     <hr>
                 </div>

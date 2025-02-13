@@ -13,6 +13,7 @@ return [
     '/lecturer/dashboard' => __DIR__ . '/../views/lecturer/dashboard.php',
     '/lecturer/read-messages' => __DIR__ . '/../views/lecturer/read-messages.php',
     '/lecturer/reply' => __DIR__ . '/../views/lecturer/reply.php',
+    '/lecturer/courses' => __DIR__ . '/../views/lecturer/courses.php',
     '/admin/dashboard' => __DIR__ . '/../views/admin/dashboard.php',
     '/admin/manage-users' => __DIR__ . '/../views/admin/manage-users.php',
     '/admin/manage-messages' => __DIR__ . '/../views/admin/manage-messages.php',
