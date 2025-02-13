@@ -22,7 +22,6 @@ class AuthController
         $this->pdo = $pdo;
         $this->userModel = new User($pdo);
     }
-
     // User Registration
     public function register()
     {
@@ -69,49 +68,49 @@ class AuthController
 
     // User Login
     public function login()
-{
-    $input = ApiHelper::getJsonInput();
+    {
+        $input = ApiHelper::getJsonInput();
 
-    // Validate input
-    ApiHelper::validateRequest(['email', 'password'], $input);
+        // Validate input
+        ApiHelper::validateRequest(['email', 'password'], $input);
 
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-    // Enkel sjekk for at e-post og passord er sendt med
-    if (empty($email) || empty($password)) {
-        header("Location: /login?error=" . urlencode("Email and password are required."));
-        exit;
+        // Enkel sjekk for at e-post og passord er sendt med
+        if (empty($email) || empty($password)) {
+            header("Location: /login?error=" . urlencode("Email and password are required."));
+            exit;
+        }
+
+        // Find user by email
+        $user = $this->userModel->getUserByEmail($input['email']);
+        if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
+            Logger::error("Login failed for email: " . $input['email']);
+            //ApiHelper::sendError(401, 'Invalid email or password.');
+            header("Location: /?error=" . urlencode("Invalid email or password."));
+            exit;
+        }
+
+        // Log in the user by setting session or token
+        AuthHelper::loginUser($user);
+        Logger::info("User logged in: " . $input['email'] . ". Session data: " . var_export($_SESSION, true));
+
+        // Redirect to the user page based on role
+        if ($user['role'] === 'student') {
+            header('Location: /student/dashboard');
+            exit;
+        } elseif ($user['role'] === 'lecturer') {
+            header('Location: /lecturer/dashboard');
+            exit;
+        } elseif ($user['role'] === 'admin') {
+            header('Location: /admin/dashboard');
+            exit;
+        } else {
+            Logger::error("Unknown role for user ID: " . $user['id']);
+            ApiHelper::sendError(400, 'Unknown role for user.');
+        }
     }
-
-    // Find user by email
-    $user = $this->userModel->getUserByEmail($input['email']);
-    if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
-        Logger::error("Login failed for email: " . $input['email']);
-        //ApiHelper::sendError(401, 'Invalid email or password.');
-        header("Location: /?error=" . urlencode("Invalid email or password."));
-        exit;
-    }
-
-    // Log in the user by setting session or token
-    AuthHelper::loginUser($user);
-    Logger::info("User logged in: " . $input['email'] . ". Session data: " . var_export($_SESSION, true));
-
-    // Redirect to the user page based on role
-    if ($user['role'] === 'student') {
-        header('Location: /student/dashboard');
-        exit;
-    } elseif ($user['role'] === 'lecturer') {
-        header('Location: /lecturer/dashboard');
-        exit;
-    } elseif ($user['role'] === 'admin') {
-        header('Location: /admin/dashboard');
-        exit;
-    } else {
-        Logger::error("Unknown role for user ID: " . $user['id']);
-        ApiHelper::sendError(400, 'Unknown role for user.');
-    }
-}
 
     // User Logout
     public function logout()
@@ -349,17 +348,17 @@ public function resetPassword()
     }
 
     public function guest()
-{
-    // Set session data for guest
-    $_SESSION['user'] = [
-        'role' => 'guest',
-        'name' => 'Guest'
-    ];
+    {
+        // Set session data for guest
+        $_SESSION['user'] = [
+            'role' => 'guest',
+            'name' => 'Guest'
+        ];
 
-    Logger::info("Guest user logged in. Session data: " . var_export($_SESSION, true));
+        Logger::info("Guest user logged in. Session data: " . var_export($_SESSION, true));
 
-    // Redirect to guest dashboard
-    header('Location: /guests/dashboard');
-    exit;
-}
+        // Redirect to guest dashboard
+        header('Location: /guests/dashboard');
+        exit;
+    }
 }

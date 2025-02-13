@@ -1,5 +1,12 @@
 # Api
+ 
+URL: [](http://158.39.188.204/steg1/api)
 
+<api-doc openapi-path="../specifications/api.yaml"></api-doc>
+
+
+
+<!--
 ## UserController
 
 ### Overview
@@ -76,7 +83,7 @@ The response is a JSON-encoded array of users, where each user is represented by
 }
 ```
 
-
+-->
 
 
 

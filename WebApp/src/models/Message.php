@@ -20,8 +20,8 @@ class Message
             return false;
         }
 
-        $sql = "INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at)
-                VALUES (:studentId, :courseId, :anonymousId, :content, NOW())";
+        $sql = "INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at, is_reported)
+                VALUES (:studentId, :courseId, :anonymousId, :content, NOW(), 0)";
         $stmt = $this->pdo->prepare($sql);
 
         try {
@@ -135,32 +135,58 @@ class Message
     }
 
     // Report a message as inappropriate
-    public function reportMessage($messageId, $reason)
-    {
-        if (!InputValidator::isNotEmpty($reason)) {
-            Logger::error("Report reason is empty for message ID $messageId");
-            return false;
-        }
+    // is_reported lagt til i funksjonen!
+public function reportMessage($messageId, $reason)
+{
+    if (!InputValidator::isNotEmpty($reason)) {
+        Logger::error("Report reason is empty for message ID $messageId");
+        return false;
+    }
 
-        if (!InputValidator::isValidInteger($messageId)) {
-            Logger::error("Invalid message ID: $messageId");
-            return false;
-        }
+    if (!InputValidator::isValidInteger($messageId)) {
+        Logger::error("Invalid message ID: $messageId");
+        return false;
+    }
 
+    // Check if the message has already been reported ISREPORTED
+    $checkSql = "SELECT is_reported FROM messages WHERE id = :messageId";
+    $checkStmt = $this->pdo->prepare($checkSql);
+    $checkStmt->execute([':messageId' => (int)$messageId]);
+    $message = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($message && $message['is_reported'] == 1) {
+        Logger::error("Message ID $messageId has already been reported.");
+        return false;
+    }
+
+    // Begin transaction
+    $this->pdo->beginTransaction();
+
+    try {
+        // Insert the report
         $sql = "INSERT INTO reports (message_id, report_reason, created_at)
                 VALUES (:messageId, :reason, NOW())";
         $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':messageId' => (int)$messageId,
+            ':reason' => InputValidator::sanitizeString($reason),
+        ]);
 
-        try {
-            return $stmt->execute([
-                ':messageId' => (int)$messageId,
-                ':reason' => InputValidator::sanitizeString($reason),
-            ]);
-        } catch (PDOException $e) {
-            Logger::error("Failed to report message ID $messageId: " . $e->getMessage());
-            return false;
-        }
+        // Update the is_reported column
+        $updateSql = "UPDATE messages SET is_reported = 1 WHERE id = :messageId";
+        $updateStmt = $this->pdo->prepare($updateSql);
+        $updateStmt->execute([':messageId' => (int)$messageId]);
+
+        // Commit transaction
+        $this->pdo->commit();
+        return true;
+    } catch (PDOException $e) {
+        // Rollback transaction
+        $this->pdo->rollBack();
+        Logger::error("Failed to report message ID $messageId: " . $e->getMessage());
+        return false;
     }
+}
 
     // Delete a message by ID
     public function deleteMessage($messageId)
@@ -184,7 +210,7 @@ class Message
     public function getPublicMessages()
     {
         try {
-            $sql = "SELECT id AS message_id, content, created_at FROM messages WHERE is_public = 1";
+            $sql = "SELECT id AS message_id, content, created_at FROM messages";
             $stmt = $this->pdo->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
