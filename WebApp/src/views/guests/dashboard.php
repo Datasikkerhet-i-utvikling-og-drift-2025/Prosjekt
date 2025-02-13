@@ -48,6 +48,10 @@ $lecturer = $stmt->fetch();
 $stmt = $pdo->prepare("SELECT id, content FROM messages WHERE course_id = :course_id");
 $stmt->execute([':course_id' => $course['id']]);
 $messages = $stmt->fetchAll();
+
+// Fetch comments for the messages
+$stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
+$comments = $stmtComments->fetchAll();
 ?>
 <div class="container">
     <h1>Course Messages</h1>
@@ -71,10 +75,24 @@ $messages = $stmt->fetchAll();
                 <label>Your Comment:</label>
                 <textarea name="comment" required></textarea>
                 <button type="submit" class="btn btn-small" style="padding: 6px 5px; font-size: 12px; width: 40px; height: 30px;">Send</button>
+            </form>
 
-             </form>
+            <p><strong>Guest comments:</strong></p>
+            <?php foreach ($comments as $comment): ?>
+                <?php if ($comment['message_id'] === $message['id']): ?>
+                    <div class="guest-item">
+                        <p><strong>Guest name: </strong> <?= sanitize($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym') ?></p>
+                        <p><strong>Comment: </strong> <?= sanitize($comment['content']) ?></p>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
     <?php endforeach; ?>
+</div>
+
+<!-- Button to view messages -->
+<div class="container">
+    <a href="/guest/view-messages.php" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
 </div>
 
 <!-- Report Modal -->

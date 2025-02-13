@@ -6,7 +6,7 @@ class InputValidator
     // Validation method for registration
     public static function validateRegistration($input)
     {
-        $rules = self::getRegistrationRules();
+        $rules = self::getRegistrationRules($input['role']);
         $errors = [];
         $sanitized = [];
 
@@ -34,23 +34,57 @@ class InputValidator
     }
 
     // Define the validation rules for registration
-    private static function getRegistrationRules()
+    private static function getRegistrationRules($role)
     {
-        return [
-            'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'name' => ['required' => true, 'min' => 3, 'max' => 100],
-            'email' => ['required' => true, 'email' => true],
-            'password' => ['required' => true, 'min' => 8],
-            'repeat_password' => ['required' => true],
-            'role' => ['required' => true],
-            'study_program' => ['required' => false, 'max' => 100],
-            'cohort_year' => ['required' => false, 'integer' => true],
-            // Nye regler for kurs
-            'course_code' => ['required' => false, 'max' => 10],
-            'course_name' => ['required' => false, 'max' => 100],
-            'course_pin' => ['required' => false, 'regex' => '/^[0-9]{4}$/']
-        ];
+
+        if ($role === 'student') {
+            return [
+                'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
+                'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
+                'name' => ['required' => true, 'min' => 3, 'max' => 100],
+                'email' => ['required' => true, 'email' => true],
+                'password' => ['required' => true, 'min' => 8],
+                'repeat_password' => ['required' => true],
+                'role' => ['required' => true],
+                'study_program' => ['required' => true, 'max' => 100],
+                'cohort_year' => ['required' => true, 'integer' => true],
+                'course_name' => ['required' => false, 'max' => 0],
+                'course_pin' => ['required' => false, 'max' => 0],
+                'course_pin' => ['required' => false, 'max' => 0]
+            ];
+        } else if ($role === 'lecturer') {
+            return [
+                'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
+                'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
+                'name' => ['required' => true, 'min' => 3, 'max' => 100],
+                'email' => ['required' => true, 'email' => true],
+                'password' => ['required' => true, 'min' => 8],
+                'repeat_password' => ['required' => true],
+                'role' => ['required' => true],
+                 // Nye regler for kurs
+                'course_code' => ['required' => true, 'max' => 10],
+                'study_program' => ['required' => false, 'max' => 0],
+                'cohort_year' => ['required' => false, 'max' => 0],
+                'course_name' => ['required' => true, 'max' => 100],
+                'course_pin' => ['required' => true, 'regex' => '/^[0-9]{4}$/']
+            ];
+
+        }
+        // return [
+        //     'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
+        //     'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
+        //     'name' => ['required' => true, 'min' => 3, 'max' => 100],
+        //     'email' => ['required' => true, 'email' => true],
+        //     'password' => ['required' => true, 'min' => 8],
+        //     'repeat_password' => ['required' => true],
+        //     'role' => ['required' => true],
+        //     'study_program' => ['required' => false, 'max' => 100],
+        //     'cohort_year' => ['required' => true, 'integer' => true],
+        //     // Nye regler for kurs
+        //     'course_code' => ['required' => false, 'max' => 10],
+        //     'course_name' => ['required' => false, 'max' => 100],
+        //     'course_pin' => ['required' => false, 'regex' => '/^[0-9]{4}$/']
+        // ];
     }
 
     //__________________________
