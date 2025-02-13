@@ -26,6 +26,17 @@ class Database
         $this->password = $_ENV['DB_PASS'];
     }
 
+    /**
+     * Establishes a connection to the database using PDO.
+     *
+     * This method initializes a PDO connection using credentials stored in environment variables.
+     * It ensures that the connection is persistent and enables error handling for better debugging.
+     *
+     * If a connection already exists, it returns the existing instance to prevent redundant connections.
+     * If the connection fails, an error is logged, and the method attempts to handle the failure gracefully.
+     *
+     * @return PDO The established PDO connection instance.
+     */
     public function connectToDb(): PDO
     {
         Logger::info("Connecting to database");
@@ -49,13 +60,35 @@ class Database
     }
 
     /**
+     * Prepares an SQL statement for execution and optionally binds parameters using a callable method.
+     *
+     * This method prepares an SQL query and allows an optional callable method to bind parameters.
+     * It ensures that SQL execution is safe and reduces the risk of SQL injection.
+     *
+     * @param string $sql The SQL query to prepare.
+     * @param callable|null $bindDataMethod Optional function to bind parameters to the statement.
+     *
+     * @return PDOStatement The prepared statement, ready for execution.
+     */
+    public function prepareSql(string $sql, ?callable $bindDataMethod = null) : PDOStatement
+    {
+        $stmt = $this->pdo->prepare($sql);
+
+        if ($bindDataMethod !== null) {
+            $bindDataMethod($stmt);
+        }
+
+        return $stmt;
+    }
+
+    /**
      * Executes a prepared SQL statement with transaction handling, error logging, and rollback on failure.
      *
      * @param PDOStatement $stmt The prepared statement to execute.
      * @param string|null $loggerMessage Optional log message for debugging.
      * @return bool Returns true if the query was successful, false if it failed.
      */
-    public function executeStatement(PDOStatement $stmt, ?string $loggerMessage = null): bool
+    public function executeSql(PDOStatement $stmt, ?string $loggerMessage = null): bool
     {
         try {
             $this->pdo->beginTransaction();
@@ -86,6 +119,32 @@ class Database
         }
     }
 
+    /**
+     * Combines SQL preparation and execution in a single method with optional parameter binding.
+     *
+     * This method first prepares the SQL statement and then executes it. If a callable method is provided,
+     * it is used to bind parameters before execution. The method also supports transaction handling,
+     * ensuring data consistency.
+     *
+     * @param string $sql The SQL query to prepare.
+     * @param PDOStatement $stmt The prepared statement to execute.
+     * @param string|null $loggerMessage Optional log message for debugging.
+     * @param callable|null $bindDataMethod Optional function to bind parameters before execution.
+     *
+     * @return bool Returns true if the query was successful, false otherwise.
+     */
+    public function prepareAndExecuteSql(string $sql, PDOStatement $stmt, ?string $loggerMessage = null, ?callable $bindDataMethod = null): bool
+    {
+        $this->prepareSql($sql, $bindDataMethod);
+        return $this->executeSql($stmt, $loggerMessage);
+    }
+
+    /**
+     * Closes the database connection by setting the PDO instance to null.
+     *
+     * This method is used to explicitly close the database connection when it is no longer needed.
+     * Setting `$this->pdo` to `null` ensures that the connection is closed, freeing up resources.
+     */
     public function closeConnection(): void
     {
         $this->pdo = null;

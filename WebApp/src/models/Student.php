@@ -75,13 +75,8 @@ class Student extends User
      */
     public function bindUserDataForDbStmt(PDOStatement $stmt): void
     {
-        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
-        $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
-        $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
-        $stmt->bindValue(':full_name', $this->fullName, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
-        $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
-        $stmt->bindValue(':role', $this->role->value, PDO::PARAM_STR);
+        parent::bindUserDataForDbStmt($stmt);
+
         $stmt->bindValue(':studyProgram', $this->studyProgram, PDO::PARAM_STR);
         $stmt->bindValue(':studyYear', $this->enrollmentYear, PDO::PARAM_INT);
     }

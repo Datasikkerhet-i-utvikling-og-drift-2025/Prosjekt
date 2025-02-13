@@ -2,7 +2,9 @@
 
 namespace models;
 
+use helpers\Logger;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 require_once __DIR__ . '/../helpers/InputValidator.php';
@@ -27,13 +29,7 @@ class Admin extends User
      */
     public function bindUserDataForDbStmt(PDOStatement $stmt): void
     {
-        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
-        $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
-        $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
-        $stmt->bindValue(':full_name', $this->fullName, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
-        $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
-        $stmt->bindValue(':role', $this->role->value, PDO::PARAM_STR);
+        parent::bindUserDataForDbStmt($stmt);
     }
 }
     // Delete a user by ID

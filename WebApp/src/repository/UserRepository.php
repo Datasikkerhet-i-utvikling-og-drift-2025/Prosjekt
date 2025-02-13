@@ -8,7 +8,7 @@ use models\User;
 
 use JsonException;
 
-class UserService
+class UserRepository
 {
 
     private Database $db;
@@ -20,17 +20,12 @@ class UserService
 
     public function createUser(User $user): bool
     {
-        $sql = "INSERT INTO users 
-                (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at) 
-                VALUES 
-                (:first_name, :last_name, :full_name, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
+        $sql = "INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at) 
+                VALUES (:first_name, :last_name, :full_name, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
 
-        $stmt = $this->db->pdo->prepare($sql);
-        $user->bindUserDataForDbStmt($stmt);
-
-        $logger = "Save user data in database";
-
-        return $this->db->executeStatement($stmt, $logger);
+        $stmt = $this->db->prepareSql($sql, [$user, 'bindUserDataForDbStmt']);
+        $loggerMessage = "Save user data in database";
+        return $this->db->executeSql($stmt, $loggerMessage);
     }
 
     public function updateUser(User $user): bool
@@ -53,12 +48,9 @@ class UserService
                         updated_at = NOW()
                     WHERE id = :id";
 
-        $stmt = $this->db->pdo->prepare($sql);
-        $user->bindUserDataForDbStmt($stmt);
-
+        $stmt = $this->db->prepareSql($sql, [$user, 'bindUserDataForDbStmt']);
         $logger = "Update user data in database";
-
-        return $this->db->executeStatement($stmt, $logger);
+        return $this->db->executeSql($stmt, $logger);
     }
 
 

@@ -171,7 +171,7 @@ abstract class User
      *
      * @return void
      */
-    public function bindUserDataForDbStmt(PDOStatement $stmt): void
+    protected function bindUserDataForDbStmt(PDOStatement $stmt): void
     {
         $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
         $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
@@ -180,21 +180,6 @@ abstract class User
         $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
         $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
         $stmt->bindValue(':role', $this->role->value, PDO::PARAM_STR);
-
-        $studyProgram = null;
-        $studyYear = null;
-        $imagePath = null;
-
-        if ($this instanceof Student) {
-            $studyProgram = $this->studyProgram;
-            $studyYear = $this->enrollmentYear;
-        } elseif ($this instanceof Lecturer) {
-            $imagePath = $this->imagePath;
-        }
-
-        $stmt->bindValue(':studyProgram', $studyProgram, $studyProgram !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
-        $stmt->bindValue(':studyYear', $studyYear, $studyYear !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
-        $stmt->bindValue(':imagePath', $imagePath, $imagePath !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
     }
 
 
