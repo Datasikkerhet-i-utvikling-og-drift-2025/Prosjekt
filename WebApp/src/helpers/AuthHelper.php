@@ -40,13 +40,12 @@ class AuthHelper
     public static function isLoggedIn()
     {
         self::startSession();
-        return isset($_SESSION['user_id']);
+        return isset($_SESSION['user']['id']);
     }
 
     // Log out the current user
     public static function logoutUser()
     {
-        Logger::info("something is happening");
         self::startSession();
         session_destroy();
         unset($_SESSION);
@@ -63,21 +62,21 @@ class AuthHelper
     public static function isRole($role)
     {
         self::startSession();
-        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === $role;
+        return isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === $role;
     }
 
     // Get the logged-in user's ID
     public static function getUserId()
     {
         self::startSession();
-        return $_SESSION['user_id'] ?? null;
+        return $_SESSION['user']['id'] ?? null;
     }
 
     // Get the logged-in user's role
     public static function getUserRole()
     {
         self::startSession();
-        return $_SESSION['user_role'] ?? null;
+        return $_SESSION['user']['role'] ?? null;
     }
 
     // Redirect to a specific page if the user is not logged in

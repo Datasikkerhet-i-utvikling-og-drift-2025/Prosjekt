@@ -145,4 +145,19 @@ class ApiHelper
     {
         return self::$logDir . '/' . self::$logFile;
     }
+
+    public static function fetchDataFromAPI($url) {
+        $baseUrl = "http://127.0.0.1:8080";
+        try {
+            $response = file_get_contents($baseUrl.$url);
+            if ($response === false) {
+                Logger::error("Failed to fetch data from API: " . $url);
+                return null;
+            }
+            return json_decode($response, true); // Decode JSON response into an associative array
+        } catch (Exception $e) {
+            Logger::error("Error fetching data from API: " . $url . " - " . $e->getMessage());
+            return null;
+        }
+    }
 }
