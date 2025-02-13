@@ -92,12 +92,12 @@ require_once __DIR__ . '/../partials/header.php';
         <div id="student-fields" style="display: <?= ($_POST['role'] ?? '') === 'student' ? 'block' : 'none' ?>;">
             <div class="form-group">
                 <label for="study_program">Study Program</label>
-                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="cohort_year">Cohort Year</label>
-                <input type="number" id="cohort_year" name="cohort_year" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <input type="number" id="cohort_year" name="cohort_year" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
         </div>
         <div id="lecturer-fields" style="display: <?= ($_POST['role'] ?? '') === 'lecturer' ? 'block' : 'none' ?>;">
@@ -110,14 +110,14 @@ require_once __DIR__ . '/../partials/header.php';
         <label for="course_code">Course Code</label>
         <input type="text" id="course_code" name="course_code" 
                placeholder="ITF12345" 
-               value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+               value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
         <label for="course_name">Course Name</label>
         <input type="text" id="course_name" name="course_name" 
                placeholder="Datasikkerhet i utvikling og drift" 
-               value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+               value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
@@ -126,7 +126,7 @@ require_once __DIR__ . '/../partials/header.php';
                placeholder="1337" 
                pattern="[0-9]{4}" 
                title="Please enter a 4-digit PIN code"
-               value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+               value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" reguired>
     </div>
 </div>
 
@@ -143,6 +143,17 @@ require_once __DIR__ . '/../partials/header.php';
         const role = this.value;
         document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
         document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
+        
+        const studentFields = document.querySelectorAll('#student-fields input');
+    const lecturerFields = document.querySelectorAll('#lecturer-fields input');
+
+    if (role === 'student') {
+        studentFields.forEach(field => field.setAttribute('required', 'true'));
+        lecturerFields.forEach(field => field.removeAttribute('required'));
+    } else if (role === 'lecturer') {
+        lecturerFields.forEach(field => field.setAttribute('required', 'true'));
+        studentFields.forEach(field => field.removeAttribute('required'));
+    }
     });
 
     // Funksjon for å vise feilmelding
