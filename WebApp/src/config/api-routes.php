@@ -51,6 +51,9 @@ try {
         ['GET', '/auth/logout', [$authController, 'logout']],
         ['POST', '/auth/password-reset/request', [$authController, 'requestPasswordReset']],
         ['POST', '/auth/password-reset', [$authController, 'resetPassword']],
+        ['POST', '/auth/change-password', [$authController, 'changePassword']],
+    
+    
 
         // Student routes
         ['GET', '/student/courses', [$studentController, 'getCourses']],

@@ -14,6 +14,21 @@
         </div>
     <?php endif; ?>
 
+    <?php if (empty($_GET['token'])): ?>
+    <!-- Request Reset Form -->
+    <form action="/auth/password-reset/request" method="POST" class="form">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" 
+                   placeholder="Enter your email address" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Request Password Reset</button>
+        </div>
+    </form>
+<?php else: ?>
+
+
     <!-- Password Reset Form -->
     <form action="/auth/password-reset" method="POST" class="form">
         <input
@@ -49,5 +64,6 @@
     <!-- Link to Login -->
     <p>Remembered your password? <a href="/">Login here</a>.</p>
 </div>
+<?php endif; ?>
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>
