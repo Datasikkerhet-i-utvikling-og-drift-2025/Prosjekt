@@ -77,7 +77,7 @@ class DatabaseService
         $stmt = $this->pdo->prepare($sql);
 
         if ($bindDataMethod !== null) {
-            $this->bindDataToSqlStmt($stmt, $bindDataMethod);
+            $this->bindObjectToSqlStmt($stmt, $bindDataMethod);
         }
 
         return $stmt;
@@ -142,6 +142,119 @@ class DatabaseService
     }
 
     /**
+     * Executes a prepared SQL statement and fetches all results with logging and transaction handling.
+     *
+     * This method ensures safe execution of a database query and retrieves multiple rows as an associative array.
+     * It utilizes `executeSql()` to maintain transaction integrity and logs the outcome.
+     *
+     * If execution fails, it logs an error and returns an empty array.
+     *
+     * @param PDOStatement $stmt The prepared statement to execute.
+     * @param string|null $loggerMessage Optional log message for debugging.
+     *
+     * @return array Returns an array of associative arrays containing the fetched rows. Returns an empty array if execution fails or no data is found.
+     */
+    public function fetchAll(PDOStatement $stmt, ?string $loggerMessage = null,): array
+    {
+        try {
+            $success = $this->executeSql($stmt, $loggerMessage);
+
+            if (!$success) {
+                Logger::error("Failed to fetch data: " . ($loggerMessage ?? "No message provided."));
+                return [];
+            }
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            Logger::success("Successfully fetched data: " . ($loggerMessage ?? "No message provided."));
+            return $result;
+
+        } catch (PDOException $e) {
+            Logger::error("Fetching data failed: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Executes a prepared SQL statement and fetches a single row with logging and transaction handling.
+     *
+     * This method ensures safe execution of a database query and retrieves a single row as an associative array.
+     * It utilizes `executeSql()` to maintain transaction integrity and logs the outcome.
+     *
+     * If execution fails or no data is found, it logs an error and returns `null`.
+     *
+     * @param PDOStatement $stmt The prepared statement to execute.
+     * @param string|null $loggerMessage Optional log message for debugging.
+     *
+     * @return array|null Returns an associative array containing the fetched row, or null if execution fails or no data is found.
+     */
+    public function fetchSingle(PDOStatement $stmt, ?string $loggerMessage = null): ?array
+    {
+        try {
+            $success = $this->executeSql($stmt, $loggerMessage);
+
+            if (!$success) {
+                Logger::error("Failed to fetch single row: " . ($loggerMessage ?? "No message provided."));
+                return null;
+            }
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$result) {
+                Logger::warning("No data found: " . ($loggerMessage ?? "No message provided."));
+                return null;
+            }
+
+            Logger::success("Successfully fetched single row: " . ($loggerMessage ?? "No message provided."));
+            return $result;
+
+        } catch (PDOException $e) {
+            Logger::error("Fetching single row failed: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Executes a prepared SQL statement and fetches a single column value with logging and transaction handling.
+     *
+     * This method ensures safe execution of a database query and retrieves a specific column value.
+     * It utilizes `executeSql()` to maintain transaction integrity and logs the outcome.
+     *
+     * If execution fails or no data is found, it logs an error and returns `null`.
+     *
+     * @param PDOStatement $stmt The prepared statement to execute.
+     * @param string|null $loggerMessage Optional log message for debugging.
+     * @param int $columnIndex The column index to fetch (default is 0, the first column).
+     *
+     * @return mixed|null Returns the scalar value of the requested column, or null if execution fails or no data is found.
+     */
+    public function fetchColumn(PDOStatement $stmt, ?string $loggerMessage = null, int $columnIndex = 0): mixed
+    {
+        try {
+            $success = $this->executeSql($stmt, $loggerMessage);
+
+            if (!$success) {
+                Logger::error("Failed to fetch column: " . ($loggerMessage ?? "No message provided."));
+                return null;
+            }
+
+            $result = $stmt->fetchColumn($columnIndex);
+
+            if ($result === false) {
+                Logger::warning("No data found for column index $columnIndex: " . ($loggerMessage ?? "No message provided."));
+                return null;
+            }
+
+            Logger::success("Successfully fetched column value: " . ($loggerMessage ?? "No message provided."));
+            return $result;
+
+        } catch (PDOException $e) {
+            Logger::error("Fetching column value failed: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Binds data to a prepared PDO statement using a provided callable function.
      *
      * The callable function must accept a PDOStatement and return a modified PDOStatement.
@@ -151,15 +264,30 @@ class DatabaseService
      *
      * @return PDOStatement The statement with bound parameters.
      */
-    public function bindDataToSqlStmt(PDOStatement $stmt, callable $bindDataMethod): PDOStatement
+    public function bindObjectToSqlStmt(PDOStatement $stmt, callable $bindDataMethod): void
     {
         $result = $bindDataMethod($stmt);
 
         if (!$result instanceof PDOStatement) {
             throw new InvalidArgumentException("The provided bindDataMethod must return a PDOStatement.");
         }
+    }
 
-        return $result;
+    public function bindArrayToSqlStmt(PDOStatement $stmt, array $paramArray, array $valueArray): void
+    {
+        if (count($paramArray) !== count($valueArray)) {
+            throw new InvalidArgumentException("Parameter array and value array must have the same length.");
+        }
+
+        foreach ($paramArray as $index => $param) {
+            $stmt->bindValue($param, $valueArray[$index], PDO::PARAM_STR);
+        }
+    }
+
+
+    public function bindSingleValueToSqlStmt(PDOStatement $stmt, $param, $value): void
+    {
+        $stmt->bindValue($param, $value, PDO::PARAM_STR);
     }
 
 

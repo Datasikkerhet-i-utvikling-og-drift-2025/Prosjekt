@@ -12,7 +12,18 @@ use models\Student;
 class UserFactory
 {
     /**
-     * @throws DateMalformedStringException
+     * Creates a user object based on the role provided in the user data array.
+     *
+     * This factory method dynamically creates an instance of `Student`, `Lecturer`, or `Admin`
+     * depending on the `role` field in the `$userData` array.
+     *
+     * @param array $userData Associative array containing user information, including a `role` key.
+     *
+     * @return Admin|Lecturer|Student Returns an instance of `Admin`, `Lecturer`, or `Student`
+     *                                based on the `role` value in `$userData`.
+     *
+     * @throws DateMalformedStringException If date formatting is incorrect in user data.
+     * @throws InvalidArgumentException If an invalid role is provided in `$userData`.
      */
     public static function createUser(array $userData): Admin|Lecturer|Student
     {
