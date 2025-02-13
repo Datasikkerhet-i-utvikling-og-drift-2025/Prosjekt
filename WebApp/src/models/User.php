@@ -16,6 +16,7 @@ class User
     // Create a new user
     public function createUser($name, $email, $password, $role, $studyProgram = null, $studyYear = null, $imagePath = null)
     {
+
         // Validate inputs
         $validationRules = [
             'name' => ['required' => true, 'sanitize' => true, 'min' => 3, 'max' => 100],
@@ -200,16 +201,15 @@ class User
         }
     }
 
-    public function updatePassword($userId, $newHashedPassword)
+    public function updatePassword($userId, $hashedPassword)  // Endre parameternavn for å være tydeligere
     {
+        $sql = "UPDATE users SET password = :hashedPassword, reset_token = NULL, reset_token_created_at = NULL WHERE id = :userId";
+        $stmt = $this->pdo->prepare($sql);
+    
         try {
-            Logger::info("Attempting to update password for user ID: " . $userId);
-            
-            $sql = "UPDATE users SET password = :password WHERE id = :id";
-            $stmt = $this->pdo->prepare($sql);
-            $result = $stmt->execute([
-                ':password' => $newHashedPassword,
-                ':id' => $userId
+            return $stmt->execute([
+                ':hashedPassword' => $hashedPassword,  // Bruk det allerede hashede passordet
+                ':userId' => $userId,
             ]);
             
             Logger::info("Password update result: " . ($result ? "success" : "failed"));

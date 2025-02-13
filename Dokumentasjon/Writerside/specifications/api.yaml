@@ -3,14 +3,32 @@ info:
   title: Feedback System API
   description: API for managing authentication, users, messages, and courses.
   version: 1.0.0
+
 servers:
-  - url: http://158.39.188.204/steg1/api
+  - url: http://localhost:8080
     description: Local development server
+  - url: http://158.39.188.204/steg1/api
+    description: Prod server
+
+tags:
+  - name: auth
+    description: Endpoints related to user authentication (register, login, password management).
+  - name: student
+    description: Endpoints for students (viewing courses, sending messages).
+  - name: lecturer
+    description: Endpoints for lecturers (viewing/replying to messages, resolving issues).
+  - name: admin
+    description: Endpoints for administrators (managing users, moderating messages).
+  - name: guest
+    description: Endpoints for guest users (viewing public messages, reporting messages).
+
 
 paths:
   /auth/register:
     post:
       summary: Register a new user
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -32,13 +50,51 @@ paths:
                   type: string
                   enum: [ student, lecturer, admin ]
       responses:
-        200:
+        '200':
           description: Registration successful
-        400:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "User registered successfully."
+                data:
+                  user_id: 123
+                  email: "john.doe@example.com"
+                  role: "student"
+        '400':
           description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Missing or invalid fields."
+                data:
+                  missing_fields:
+                    - email
+
   /auth/login:
     post:
       summary: Login a user
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -53,36 +109,1400 @@ paths:
                   type: string
                   format: password
       responses:
-        200:
+        '200':
           description: Login successful
-        401:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Login successful."
+                data:
+                  user_id: 123
+                  role: "student"
+        '401':
           description: Unauthorized
-  
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Invalid email or password."
+                data: {}
+
   /auth/logout:
+    get:
+      summary: Logout the current user
+      tags:
+        - auth
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Logout successful."
+                data: {}
+        '401':
+          description: Unauthorized (no active session)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Not logged in."
+                data: {}
+
   /auth/change-password:
+    post:
+      summary: Change the user’s password
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+                confirm_password:
+                  type: string
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Password changed successfully."
+                data: {}
+        '400':
+          description: Validation error or mismatched passwords
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Passwords do not match."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in."
+                data: {}
+
   /auth/password-reset/request:
+    post:
+      summary: Request a password reset link
+      description: Sends an email containing reset instructions if the user exists.
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Password reset instructions sent to your email."
+                data: {}
+        '400':
+          description: Email is missing or invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Email is missing or invalid."
+                data: {}
+        '404':
+          description: Email not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Email not found."
+                data: {}
+
   /auth/reset-password:
+    post:
+      summary: Reset the user’s password
+      description: Resets a user’s password, typically after verifying a token.
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                new_password:
+                  type: string
+                confirm_password:
+                  type: string
+      responses:
+        '200':
+          description: Password has been reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Password reset successfully."
+                data: {}
+        '400':
+          description: Validation error (e.g., passwords don’t match)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Passwords do not match."
+                data: {}
+        '404':
+          description: Email not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Email not found."
+                data: {}
 
   /student/courses:
+    get:
+      summary: Get a list of all courses (for students)
+      tags:
+        - student
+      responses:
+        '200':
+          description: Courses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Courses retrieved successfully."
+                data:
+                  - course_id: 1
+                    course_name: "Intro to Security"
+                  - course_id: 2
+                    course_name: "Advanced Networking"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a student."
+                data: {}
+
   /student/messages:
+    get:
+      summary: Get messages sent by the current student
+      tags:
+        - student
+      responses:
+        '200':
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Messages retrieved successfully."
+                data:
+                  - message_id: 101
+                    content: "Hello, I need help with the assignment."
+                  - message_id: 102
+                    content: "Is the exam schedule out?"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a student."
+                data: {}
+
   /student/message/send:
+    post:
+      summary: Send a new message to a course
+      tags:
+        - student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: integer
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Message created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Message sent successfully."
+                data:
+                  message_id: 999
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Content cannot be empty."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a student."
+                data: {}
 
   /lecturer/courses:
+    get:
+      summary: Get all courses assigned to the current lecturer
+      tags:
+        - lecturer
+      responses:
+        '200':
+          description: Courses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Courses retrieved successfully."
+                data:
+                  - course_id: 10
+                    course_name: "Data Structures"
+                  - course_id: 11
+                    course_name: "Operating Systems"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a lecturer."
+                data: {}
+
   /lecturer/messages:
+    post:
+      summary: Get messages for a specific course
+      description: Expects a course_id in the request body
+      tags:
+        - lecturer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: integer
+      responses:
+        '200':
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Messages retrieved successfully."
+                data:
+                  - message_id: 201
+                    content: "Hello from Student."
+                  - message_id: 202
+                    content: "Another question from Student."
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Missing or invalid course_id."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a lecturer."
+                data: {}
+        '403':
+          description: Forbidden (course doesn’t belong to this lecturer)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Forbidden: You do not have access to this course."
+                data: {}
+
   /lecturer/message/reply:
+    post:
+      summary: Reply to a message
+      tags:
+        - lecturer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: integer
+                reply:
+                  type: string
+      responses:
+        '200':
+          description: Reply sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Reply sent successfully."
+                data: {}
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Missing reply text."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a lecturer."
+                data: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Forbidden: You do not have access to this message."
+                data: {}
+
   /lecturer/message/resolve:
+    post:
+      summary: Mark a message as resolved
+      tags:
+        - lecturer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: integer
+      responses:
+        '200':
+          description: Message marked as resolved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Message marked as resolved."
+                data: {}
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: message_id is required."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: You must be logged in as a lecturer."
+                data: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Forbidden: This message is not from your course."
+                data: {}
 
   /admin/users:
+    get:
+      summary: Get all users
+      description: Optionally filter users by role via query parameter (?role=)
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Users retrieved successfully."
+                data:
+                  - user_id: 1
+                    role: "admin"
+                    email: "admin@example.com"
+                  - user_id: 2
+                    role: "student"
+                    email: "student@example.com"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: Admin role required."
+                data: {}
+
   /admin/user/delete:
+    post:
+      summary: Delete a user by ID
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "User deleted successfully."
+                data: {}
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Missing or invalid user_id."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: Admin role required."
+                data: {}
+
   /admin/messages/reported:
+    get:
+      summary: Get all reported messages
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Reported messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Reported messages retrieved successfully."
+                data:
+                  - message_id: 300
+                    content: "Offensive content"
+                    report_reason: "Spam"
+                  - message_id: 301
+                    content: "Another issue"
+                    report_reason: "Harassment"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: Admin role required."
+                data: {}
+
   /admin/message/delete:
+    post:
+      summary: Delete a message by ID
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: integer
+      responses:
+        '200':
+          description: Message deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Message deleted successfully."
+                data: {}
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Missing or invalid message_id."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: Admin role required."
+                data: {}
+
   /admin/message/update:
+    post:
+      summary: Update (e.g. censor) a message
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: integer
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Message updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Message updated successfully."
+                data: {}
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Missing or invalid fields."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: Admin role required."
+                data: {}
+
   /admin/user/details:
+    get:
+      summary: Get details for a specific user
+      tags:
+        - admin
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "User details retrieved successfully."
+                data:
+                  user_id: 7
+                  email: "someone@example.com"
+                  role: "student"
+        '400':
+          description: Missing user_id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Missing user_id parameter."
+                data: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Unauthorized: Admin role required."
+                data: {}
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "User not found."
+                data: {}
 
   /guest/messages:
+    get:
+      summary: Get all public messages
+      tags:
+        - guest
+      responses:
+        '200':
+          description: Public messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Public messages retrieved successfully."
+                data:
+                  - message_id: 400
+                    content: "Public message #1"
+                  - message_id: 401
+                    content: "Public message #2"
+
   /guest/messages/view:
+    post:
+      summary: View messages for a specific course (requires PIN code)
+      tags:
+        - guest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: integer
+                pin_code:
+                  type: string
+      responses:
+        '200':
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+              example:
+                success: true
+                message: "Messages retrieved successfully."
+                data:
+                  - message_id: 500
+                    content: "Hello from the course."
+                  - message_id: 501
+                    content: "Another message."
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Missing or invalid course_id/pin_code."
+                data: {}
+        '403':
+          description: Invalid course ID or PIN code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Invalid course ID or PIN code."
+                data: {}
+
   /guest/messages/report:
+    post:
+      summary: Report a message
+      tags:
+        - guest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: integer
+                report_reason:
+                  type: string
+      responses:
+        '200':
+          description: Message reported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Message reported successfully."
+                data: {}
+        '400':
+          description: Report reason is empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Report reason cannot be empty."
+                data: {}
+        '500':
+          description: Failed to report the message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "An internal server error occurred while reporting."
+                data: {}
+
   /guest/messages/comment:
+    post:
+      summary: Add a comment to a message
+      tags:
+        - guest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id:
+                  type: integer
+                guest_name:
+                  type: string
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: true
+                message: "Comment added successfully."
+                data:
+                  comment_id: 700
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Validation error: Missing required fields."
+                data: {}
+        '500':
+          description: Failed to add comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+              example:
+                success: false
+                message: "Server error: Failed to add comment."
+                data: {}
 
 components:
   securitySchemes:

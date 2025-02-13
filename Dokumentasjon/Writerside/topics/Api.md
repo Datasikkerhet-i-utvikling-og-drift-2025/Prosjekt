@@ -1,8 +1,6 @@
 # Api
-
-## URL: [http://158.39.188.204/steg1/api](http://158.39.188.204/steg1/api)
-
-## Endpoints:
+ 
+URL: [](http://158.39.188.204/steg1/api)
 
 <api-doc openapi-path="../specifications/api.yaml"></api-doc>
 

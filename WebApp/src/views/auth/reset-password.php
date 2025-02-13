@@ -17,11 +17,27 @@
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
-    <form action="/auth/reset-password" method="POST">
+    <?php if (empty($_GET['token'])): ?>
+    <!-- Request Reset Form -->
+    <form action="/auth/password-reset/request" method="POST" class="form">
         <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" 
+                   placeholder="Enter your email address" required>
         </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Request Password Reset</button>
+        </div>
+    </form>
+<?php else: ?>
+
+
+    <!-- Password Reset Form -->
+    <form action="/auth/password-reset" method="POST" class="form">
+        <input
+                type="hidden"
+                name="token"
+                value="<?= htmlspecialchars($_GET['token'] ?? '', ENT_QUOTES, 'UTF-8') ?>" />
 
         <div class="form-group">
             <label for="new_password">New Password</label>
@@ -40,5 +56,6 @@
 
     <p>Remember your password? <a href="/">Login here</a></p>
 </div>
+<?php endif; ?>
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>
