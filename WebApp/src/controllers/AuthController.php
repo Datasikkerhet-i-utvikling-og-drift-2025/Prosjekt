@@ -258,8 +258,11 @@ class AuthController
             } else {
                 $validation['errors'][] = "Profile picture is required for lecturers.";
             }
+            return array('/uploads/profile_pictures/'.$file['name'], $validation);
         }
-        return array('/uploads/profile_pictures/'.$file['name'], $validation);
+        else {
+            return array($profilePicturePath, $validation);
+        }
     }
 
     /**
