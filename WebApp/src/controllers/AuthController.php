@@ -42,7 +42,7 @@ class AuthController
 
         // Check for validation errors
         $validation = $this->checkForError($validation);
-
+        
         // Hash password
         $hashedPassword = AuthHelper::hashPassword($validation['sanitized']['password']);
 
@@ -372,14 +372,17 @@ public function resetPassword()
                 $allowedTypes = ['image/jpeg', 'image/png'];
                 if (!in_array($file['type'], $allowedTypes)) {
                     $validation['errors'][] = "Invalid file type for profile picture. Only JPG and PNG are allowed.";
+                    Logger::error("Invalid file type for profile picture: " . $file['type']);
                 } elseif ($file['size'] > 2 * 1024 * 1024) { // 2MB limit
                     $validation['errors'][] = "Profile picture size must not exceed 2MB.";
+                    Logger::error("Profile picture size exceeds limit: " . $file['size'] . " bytes");
                 } else {
                     $profilePicturePath = $uploadDir . basename($file['name']);
                     move_uploaded_file($file['tmp_name'], $profilePicturePath);
                 }
             } else {
                 $validation['errors'][] = "Profile picture is required for lecturers.";
+                Logger::error("Profile picture upload error: " . var_export($file, true));
             }
             return array('/uploads/profile_pictures/'.$file['name'], $validation);
         }
@@ -396,7 +399,7 @@ public function resetPassword()
     {
         if (!empty($validation['errors'])) {
             $_SESSION['errors'] = $validation['errors'];
-            //header("Location: /register");
+            header("Location: /register");
             exit;
         }
         return $validation;
