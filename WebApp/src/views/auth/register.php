@@ -14,7 +14,6 @@ if (isset($_SESSION['user'])) {
     }
 }
 
-
 require_once __DIR__ . '/../../controllers/AuthController.php';
 require_once __DIR__ . '/../../config/Database.php';
 
@@ -146,13 +145,6 @@ require_once __DIR__ . '/../partials/header.php';
         document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
     });
 
-      // Eksisterende kode for role-endring
-      document.getElementById('role').addEventListener('change', function () {
-        const role = this.value;
-        document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
-        document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
-    });
-
     // Funksjon for å vise feilmelding
     function showError(input, message) {
         // Fjern eksisterende feilmelding hvis den finnes
@@ -190,9 +182,46 @@ require_once __DIR__ . '/../partials/header.php';
 
     document.getElementById('repeat_password').addEventListener('input', function() {
         const password = document.getElementById('password').value;
-        const repeatPassword = document.getElementById('repeat_password').value;
+        const repeatPassword = this.value;
         if (repeatPassword !== password) {
             showError(this, 'Passwords must match');
+        } else {
+            removeError(this);
+        }
+    });
+
+    // Valider fornavn mens brukeren skriver
+    document.getElementById('first_name').addEventListener('input', function() {
+        if (this.value.length < 3) {
+            showError(this, 'First name must be at least 3 characters long');
+        } else {
+            removeError(this);
+        }
+    });
+
+    // Valider etternavn mens brukeren skriver
+    document.getElementById('last_name').addEventListener('input', function() {
+        if (this.value.length < 3) {
+            showError(this, 'Last name must be at least 3 characters long');
+        } else {
+            removeError(this);
+        }
+    });
+
+    // Valider e-post mens brukeren skriver
+    document.getElementById('email').addEventListener('input', function() {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(this.value)) {
+            showError(this, 'Email must be a valid email address (e.g., user@example.com)');
+        } else {
+            removeError(this);
+        }
+    });
+
+    // Valider kurskode mens brukeren skriver
+    document.getElementById('course_code').addEventListener('input', function() {
+        if (this.value.length > 10) {
+            showError(this, 'Course code must not exceed 10 characters');
         } else {
             removeError(this);
         }
@@ -202,6 +231,10 @@ require_once __DIR__ . '/../partials/header.php';
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
         const repeatPassword = document.getElementById('repeat_password').value;
+        const firstName = document.getElementById('first_name').value;
+        const lastName = document.getElementById('last_name').value;
+        const email = document.getElementById('email').value;
+        const courseCode = document.getElementById('course_code').value;
 
         if (password.length < 8) {
             e.preventDefault();
@@ -215,6 +248,30 @@ require_once __DIR__ . '/../partials/header.php';
             return false;
         }
 
+        if (firstName.length < 3) {
+            e.preventDefault();
+            showError(document.getElementById('first_name'), 'First name must be at least 3 characters long');
+            return false;
+        }
+
+        if (lastName.length < 3) {
+            e.preventDefault();
+            showError(document.getElementById('last_name'), 'Last name must be at least 3 characters long');
+            return false;
+        }
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            e.preventDefault();
+            showError(document.getElementById('email'), 'Email must contain @ and end with .com (e.g., user@example.com)');
+            return false;
+        }
+
+        if (courseCode.length > 10) {
+            e.preventDefault();
+            showError(document.getElementById('course_code'), 'Course code must not exceed 10 characters');
+            return false;
+        }
     });
 </script>
 

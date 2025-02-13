@@ -11,3 +11,6 @@ gen
 /public/uploads/
 !/WebApp/public/uploads/
 /WebApp/public/uploads/
+
+.png
+.jpg
