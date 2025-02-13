@@ -19,4 +19,5 @@ return [
     '/guests/report-message' => __DIR__ . '/../views/guests/report-message.php',
     '/guests/dashboard' => __DIR__ . '/../views/guests/dashboard.php',
     '/auth/guest' => __DIR__ . '/../controllers/AuthController.php@guest', // Added route for guest handler
+    '/profile' => __DIR__ . '/../views/profile/index.php',
 ];

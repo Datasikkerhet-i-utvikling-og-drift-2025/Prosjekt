@@ -200,15 +200,14 @@ class User
         }
     }
 
-    // Update user password
-    public function updatePassword($userId, $newPassword)
+    public function updatePassword($userId, $hashedPassword)  // Endre parameternavn for å være tydeligere
     {
-        $sql = "UPDATE users SET password = :newPassword, reset_token = NULL, reset_token_created_at = NULL WHERE id = :userId";
+        $sql = "UPDATE users SET password = :hashedPassword, reset_token = NULL, reset_token_created_at = NULL WHERE id = :userId";
         $stmt = $this->pdo->prepare($sql);
-
+    
         try {
             return $stmt->execute([
-                ':newPassword' => AuthHelper::hashPassword($newPassword),
+                ':hashedPassword' => $hashedPassword,  // Bruk det allerede hashede passordet
                 ':userId' => $userId,
             ]);
         } catch (Exception $e) {
