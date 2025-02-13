@@ -10,10 +10,25 @@ servers:
   - url: http://158.39.188.204/steg1/api
     description: Prod server
 
+tags:
+  - name: auth
+    description: Endpoints related to user authentication (register, login, password management).
+  - name: student
+    description: Endpoints for students (viewing courses, sending messages).
+  - name: lecturer
+    description: Endpoints for lecturers (viewing/replying to messages, resolving issues).
+  - name: admin
+    description: Endpoints for administrators (managing users, moderating messages).
+  - name: guest
+    description: Endpoints for guest users (viewing public messages, reporting messages).
+
+
 paths:
   /auth/register:
     post:
       summary: Register a new user
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -78,6 +93,8 @@ paths:
   /auth/login:
     post:
       summary: Login a user
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -132,6 +149,8 @@ paths:
   /auth/logout:
     get:
       summary: Logout the current user
+      tags:
+        - auth
       responses:
         '200':
           description: Logout successful
@@ -171,6 +190,8 @@ paths:
   /auth/change-password:
     post:
       summary: Change the user’s password
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -241,6 +262,8 @@ paths:
     post:
       summary: Request a password reset link
       description: Sends an email containing reset instructions if the user exists.
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -308,6 +331,8 @@ paths:
     post:
       summary: Reset the user’s password
       description: Resets a user’s password, typically after verifying a token.
+      tags:
+        - auth
       requestBody:
         required: true
         content:
@@ -378,6 +403,8 @@ paths:
   /student/courses:
     get:
       summary: Get a list of all courses (for students)
+      tags:
+        - student
       responses:
         '200':
           description: Courses retrieved successfully
@@ -423,6 +450,8 @@ paths:
   /student/messages:
     get:
       summary: Get messages sent by the current student
+      tags:
+        - student
       responses:
         '200':
           description: Messages retrieved successfully
@@ -468,6 +497,8 @@ paths:
   /student/message/send:
     post:
       summary: Send a new message to a course
+      tags:
+        - student
       requestBody:
         required: true
         content:
@@ -536,6 +567,8 @@ paths:
   /lecturer/courses:
     get:
       summary: Get all courses assigned to the current lecturer
+      tags:
+        - lecturer
       responses:
         '200':
           description: Courses retrieved successfully
@@ -582,6 +615,8 @@ paths:
     post:
       summary: Get messages for a specific course
       description: Expects a course_id in the request body
+      tags:
+        - lecturer
       requestBody:
         required: true
         content:
@@ -670,6 +705,8 @@ paths:
   /lecturer/message/reply:
     post:
       summary: Reply to a message
+      tags:
+        - lecturer
       requestBody:
         required: true
         content:
@@ -754,6 +791,8 @@ paths:
   /lecturer/message/resolve:
     post:
       summary: Mark a message as resolved
+      tags:
+        - lecturer
       requestBody:
         required: true
         content:
@@ -837,6 +876,8 @@ paths:
     get:
       summary: Get all users
       description: Optionally filter users by role via query parameter (?role=)
+      tags:
+        - admin
       responses:
         '200':
           description: Users retrieved successfully
@@ -884,6 +925,8 @@ paths:
   /admin/user/delete:
     post:
       summary: Delete a user by ID
+      tags:
+        - admin
       requestBody:
         required: true
         content:
@@ -949,6 +992,8 @@ paths:
   /admin/messages/reported:
     get:
       summary: Get all reported messages
+      tags:
+        - admin
       responses:
         '200':
           description: Reported messages retrieved successfully
@@ -996,6 +1041,8 @@ paths:
   /admin/message/delete:
     post:
       summary: Delete a message by ID
+      tags:
+        - admin
       requestBody:
         required: true
         content:
@@ -1061,6 +1108,8 @@ paths:
   /admin/message/update:
     post:
       summary: Update (e.g. censor) a message
+      tags:
+        - admin
       requestBody:
         required: true
         content:
@@ -1128,6 +1177,8 @@ paths:
   /admin/user/details:
     get:
       summary: Get details for a specific user
+      tags:
+        - admin
       parameters:
         - name: user_id
           in: query
@@ -1210,6 +1261,8 @@ paths:
   /guest/messages:
     get:
       summary: Get all public messages
+      tags:
+        - guest
       responses:
         '200':
           description: Public messages retrieved successfully
@@ -1238,6 +1291,8 @@ paths:
   /guest/messages/view:
     post:
       summary: View messages for a specific course (requires PIN code)
+      tags:
+        - guest
       requestBody:
         required: true
         content:
@@ -1311,6 +1366,8 @@ paths:
   /guest/messages/report:
     post:
       summary: Report a message
+      tags:
+        - guest
       requestBody:
         required: true
         content:
@@ -1378,6 +1435,8 @@ paths:
   /guest/messages/comment:
     post:
       summary: Add a comment to a message
+      tags:
+        - guest
       requestBody:
         required: true
         content:
