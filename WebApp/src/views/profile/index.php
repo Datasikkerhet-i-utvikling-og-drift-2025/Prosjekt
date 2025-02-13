@@ -1,7 +1,5 @@
 <?php
 session_start();
-var_dump($_SESSION); // Midlertidig for debugging
-Logger::info("Profile page session data: " . var_export($_SESSION, true));
 
 // Check if user is logged in
 if (!isset($_SESSION['user'])) {
