@@ -27,7 +27,7 @@ try {
     // Fetch available courses
     $stmtCourses = $pdo->query("SELECT id, code, name FROM courses");
     $courses = $stmtCourses->fetchAll();
-
+    //Fetch guest comments
     $stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
     $comments = $stmtComments->fetchAll();
 

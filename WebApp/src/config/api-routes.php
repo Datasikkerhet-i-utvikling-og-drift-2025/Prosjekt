@@ -63,7 +63,8 @@ try {
 
         // Lecturer routes
         ['GET', '/lecturer/courses', [$lecturerController, 'getCourses']],
-        ['GET', '/lecturer/messages', [$lecturerController, 'getMessagesForCourse']],
+        ['POST', '/lecturer/courses', [$lecturerController, 'getCourses']],
+        ['POST', '/lecturer/messages', [$lecturerController, 'getMessagesForCourse']],
         ['POST', '/lecturer/message/reply', [$lecturerController, 'replyToMessage']],
         ['POST', '/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
 
