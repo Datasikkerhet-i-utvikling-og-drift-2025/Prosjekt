@@ -16,6 +16,7 @@ class User
     // Create a new user
     public function createUser($name, $email, $password, $role, $studyProgram = null, $studyYear = null, $imagePath = null)
     {
+
         // Validate inputs
         $validationRules = [
             'name' => ['required' => true, 'sanitize' => true, 'min' => 3, 'max' => 100],
@@ -210,8 +211,11 @@ class User
                 ':hashedPassword' => $hashedPassword,  // Bruk det allerede hashede passordet
                 ':userId' => $userId,
             ]);
+            
+            Logger::info("Password update result: " . ($result ? "success" : "failed"));
+            return $result;
         } catch (Exception $e) {
-            Logger::error("Failed to update user password: " . $e->getMessage());
+            Logger::error("Failed to update password: " . $e->getMessage());
             return false;
         }
     }

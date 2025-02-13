@@ -210,7 +210,7 @@ public function reportMessage($messageId, $reason)
     public function getPublicMessages()
     {
         try {
-            $sql = "SELECT id AS message_id, content, created_at FROM messages WHERE is_public = 1";
+            $sql = "SELECT id AS message_id, content, created_at FROM messages";
             $stmt = $this->pdo->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
