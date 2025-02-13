@@ -49,6 +49,7 @@ try {
         ['POST', '/auth/register', [$authController, 'register']],
         ['POST', '/auth/login', [$authController, 'login']],
         ['GET', '/auth/logout', [$authController, 'logout']],
+        ['POST', '/auth/change-password', [$authController, 'changePassword']],
         ['POST', '/auth/password-reset/request', [$authController, 'requestPasswordReset']],
         ['POST', '/auth/password-reset', [$authController, 'resetPassword']],
         ['POST', '/auth/change-password', [$authController, 'changePassword']],
