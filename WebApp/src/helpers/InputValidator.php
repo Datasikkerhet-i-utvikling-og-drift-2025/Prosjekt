@@ -62,7 +62,7 @@ class InputValidator
                 'repeat_password' => ['required' => true],
                 'role' => ['required' => true],
                  // Nye regler for kurs
-                'course_code' => ['required' => true, 'max' => 0],
+                'course_code' => ['required' => true, 'max' => 10],
                 'study_program' => ['required' => false, 'max' => 0],
                 'cohort_year' => ['required' => false, 'max' => 0],
                 'course_name' => ['required' => true, 'max' => 100],
