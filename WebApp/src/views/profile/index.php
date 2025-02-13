@@ -7,12 +7,12 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 
-use helpers\Database;
+use service\DatabaseService;
 
-$db = new Database();
+$db = new DatabaseService();
 $pdo = $db->pdo;
 $authController = new AuthController($pdo);
 

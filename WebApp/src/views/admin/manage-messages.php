@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 // Include required files using __DIR__
-require_once __DIR__ . '/../../helpers/Database.php';
+require_once __DIR__ . '/../../helpers/DatabaseService.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 
@@ -24,7 +24,7 @@ $successMessage = $_GET['success'] ?? '';
 
 // Fetch messages from the database
 try {
-    $pdo = (new helpers\Database())->pdo;
+    $pdo = (new service\DatabaseService())->pdo;
     $stmt = $pdo->query("
         SELECT messages.id, courses.name AS course_name, messages.content, messages.reply 
         FROM messages 

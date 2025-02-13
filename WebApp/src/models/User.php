@@ -237,79 +237,10 @@ abstract class User
         }
     }
 
-    // Retrieve a user by email
-    public function getUserByEmail($email)
-    {
-        Logger::info("Getting user by email: " . $email);
-        $sql = "SELECT * FROM users WHERE email = :email";
-        $stmt = $this->pdo->prepare($sql);
 
-        try {
-            $stmt->execute([':email' => InputValidator::sanitizeEmail($email)]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::error("Failed to retrieve user by email: " . $e->getMessage());
-            return null;
-        }
-    }
 
-    // Retrieve a user by ID
-    public function getUserById($id)
-    {
-        Logger::info("Getting user by id: " . $id);
-        $sql = "SELECT * FROM users WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
 
-        try {
-            $stmt->execute([':id' => $id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::error("Failed to retrieve user by ID: " . $e->getMessage());
-            return null;
-        }
-    }
 
-    // Update a user's information
-    public function updateUser($id, $name, $email, $password = null, $role = null, $studyProgram = null, $studyYear = null, $imagePath = null)
-    {
-        Logger::info("Updating user with id: " . $id);
-        $sql = "UPDATE users SET 
-                name = :name, 
-                email = :email, 
-                role = :role, 
-                study_program = :studyProgram, 
-                study_year = :studyYear, 
-                image_path = :imagePath,
-                updated_at = NOW()";
-
-        if ($password) {
-            $sql .= ", password = :password";
-        }
-
-        $sql .= " WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-
-        $params = [
-            ':id' => $id,
-            ':name' => InputValidator::sanitizeString($name),
-            ':email' => InputValidator::sanitizeEmail($email),
-            ':role' => $role,
-            ':studyProgram' => $studyProgram,
-            ':studyYear' => $studyYear,
-            ':imagePath' => $imagePath,
-        ];
-
-        if ($password) {
-            $params[':password'] = AuthHelper::hashPassword($password);
-        }
-
-        try {
-            return $stmt->execute($params);
-        } catch (Exception $e) {
-            Logger::error("Failed to update user: " . $e->getMessage());
-            return false;
-        }
-    }
 
     // Delete a user by ID
     public function deleteUser($id)

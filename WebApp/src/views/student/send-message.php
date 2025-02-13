@@ -19,12 +19,12 @@ $messageSent = false;
 $errorMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/../../config/Database.php';
+    require_once __DIR__ . '/../../config/DatabaseService.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
     require_once __DIR__ . '/../../models/Message.php';
     
     try {
-        $db = new helpers\Database();
+        $db = new service\DatabaseService();
         $pdo = $db->pdo;
 
         $messageContent = trim($_POST['message_content'] ?? '');

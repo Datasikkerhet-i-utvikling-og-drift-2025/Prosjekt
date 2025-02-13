@@ -51,7 +51,7 @@ class AdminController
                 Logger::info("Admin deleted user with ID: " . $input['user_id']);
                 ApiHelper::sendResponse(200, [], 'User deleted successfully.');
             } else {
-                throw new Exception("Database operation failed.");
+                throw new Exception("DatabaseService operation failed.");
             }
         } catch (Exception $e) {
             Logger::error("Failed to delete user ID: " . $input['user_id'] . ". Error: " . $e->getMessage());
@@ -90,7 +90,7 @@ class AdminController
                 Logger::info("Admin deleted message with ID: " . $input['message_id']);
                 ApiHelper::sendResponse(200, [], 'Message deleted successfully.');
             } else {
-                throw new Exception("Database operation failed.");
+                throw new Exception("DatabaseService operation failed.");
             }
         } catch (Exception $e) {
             Logger::error("Failed to delete message ID: " . $input['message_id'] . ". Error: " . $e->getMessage());
@@ -113,7 +113,7 @@ class AdminController
                 Logger::info("Admin updated message with ID: " . $input['message_id']);
                 ApiHelper::sendResponse(200, [], 'Message updated successfully.');
             } else {
-                throw new Exception("Database operation failed.");
+                throw new Exception("DatabaseService operation failed.");
             }
         } catch (Exception $e) {
             Logger::error("Failed to update message ID: " . $input['message_id'] . ". Error: " . $e->getMessage());

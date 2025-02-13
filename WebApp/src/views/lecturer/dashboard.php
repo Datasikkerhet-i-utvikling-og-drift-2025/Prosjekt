@@ -14,12 +14,12 @@ $lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
 $courses = [];
 $messages = [];
 $errorMessage = '';
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 try {
    
    
 
-    $db = new helpers\Database();
+    $db = new service\DatabaseService();
     $pdo = $db->pdo;
 
     $lecturerId = $_SESSION['user']['id'];

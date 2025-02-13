@@ -20,10 +20,10 @@ $errorMessage = '';
 $successMessage = '';
 
 try {
-    require_once __DIR__ . '/../../config/Database.php';
+    require_once __DIR__ . '/../../config/DatabaseService.php';
     require_once __DIR__ . '/../../helpers/Logger.php';
 
-    $db = new helpers\Database();
+    $db = new service\DatabaseService();
     $pdo = $db->pdo;
 
     // Handle reply submission

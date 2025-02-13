@@ -3,7 +3,7 @@ session_start();
 
 // Include required files using __DIR__
 require_once __DIR__ . '/../partials/header.php';
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 
 // Sanitize input
 function sanitize($value) {
@@ -27,7 +27,7 @@ $errorMessage = '';
 
 try {
     // Fetch messages from the database
-    $db = new helpers\Database();
+    $db = new service\DatabaseService();
     $pdo = $db->pdo;
 
     $stmt = $pdo->prepare("

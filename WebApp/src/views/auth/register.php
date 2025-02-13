@@ -15,15 +15,15 @@ if (isset($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../../controllers/AuthController.php';
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 
-use helpers\Database;
+use service\DatabaseService;
 
 // Flytt use statement til toppen
 
 // Prosesser form submission først
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $db = new Database();
+    $db = new DatabaseService();
     $pdo = $db->pdo;
     $authController = new AuthController($pdo);
     $authController->register();

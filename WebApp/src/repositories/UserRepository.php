@@ -2,16 +2,14 @@
 
 namespace services;
 
-use helpers\Database;
 use helpers\Logger;
 use models\User;
-
-use JsonException;
+use service\DatabaseService;
 
 class UserRepository
 {
 
-    private Database $db;
+    private DatabaseService $db;
 
     public function __construct($db)
     {
@@ -53,5 +51,34 @@ class UserRepository
         return $this->db->executeSql($stmt, $logger);
     }
 
+    public function getUserByEmail(User $user): bool
+    {
+        $sql = "SELECT * FROM users 
+                WHERE email = :email";
+
+        $stmt = $this->db->prepareSql($sql, [$user, 'bindUserDataForDbStmt']);
+        $logger = "Getting user by email: " . $user->email;
+        return $this->db->executeSql($stmt, $logger);
+    }
+
+    public function getUserById(User $user): bool
+    {
+        $sql = "SELECT * FROM users 
+                WHERE id = :id";
+
+        $stmt = $this->db->prepareSql($sql, [$user, 'bindUserDataForDbStmt']);
+        $logger = "Getting user by id: " . $user->id;
+        return $this->db->executeSql($stmt, $logger);
+    }
+
+    public function deleteUserById($user): bool
+    {
+        $sql = "DELETE FROM users 
+                WHERE id = :id";
+
+        $stmt = $this->db->prepareSql($sql, [$user, 'bindUserDataForDbStmt']);
+        $logger = "Deleting user with id: " . $user->id;
+        return $this->db->executeSql($stmt, $logger);
+    }
 
 }

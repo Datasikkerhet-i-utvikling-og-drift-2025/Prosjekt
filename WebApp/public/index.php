@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 // Autoload required files
 require_once __DIR__ . '/../src/config/app.php'; // Application config
 require_once __DIR__ . '/../src/helpers/ApiHelper.php'; // API helpers
-require_once __DIR__ . '/../src/config/Database.php'; // Database connection
+require_once __DIR__ . '/../src/config/DatabaseService.php'; // DatabaseService connection
 require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger for error tracking
 require_once __DIR__ . '/../src/autoload.php';
 

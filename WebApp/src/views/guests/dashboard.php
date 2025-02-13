@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 
@@ -9,7 +9,7 @@ function sanitize($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$pdo = (new helpers\Database())->pdo;
+$pdo = (new service\DatabaseService())->pdo;
 $pin = $_POST['pin'] ?? null;
 $authorized = false;
 $course = null;

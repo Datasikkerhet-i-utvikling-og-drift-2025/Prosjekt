@@ -8,20 +8,20 @@ require_once __DIR__ . '/../controllers/GuestController.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/LecturerController.php';
 require_once __DIR__ . '/../controllers/AdminController.php';
-require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/DatabaseService.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
 use Exception;
-use helpers\Database;
 use helpers\Logger;
+use service\DatabaseService;
 
 Logger::info('Initializing application...');
 
 // Initialize database connection
 try {
-    $db = new Database();
+    $db = new DatabaseService();
     $pdo = $db->connectToDb();
-    Logger::info('Database connection initialized successfully.');
+    Logger::info('DatabaseService connection initialized successfully.');
 } catch (Exception $e) {
     Logger::error('Error initializing database: ' . $e->getMessage());
     http_response_code(500);

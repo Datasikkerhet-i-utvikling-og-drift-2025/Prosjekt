@@ -1,12 +1,14 @@
 <?php
 
-namespace helpers;
+namespace service;
 
+use helpers\Logger;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
 
-class Database
+class DatabaseService
 {
     private string $host;
     private string $dbName;
@@ -52,7 +54,7 @@ class Database
                 $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
                 Logger::success("Connected to database");
             } catch (PDOException $e) {
-                Logger::error('Database connection failed: ' . $e->getMessage());
+                Logger::error('DatabaseService connection failed: ' . $e->getMessage());
             }
         }
 
@@ -75,7 +77,7 @@ class Database
         $stmt = $this->pdo->prepare($sql);
 
         if ($bindDataMethod !== null) {
-            $bindDataMethod($stmt);
+            $this->bindDataToSqlStmt($stmt, $bindDataMethod);
         }
 
         return $stmt;
@@ -138,6 +140,28 @@ class Database
         $this->prepareSql($sql, $bindDataMethod);
         return $this->executeSql($stmt, $loggerMessage);
     }
+
+    /**
+     * Binds data to a prepared PDO statement using a provided callable function.
+     *
+     * The callable function must accept a PDOStatement and return a modified PDOStatement.
+     *
+     * @param PDOStatement $stmt The prepared statement to bind data to.
+     * @param callable $bindDataMethod A function that binds data and returns a PDOStatement.
+     *
+     * @return PDOStatement The statement with bound parameters.
+     */
+    public function bindDataToSqlStmt(PDOStatement $stmt, callable $bindDataMethod): PDOStatement
+    {
+        $result = $bindDataMethod($stmt);
+
+        if (!$result instanceof PDOStatement) {
+            throw new InvalidArgumentException("The provided bindDataMethod must return a PDOStatement.");
+        }
+
+        return $result;
+    }
+
 
     /**
      * Closes the database connection by setting the PDO instance to null.

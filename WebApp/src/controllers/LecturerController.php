@@ -87,7 +87,7 @@ class LecturerController
                 Logger::info("Reply sent successfully for message ID: {$input['message_id']} by lecturer ID: $lecturerId");
                 ApiHelper::sendResponse(200, [], 'Reply sent successfully.');
             } else {
-                throw new Exception("Database operation failed");
+                throw new Exception("DatabaseService operation failed");
             }
         } catch (Exception $e) {
             Logger::error("Failed to send reply for message ID: {$input['message_id']}. Error: " . $e->getMessage());
@@ -120,7 +120,7 @@ class LecturerController
                 Logger::info("Message ID: {$input['message_id']} marked as resolved by lecturer ID: $lecturerId");
                 ApiHelper::sendResponse(200, [], 'Message marked as resolved.');
             } else {
-                throw new Exception("Database operation failed");
+                throw new Exception("DatabaseService operation failed");
             }
         } catch (Exception $e) {
             Logger::error("Failed to mark message ID: {$input['message_id']} as resolved. Error: " . $e->getMessage());

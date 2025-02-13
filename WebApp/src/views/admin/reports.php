@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 // Include database connection
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 
 // Function to sanitize output
 function sanitize($value) {
@@ -21,7 +21,7 @@ $errorMessage = '';
 
 // Fetch reported messages from the database
 try {
-    $pdo = (new helpers\Database())->pdo;
+    $pdo = (new service\DatabaseService())->pdo;
     $stmt = $pdo->query("
         SELECT r.id AS report_id, m.id AS message_id, m.content AS message_content, 
                r.reported_by, r.reason 

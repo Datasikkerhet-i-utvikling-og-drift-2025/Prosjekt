@@ -9,7 +9,7 @@ return [
     'environment' => 'development', // Options: 'development', 'production'
     'debug' => true, // Enable or disable debug mode
 
-    // Database Settings
+    // DatabaseService Settings
     'database' => [
         'host' => getenv('DB_HOST'),
         'port' => getenv('DB_PORT'),

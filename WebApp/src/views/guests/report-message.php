@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/DatabaseService.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 
@@ -15,7 +15,7 @@ $errorMessage = '';
 
 try {
     // Fetch available courses
-    $db = new helpers\Database();
+    $db = new service\DatabaseService();
     $pdo = $db->pdo;
 
     $stmtCourses = $pdo->query("SELECT id, code, name FROM courses");

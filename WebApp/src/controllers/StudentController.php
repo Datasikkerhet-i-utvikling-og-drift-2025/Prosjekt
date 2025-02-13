@@ -83,7 +83,7 @@ class StudentController
                 Logger::info("Message sent successfully by student ID: $studentId");
                 ApiHelper::sendResponse(201, [], 'Message sent successfully.');
             } else {
-                throw new Exception("Database operation failed");
+                throw new Exception("DatabaseService operation failed");
             }
         } catch (Exception $e) {
             Logger::error("Failed to send message for student ID: " . AuthHelper::getUserId() . ". Error: " . $e->getMessage());
