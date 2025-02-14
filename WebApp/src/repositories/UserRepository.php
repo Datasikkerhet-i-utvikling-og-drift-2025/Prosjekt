@@ -5,7 +5,7 @@ namespace repositories;
 use factories\UserFactory;
 use helpers\Logger;
 use models\User;
-use service\DatabaseService;
+use services\DatabaseService;
 
 use DateMalformedStringException;
 
@@ -33,7 +33,6 @@ class UserRepository
      */
     public function createUser(User $user): bool
     {
-        Logger::debug("Checking the users data: " . json_encode((array) $user, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
         $sql = "INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at) 
                 VALUES (:first_name, :last_name, :full_name, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
 

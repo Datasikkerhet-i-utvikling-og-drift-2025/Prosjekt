@@ -7,8 +7,8 @@ error_reporting(E_ALL);
 
 use helpers\ApiHelper;
 use helpers\Logger;
-use service\DatabaseService;
 use repositories\UserRepository;
+use services\DatabaseService;
 
 // Autoload required files
 require_once __DIR__ . '/../src/config/app.php'; // Application config

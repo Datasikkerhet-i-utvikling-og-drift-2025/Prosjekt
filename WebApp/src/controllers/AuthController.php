@@ -57,8 +57,6 @@ class AuthController
         $input = $_POST;
         $input['name'] = trim(($input['first_name'] ?? '') . ' ' . ($input['last_name'] ?? ''));
         $validation = InputValidator::validateRegistration($input);
-        Logger::debug('Input Data: ' . json_encode($input, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
-        Logger::debug('Validation Data: ' . json_encode($validation, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
         // Check for validation errors
         if (!empty($validation['errors'])) {

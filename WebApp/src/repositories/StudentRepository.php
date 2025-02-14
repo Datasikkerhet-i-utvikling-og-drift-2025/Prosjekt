@@ -4,7 +4,7 @@ namespace repositories;
 
 use helpers\Logger;
 use helpers\InputValidator;
-use service\DatabaseService;
+use services\DatabaseService;
 
 use PDOException;
 

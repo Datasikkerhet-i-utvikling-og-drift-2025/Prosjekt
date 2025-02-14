@@ -5,7 +5,7 @@ namespace repositories;
 use models\Comment;
 use helpers\InputValidator;
 use helpers\Logger;
-use service\DatabaseService;
+use services\DatabaseService;
 
 use PDO;
 use PDOException;

@@ -5,7 +5,7 @@ namespace repositories;
 use helpers\InputValidator;
 use helpers\Logger;
 use models\Course;
-use service\DatabaseService;
+use services\DatabaseService;
 
 use PDO;
 use PDOException;

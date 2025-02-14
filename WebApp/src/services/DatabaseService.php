@@ -1,6 +1,6 @@
 <?php
 
-namespace service;
+namespace services;
 
 use helpers\Logger;
 
@@ -28,6 +28,7 @@ class DatabaseService
         $this->dbName = $_ENV['DB_NAME'];
         $this->username = $_ENV['DB_USER'];
         $this->password = $_ENV['DB_PASS'];
+
         $this->connectToDb();
     }
 

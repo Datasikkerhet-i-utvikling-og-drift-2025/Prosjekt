@@ -3,7 +3,7 @@
 namespace repositories;
 
 use models\Message;
-use service\DatabaseService;
+use services\DatabaseService;
 use helpers\InputValidator;
 use helpers\Logger;
 

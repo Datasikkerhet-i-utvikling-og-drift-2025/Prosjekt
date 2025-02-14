@@ -86,6 +86,7 @@ class Course
      *   - `lecturerId` (int) ID of the lecturer.
      *   - `pinCode` (string) 4-digit course access code.
      *   - `createdAt` (string|null) Course creation timestamp (defaults to 'now').
+     * @throws \DateMalformedStringException
      */
     public function __construct(array $courseData)
     {
