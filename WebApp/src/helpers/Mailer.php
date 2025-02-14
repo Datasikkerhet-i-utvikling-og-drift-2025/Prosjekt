@@ -1,5 +1,10 @@
 <?php
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../helpers/Logger.php';
+
+
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -7,23 +12,40 @@ class Mailer {
     private $mail;
 
     public function __construct() {
-        $this->mail = new PHPMailer(true);
-        
-        // Server settings
-        $this->mail->isSMTP();
-        $this->mail->Host = 'smtp.gmail.com'; // Eller din SMTP server
-        $this->mail->SMTPAuth = true;
-        $this->mail->Username = 'feedback.system.hiof@gmail.com';
-        $this->mail->Password = 'ztfu pjoy bxds mtac'; // Bruk app-passord for Gmail
-        $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $this->mail->Port = 587;
+        try {
+            $this->mail = new PHPMailer(true);
+            $this->mail->SMTPDebug = 2; // Aktiver SMTP debugging
+            $this->mail->Debugoutput = function($str, $level) {
+                Logger::info("SMTP Debug: " . $str);
+            };
+
+            $this->mail->isSMTP();
+            $this->mail->Host = getenv('SMTP_HOST');
+            $this->mail->SMTPAuth = true;
+            $this->mail->Username = getenv('SMTP_USERNAME');
+            $this->mail->Password = getenv('SMTP_PASSWORD');
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mail->Port = getenv('SMTP_PORT');
+
+            Logger::info("SMTP Configuration: " . json_encode([
+                'host' => getenv('SMTP_HOST'),
+                'username' => getenv('SMTP_USERNAME'),
+                'port' => getenv('SMTP_PORT')
+            ]));
+        } catch (Exception $e) {
+            Logger::error("Mailer initialization failed: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function sendPasswordReset($email, $resetToken) {
         try {
-            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
+            Logger::info("Attempting to send password reset email to: " . $email);
 
-            $this->mail->setFrom('your-email@gmail.com', 'Your System');
+            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
+            Logger::info("Reset link generated: " . $resetLink);
+
+            $this->mail->setFrom(getenv('SMTP_USERNAME'), 'Feedback System');
             $this->mail->addAddress($email);
             $this->mail->isHTML(true);
             $this->mail->Subject = 'Password Reset Request';
@@ -35,9 +57,10 @@ class Mailer {
             ";
 
             $this->mail->send();
+            Logger::info("Password reset email sent successfully to: " . $email);
             return true;
         } catch (Exception $e) {
-            Logger::error("Email sending failed: " . $e->getMessage());
+            Logger::error("Failed to send password reset email: " . $e->getMessage());
             return false;
         }
     }

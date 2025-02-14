@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../../vendor/autoload.php'; 
 require_once __DIR__ . '/../helpers/ApiHelper.php';
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../helpers/InputValidator.php';
@@ -8,6 +9,9 @@ require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
 require_once __DIR__ . '/../models/Course.php';
 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class AuthController
 {
@@ -185,6 +189,7 @@ class AuthController
     
         try {
             $email = $_POST['email'] ?? '';
+            Logger::info("Starting password reset request for email: " . $email);
             
             // Finn bruker
             $user = $this->userModel->getUserByEmail($email);
@@ -203,17 +208,20 @@ class AuthController
     
             // Send email
             $mailer = new Mailer();
+            Logger::info("Mailer instance created");
             if (!$mailer->sendPasswordReset($email, $resetToken)) {
                 throw new Exception('Failed to send reset email');
             }
     
             $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
-            header('Location: /login');
+            header('Location: /');
+            Logger::info("Mail send attempt result: " . ($result ? 'success' : 'failed'));
             exit;
     
         } catch (Exception $e) {
             $_SESSION['errors'] = $e->getMessage();
             header('Location: /reset-password');
+            Logger::error("Password reset error: " . $e->getMessage());
             exit;
         }
     }

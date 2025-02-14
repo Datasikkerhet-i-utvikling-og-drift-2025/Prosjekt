@@ -3,7 +3,7 @@
         'name' => 'snils/web-app',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '7ba37611f72d8653342fe2840575436cfba1bbec',
+        'reference' => '480cf63b6f25b7b94c322dbaa895822cc0ad815e',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'snils/web-app' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '7ba37611f72d8653342fe2840575436cfba1bbec',
+            'reference' => '480cf63b6f25b7b94c322dbaa895822cc0ad815e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

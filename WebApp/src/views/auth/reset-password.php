@@ -27,6 +27,7 @@
                     id="email" 
                     name="email" 
                     placeholder="Enter your email"
+                      autocomplete="email"
                     required>
             </div>
 
@@ -49,6 +50,7 @@
                     id="new_password" 
                     name="new_password" 
                     placeholder="Enter your new password"
+                    autocomplete="new-password"
                     required>
             </div>
 
@@ -59,6 +61,7 @@
                     id="confirm_password" 
                     name="confirm_password" 
                     placeholder="Confirm your new password"
+                    autocomplete="new-password"
                     required>
             </div>
 
