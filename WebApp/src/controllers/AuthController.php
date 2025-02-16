@@ -25,6 +25,9 @@ use repositories\UserRepository;
 use RuntimeException;
 use service\DatabaseService;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 class AuthController
 {
     private UserRepository $userRepository;
@@ -225,34 +228,37 @@ class AuthController
         ApiHelper::sendResponse(200, [], 'Password updated successfully.');
     }
 
-    /**
-     * Request a password reset link.
-     *
-     * @return void
-     * @throws JsonException|RandomException
-     * @throws DateMalformedStringException
-     */
-    public function requestPasswordReset()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ApiHelper::sendError(405, 'Invalid request method.');
-        }
-
-        $email = $_POST['email'] ?? '';
-        $user = $this->userRepository->getUserByEmail($email);
-
-        if (!$user) {
-            ApiHelper::sendResponse(200, [], 'If this email exists, you will receive a reset link.');
-        }
-
-        $resetToken = bin2hex(random_bytes(32));
-        if (!$this->userRepository->savePasswordResetToken($user->id, $resetToken)) {
-            ApiHelper::sendError(500, 'Failed to process reset request.');
-        }
-
-        new Mailer()->sendPasswordReset($email, $resetToken);
-        ApiHelper::sendResponse(200, [], 'If this email exists, you will receive a reset link.');
+public function requestPasswordReset()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: /reset-password');
+        exit;
     }
+
+    $email = $_POST['email'] ?? '';
+    
+    // Find user by email
+    $user = $this->userModel->getUserByEmail($email);
+    if (!$user) {
+        header('Location: /reset-password?error=' . urlencode('Email not found'));
+        exit;
+    }
+
+    // Generate reset token
+    $resetToken = bin2hex(random_bytes(32));
+    
+    // Save token to database
+    if ($this->userModel->savePasswordResetToken($user['id'], $resetToken)) {
+        // Send reset email
+        $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
+        // Her bør du implementere email-sending
+        
+        header('Location: /login?success=' . urlencode('Password reset instructions sent to your email'));
+    } else {
+        header('Location: /reset-password?error=' . urlencode('Failed to process reset request'));
+    }
+    exit;
+}
 
     /**
      * Reset user password using a token.

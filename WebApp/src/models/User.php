@@ -115,66 +115,39 @@ abstract class User
         }
     }
 
-    /** @var DateTime $updatedAt Timestamp of the last modification of the user record. */
-    protected DateTime $updatedAt {
-        get {
-            return $this->updatedAt;
-        }
-        set {
-            $this->updatedAt = $value;
+    // Save a password reset token
+    public function savePasswordResetToken($userId, $resetToken)
+    {
+        $sql = "UPDATE users SET reset_token = :resetToken, reset_token_created_at = NOW() WHERE id = :userId";
+        $stmt = $this->pdo->prepare($sql);
+
+        try {
+            return $stmt->execute([
+                ':resetToken' => $resetToken,
+                ':userId' => $userId,
+            ]);
+        } catch (Exception $e) {
+            Logger::error("Failed to save password reset token: " . $e->getMessage());
+            return false;
         }
     }
 
+    // Retrieve a user by reset token
+    public function getUserByResetToken($resetToken)
+    {
+        $sql = "SELECT * FROM users WHERE reset_token = :resetToken AND reset_token_created_at >= (NOW() - INTERVAL 1 HOUR)";
+        $stmt = $this->pdo->prepare($sql);
 
-    /**
-     * Constructs a new User instance.
-     *
-     * This constructor initializes the user properties based on the provided user data array.
-     * It ensures that timestamps are set correctly and assigns default values where necessary.
-     *
-     * @param array $userData Associative array containing user data with the following keys:<br>
-     *        - `id` (int|null) User ID (if null, will be assigned by the database).<br>
-     *        - `firstName` (string) User's first name.<br>
-     *        - `lastName` (string) User's last name.<br>
-     *        - `email` (string) User's email address.<br>
-     *        - `password` (string) User's password (hashed or plain text).<br>
-     *        - `role` (UserRole) User's assigned role.<br>
-     *        - `resetToken` (string|null) Optional reset token for password recovery.<br>
-     *        - `resetTokenCreatedAt` (string|null) Timestamp of when the reset token was created.<br>
-     *        - `createdAt` (string|null) Timestamp when the user was created (defaults to `now`).<br>
-     *        - `updatedAt` (string|null) Timestamp when the user was last updated (defaults to `now`).
-     *
-     * @throws DateMalformedStringException If any provided date string cannot be converted to a DateTime object.
-     */
-    public function __construct(array $userData) {
-        $this->id = $userData['id'] ?? null;
-        $this->firstName = InputValidator::sanitizeString($userData['first_name'] ?? '');
-        $this->lastName = InputValidator::sanitizeString($userData['last_name'] ?? '');
-        $this->fullName = $this->firstName . " " . $this->lastName;
-        $this->email = isset($userData['email']) && InputValidator::isValidEmail($userData['email']) ? $userData['email'] : '';
-        $this->password = AuthHelper::ensurePasswordHashed($userData['password'] ?? '');
-        $this->role = UserRole::tryFrom($userData['role']) ?? UserRole::STUDENT;
-        $this->resetToken = isset($userData['resetToken']) ? InputValidator::sanitizeString($userData['resetToken']) : null;
-        $this->resetTokenCreatedAt = isset($userData['resetTokenCreatedAt']) ? new DateTime($userData['resetTokenCreatedAt']) : null;
-        $this->createdAt = new DateTime($userData['createdAt'] ?? 'now');
-        $this->updatedAt = new DateTime($userData['updatedAt'] ?? 'now');
+        try {
+            $stmt->execute([':resetToken' => $resetToken]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::error("Failed to retrieve user by reset token: " . $e->getMessage());
+            return null;
+        }
     }
 
-
-    /**
-     * Binds the user's properties as parameters for a prepared PDO statement.
-     *
-     * This method ensures that all relevant user attributes are securely bound to a
-     * prepared SQL statement before execution, reducing the risk of SQL injection.
-     *
-     * It also handles specific attributes for `Student` and `Lecturer` subclasses,
-     * binding additional fields like `studyProgram`, `enrollmentYear`, and `imagePath`.
-     *
-     * @param PDOStatement $stmt The prepared statement to which user attributes will be bound.
-     *
-     * @return void
-     */
-    protected function bindUserDataForDbStmt(PDOStatement $stmt): void
+    public function updatePassword($userId, $hashedPassword)  // Endre parameternavn for å være tydeligere
     {
         $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
         $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
