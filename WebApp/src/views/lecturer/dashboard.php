@@ -14,7 +14,7 @@ $lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
 $courses = [];
 $messages = [];
 $errorMessage = '';
-require_once __DIR__ . '/../../config/DatabaseService.php';
+require_once __DIR__ . '/../../config/DatabaseManager.php';
 try {
    
    

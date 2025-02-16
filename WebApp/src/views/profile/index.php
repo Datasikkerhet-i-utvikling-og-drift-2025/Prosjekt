@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../../config/DatabaseService.php';
+require_once __DIR__ . '/../../config/DatabaseManager.php';
 require_once __DIR__ . '/../../controllers/AuthController.php';
 
 use service\DatabaseService;

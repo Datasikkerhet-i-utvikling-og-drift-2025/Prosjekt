@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 // Include required files using __DIR__
-require_once __DIR__ . '/../../helpers/DatabaseService.php';
+require_once __DIR__ . '/../../helpers/DatabaseManager.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 

@@ -4,25 +4,22 @@ namespace repositories;
 
 use helpers\InputValidator;
 use helpers\Logger;
+use managers\DatabaseManager;
 use models\Course;
-use services\DatabaseService;
-
-use PDO;
-use PDOException;
 
 /**
  * Repository class for handling course-related database operations.
  */
 class CourseRepository
 {
-    private DatabaseService $db;
+    private DatabaseManager $db;
 
     /**
      * Constructs the CourseRepository.
      *
-     * @param DatabaseService $db The database service instance.
+     * @param DatabaseManager $db The database service instance.
      */
-    public function __construct(DatabaseService $db)
+    public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
     }
@@ -53,12 +50,12 @@ class CourseRepository
         $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
                 VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindArrayToSqlStmt($stmt, [':code', ':name', ':lecturerId', ':pinCode'],
             [$code, $name, $lecturerId, $pinCode]);
         $logger = "Creating course with code: " . $code;
 
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 
@@ -77,7 +74,7 @@ class CourseRepository
         }
 
         $sql = "SELECT * FROM courses WHERE id = :id";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
 
         $logger = "Fetching course by ID: " . $courseId;
@@ -95,7 +92,7 @@ class CourseRepository
     public function getAllCourses(): array
     {
         $sql = "SELECT * FROM courses";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
 
         $logger = "Fetching all courses from the database";
         $coursesData = $this->db->fetchAll($stmt, $logger);
@@ -140,12 +137,12 @@ class CourseRepository
                     updated_at = NOW()
                 WHERE id = :id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindArrayToSqlStmt($stmt, [':id', ':code', ':name', ':lecturerId', ':pinCode'],
             [$id, $code, $name, $lecturerId, $pinCode]);
         $logger = "Updating course ID: " . $id;
 
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 
@@ -164,10 +161,10 @@ class CourseRepository
         }
 
         $sql = "DELETE FROM courses WHERE id = :id";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
 
         $logger = "Deleting course ID: " . $courseId;
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 }

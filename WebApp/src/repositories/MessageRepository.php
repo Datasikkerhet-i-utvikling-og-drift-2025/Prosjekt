@@ -2,25 +2,20 @@
 
 namespace repositories;
 
-use models\Message;
-use services\DatabaseService;
 use helpers\InputValidator;
 use helpers\Logger;
-
-use DateMalformedStringException;
-use PDO;
-use PDOException;
+use managers\DatabaseManager;
 
 class MessageRepository
 {
-    private DatabaseService $db;
+    private DatabaseManager $db;
 
     /**
      * Constructs a new MessageRepository instance.
      *
-     * @param DatabaseService $db The database service used for queries.
+     * @param DatabaseManager $db The database service used for queries.
      */
-    public function __construct(DatabaseService $db)
+    public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
     }
@@ -52,11 +47,11 @@ class MessageRepository
             InputValidator::sanitizeString($content)
         ];
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindArrayToSqlStmt($stmt, $params, $values);
 
         $loggerMessage = "Creating a new message for student ID: $studentId in course ID: $courseId";
-        return $this->db->executeSql($stmt, $loggerMessage);
+        return $this->db->executeStmt($stmt, $loggerMessage);
     }
 
 
@@ -71,7 +66,7 @@ class MessageRepository
         $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, m.anonymous_id
                 FROM messages m WHERE m.course_id = :courseId";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':courseId', $courseId);
 
         $loggerMessage = "Fetching messages for course ID: $courseId";
@@ -93,7 +88,7 @@ class MessageRepository
                 JOIN courses c ON m.course_id = c.id
                 WHERE m.student_id = :studentId";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':studentId', $studentId);
 
         $loggerMessage = "Fetching messages for student ID: $studentId";
@@ -115,7 +110,7 @@ class MessageRepository
                 JOIN courses c ON m.course_id = c.id
                 WHERE m.id = :messageId";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':messageId', $messageId);
 
         $loggerMessage = "Fetching message ID: $messageId";
@@ -138,11 +133,11 @@ class MessageRepository
         }
 
         $sql = "UPDATE messages SET reply = :replyContent, updated_at = NOW() WHERE id = :messageId";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':replyContent'], [$messageId, InputValidator::sanitizeString($replyContent)]);
 
         $loggerMessage = "Updating reply for message ID: $messageId";
-        return $this->db->executeSql($stmt, $loggerMessage);
+        return $this->db->executeStmt($stmt, $loggerMessage);
     }
 
 
@@ -161,11 +156,11 @@ class MessageRepository
         }
 
         $sql = "UPDATE messages SET is_reported = 1 WHERE id = :messageId";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':messageId', $messageId);
 
         $loggerMessage = "Reporting message ID: $messageId";
-        return $this->db->executeSql($stmt, $loggerMessage);
+        return $this->db->executeStmt($stmt, $loggerMessage);
     }
 
 
@@ -185,13 +180,13 @@ class MessageRepository
 
         // Prepare SQL query
         $sql = "DELETE FROM messages WHERE id = :message_id";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
 
         // Bind parameters and execute query
         $this->db->bindSingleValueToSqlStmt($stmt, ':message_id', $messageId);
         $logger = "Deleting message with ID: $messageId";
 
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 
@@ -203,7 +198,7 @@ class MessageRepository
     public function getPublicMessages(): array
     {
         $sql = "SELECT id AS message_id, content, created_at FROM messages";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
 
         $loggerMessage = "Fetching all public messages";
         return $this->db->fetchAll($stmt, $loggerMessage);
@@ -234,13 +229,13 @@ class MessageRepository
 
         // Prepare SQL query
         $sql = "UPDATE messages SET content = :content, updated_at = NOW() WHERE id = :message_id";
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
 
         // Bind parameters and execute query
         $this->db->bindArrayToSqlStmt($stmt, [':message_id', ':content'], [$message_id, $sanitizedContent]);
         $logger = "Updating message content for message ID: $message_id";
 
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 }

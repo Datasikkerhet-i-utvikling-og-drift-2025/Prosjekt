@@ -2,27 +2,24 @@
 
 namespace repositories;
 
-use models\Comment;
 use helpers\InputValidator;
 use helpers\Logger;
-use services\DatabaseService;
-
-use PDO;
-use PDOException;
+use managers\DatabaseManager;
+use models\Comment;
 
 /**
  * Repository class for handling comment-related database operations.
  */
 class CommentRepository
 {
-    private DatabaseService $db;
+    private DatabaseManager $db;
 
     /**
      * CommentRepository constructor.
      *
-     * @param DatabaseService $db Database service instance for handling queries.
+     * @param DatabaseManager $db Database service instance for handling queries.
      */
-    public function __construct(DatabaseService $db)
+    public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
     }
@@ -51,7 +48,7 @@ class CommentRepository
         $sql = "INSERT INTO comments (message_id, guest_name, content, created_at)
                 VALUES (:message_id, :guest_name, :content, NOW())";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindArrayToSqlStmt(
             $stmt,
             [':message_id', ':guest_name', ':content'],
@@ -59,7 +56,7 @@ class CommentRepository
         );
 
         $logger = "Adding comment to message ID: $messageId";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
     /**
@@ -81,7 +78,7 @@ class CommentRepository
                 WHERE message_id = :message_id 
                 ORDER BY created_at ASC";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':message_id', (int)$messageId);
         $logger = "Fetching comments for message ID: $messageId";
 
@@ -112,10 +109,10 @@ class CommentRepository
         $sql = "DELETE FROM comments 
                 WHERE id = :id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':id', (int)$commentId);
         $logger = "Deleting comment ID: $commentId";
 
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 }

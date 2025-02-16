@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/DatabaseService.php';
+require_once __DIR__ . '/../../config/DatabaseManager.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 

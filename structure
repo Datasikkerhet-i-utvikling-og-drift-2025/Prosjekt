@@ -40,6 +40,9 @@ Prosjekt/
 │    │   │   ├── AdminController.php
 │    │   │   └── GuestController.php
 │    │   │
+│    │   ├── managers/
+│    │   │   └── DatabaseManager.php
+│    │   │
 │    │   ├── models/                 # Models represent database entities
 │    │   │   ├── User.php
 │    │   │   ├── Message.php
@@ -48,6 +51,25 @@ Prosjekt/
 │    │   │   ├── Lecturer.php
 │    │   │   ├── Student.php
 │    │   │   └── Admin.php
+│    │   │
+│    │   ├── services/
+│    │   │   ├── AuthService.php
+│    │   │   ├── UserService.php
+│    │   │   ├── MessageService.php
+│    │   │   ├── CourseService.php
+│    │   │   ├── CommentService.php
+│    │   │   ├── LecturerService.php
+│    │   │   ├── StudentService.php
+│    │   │   └── AdminService.php
+│    │   │
+│    │   ├── repositories/                 # Sql queries
+│    │   │   ├── UserRepository.php
+│    │   │   ├── MessageRepository.php
+│    │   │   ├── CourseRepository.php
+│    │   │   ├── CommentRepository.php
+│    │   │   ├── LecturerRepository.php
+│    │   │   ├── StudentRepository.php
+│    │   │   └── AdminRepository.php
 │    │   │
 │    │   ├── views/                  # Views for rendering HTML
 │    │   │   ├── auth/               # Views related to authentication
@@ -85,18 +107,9 @@ Prosjekt/
 │    │   │   └── ApiHelper.php
 │    │   │
 │    │   └── config/                 # Configuration files
-│    │       ├── database.php        # Database connection setup
 │    │       ├── app.php             # General application config
 │    │       ├── view-routes.php
 │    │       └── api-routes.php      # API route definitions
-│    │
-│    ├── database/                   # Database schema and migrations
-│    │   ├── migrations/             # Database migrations
-│    │   │   ├── create_users_table.sql
-│    │   │   ├── create_messages_table.sql
-│    │   │   └── create_courses_table.sql
-│    │   └── seeds/                  # Seed data for initial setup
-│    │       └── seed_initial_data.sql
 │    │
 │    ├── tests/                      # Automated tests
 │    │

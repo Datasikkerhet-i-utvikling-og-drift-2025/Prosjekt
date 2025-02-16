@@ -101,7 +101,7 @@ class Logger
         self::rotateLogFile();
 
         $date = date('Y-m-d H:i:s'); // Current timestamp
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $file = $backtrace[0]['file'] ?? 'unknown';
         $line = $backtrace[0]['line'] ?? 'unknown';
 

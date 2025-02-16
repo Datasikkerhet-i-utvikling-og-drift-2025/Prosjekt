@@ -7,14 +7,14 @@ error_reporting(E_ALL);
 
 use helpers\ApiHelper;
 use helpers\Logger;
+use managers\DatabaseManager;
 use repositories\UserRepository;
-use services\DatabaseService;
 
 // Autoload required files
 require_once __DIR__ . '/../src/config/app.php'; // Application config
 require_once __DIR__ . '/../src/helpers/ApiHelper.php'; // API helpers
 require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger for error tracking
-require_once __DIR__ . '/../src/services/DatabaseService.php'; // Database connection
+require_once __DIR__ . '/../src/services/DatabaseManager.php'; // Database connection
 require_once __DIR__ . '/../src/repositories/UserRepository.php'; // User repository
 require_once __DIR__ . '/../src/autoload.php'; // Autoloader for PSR-4 compliance
 
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Initialize database connection
-$dbService = new DatabaseService();
+$dbService = new DatabaseManager();
 $userRepo = new UserRepository($dbService);
 
 // Get HTTP method and requested URI

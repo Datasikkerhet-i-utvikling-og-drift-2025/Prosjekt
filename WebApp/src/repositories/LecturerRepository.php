@@ -2,23 +2,22 @@
 
 namespace repositories;
 
-use helpers\Logger;
 use helpers\InputValidator;
-use services\DatabaseService;
-
-use PDOException;
+use helpers\Logger;
+use managers\DatabaseManager;
+use PDO;
 
 class LecturerRepository
 {
-    private DatabaseService $db;
+    private DatabaseManager $db;
 
 
     /**
      * Constructs a LecturerRepository instance.
      *
-     * @param DatabaseService $db The database service instance for handling database operations.
+     * @param DatabaseManager $db The database service instance for handling database operations.
      */
-    public function __construct(DatabaseService $db)
+    public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
     }
@@ -33,13 +32,16 @@ class LecturerRepository
      */
     public function getCourses(string $lecturerId): array
     {
-        $sql = "SELECT id, code, name, pin_code, created_at FROM courses WHERE lecturer_id = :lecturerId";
+        $sql = "SELECT id, code, name, pin_code, created_at 
+                FROM courses 
+                WHERE lecturer_id = :lecturerId";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":lecturerId", $lecturerId);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt->bindValue(":lecturerId", $lecturerId, PDO::PARAM_STR)
+        );
 
-        $logger = "Fetching courses for lecturer ID: $lecturerId";
-        return $this->db->fetchAll($stmt, $logger);
+        return $this->db->fetchAll("Fetching courses for lecturer ID: $lecturerId");
     }
 
 
@@ -56,11 +58,12 @@ class LecturerRepository
                 FROM messages m
                 WHERE m.course_id = :courseId";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":courseId", $courseId);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt->bindValue(":courseId", $courseId, PDO::PARAM_STR)
+        );
 
-        $logger = "Fetching messages for course ID: $courseId";
-        return $this->db->fetchAll($stmt, $logger);
+        return $this->db->fetchAll("Fetching messages for course ID: $courseId");
     }
 
 
@@ -74,22 +77,23 @@ class LecturerRepository
      */
     public function replyToMessage(string $messageId, string $replyContent): bool
     {
-        // Validate reply content
         if (!InputValidator::isNotEmpty($replyContent)) {
             Logger::error("Reply content is empty for message ID: $messageId");
             return false;
         }
 
-        $sql = "UPDATE messages SET reply = :replyContent, updated_at = NOW() WHERE id = :messageId";
+        $sql = "UPDATE messages 
+                SET reply = :replyContent, updated_at = NOW() 
+                WHERE id = :messageId";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':replyContent'], [
-            $messageId,
-            InputValidator::sanitizeString($replyContent)
-        ]);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt
+                ->bindValue(":messageId", $messageId, PDO::PARAM_STR)
+                ->bindValue(":replyContent", InputValidator::sanitizeString($replyContent), PDO::PARAM_STR)
+        );
 
-        $logger = "Replying to message ID: $messageId";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt("Replying to message ID: $messageId");
     }
 
 
@@ -106,11 +110,12 @@ class LecturerRepository
                 FROM messages m
                 WHERE m.id = :messageId";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":messageId", $messageId);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt->bindValue(":messageId", $messageId, PDO::PARAM_STR)
+        );
 
-        $logger = "Fetching message ID: $messageId";
-        return $this->db->fetchSingle($stmt, $logger);
+        return $this->db->fetchSingle("Fetching message ID: $messageId");
     }
 
 
@@ -124,7 +129,6 @@ class LecturerRepository
      */
     public function reportMessage(string $messageId, string $reason): bool
     {
-        // Validate report reason
         if (!InputValidator::isNotEmpty($reason)) {
             Logger::error("Report reason is empty for message ID: $messageId");
             return false;
@@ -133,13 +137,13 @@ class LecturerRepository
         $sql = "INSERT INTO reports (message_id, report_reason, created_at)
                 VALUES (:messageId, :reason, NOW())";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':reason'], [
-            $messageId,
-            InputValidator::sanitizeString($reason)
-        ]);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt
+                ->bindValue(":messageId", $messageId, PDO::PARAM_STR)
+                ->bindValue(":reason", InputValidator::sanitizeString($reason), PDO::PARAM_STR)
+        );
 
-        $logger = "Reporting message ID: $messageId";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt("Reporting message ID: $messageId");
     }
 }

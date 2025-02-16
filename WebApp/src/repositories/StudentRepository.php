@@ -2,23 +2,21 @@
 
 namespace repositories;
 
-use helpers\Logger;
 use helpers\InputValidator;
-use services\DatabaseService;
-
-use PDOException;
+use helpers\Logger;
+use managers\DatabaseManager;
 
 class StudentRepository
 {
-    private DatabaseService $db;
+    private DatabaseManager $db;
 
 
     /**
      * Constructs a StudentRepository instance.
      *
-     * @param DatabaseService $db The database service instance for handling database operations.
+     * @param DatabaseManager $db The database service instance for handling database operations.
      */
-    public function __construct(DatabaseService $db)
+    public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
     }
@@ -36,7 +34,6 @@ class StudentRepository
      */
     public function sendMessage(string $studentId, string $courseId, ?string $anonymousId, string $content): bool
     {
-        // Validate message content
         if (!InputValidator::isNotEmpty($content)) {
             Logger::error("Message content is empty for student ID: $studentId");
             return false;
@@ -45,16 +42,16 @@ class StudentRepository
         $sql = "INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at)
                 VALUES (:studentId, :courseId, :anonymousId, :content, NOW())";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':studentId', ':courseId', ':anonymousId', ':content'], [
-            $studentId,
-            $courseId,
-            $anonymousId,
-            InputValidator::sanitizeString($content)
-        ]);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt
+                ->bindValue(":studentId", $studentId, \PDO::PARAM_STR)
+                ->bindValue(":courseId", $courseId, \PDO::PARAM_STR)
+                ->bindValue(":anonymousId", $anonymousId, \PDO::PARAM_STR)
+                ->bindValue(":content", InputValidator::sanitizeString($content), \PDO::PARAM_STR)
+        );
 
-        $logger = "Sending message from student ID: $studentId to course ID: $courseId";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt("Sending message from student ID: $studentId to course ID: $courseId");
     }
 
 
@@ -74,11 +71,12 @@ class StudentRepository
                 WHERE m.student_id = :studentId
                 ORDER BY m.created_at DESC";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":studentId", $studentId);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt->bindValue(":studentId", $studentId, \PDO::PARAM_STR)
+        );
 
-        $logger = "Fetching messages for student ID: $studentId";
-        return $this->db->fetchAll($stmt, $logger);
+        return $this->db->fetchAll("Fetching messages for student ID: $studentId");
     }
 
 
@@ -98,11 +96,14 @@ class StudentRepository
                 JOIN courses c ON m.course_id = c.id
                 WHERE m.id = :messageId AND m.student_id = :studentId";
 
-        $stmt = $this->db->prepareSql($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':studentId'], [$messageId, $studentId]);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $stmt
+                ->bindValue(":messageId", $messageId, \PDO::PARAM_STR)
+                ->bindValue(":studentId", $studentId, \PDO::PARAM_STR)
+        );
 
-        $logger = "Fetching message ID: $messageId for student ID: $studentId";
-        return $this->db->fetchSingle($stmt, $logger);
+        return $this->db->fetchSingle("Fetching message ID: $messageId for student ID: $studentId");
     }
 
 
@@ -113,11 +114,11 @@ class StudentRepository
      */
     public function getAvailableCourses(): array
     {
-        $sql = "SELECT id, code, name FROM courses";
+        $sql = "SELECT id, code, name 
+                FROM courses";
 
-        $stmt = $this->db->prepareSql($sql);
-        $logger = "Fetching available courses";
+        $this->db->prepareStmt($sql);
 
-        return $this->db->fetchAll($stmt, $logger);
+        return $this->db->fetchAll("Fetching available courses");
     }
 }

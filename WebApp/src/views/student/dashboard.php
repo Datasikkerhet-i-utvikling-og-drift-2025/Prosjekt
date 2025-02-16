@@ -13,7 +13,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
 $studentName = $_SESSION['user']['name'] ?? 'Student';
 
 // Include required files
-require_once __DIR__ . '/../../config/DatabaseService.php';
+require_once __DIR__ . '/../../config/DatabaseManager.php';
 
 try {
     $db = new service\DatabaseService();

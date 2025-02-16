@@ -2,23 +2,21 @@
 
 namespace repositories;
 
-use helpers\Logger;
 use helpers\InputValidator;
-use services\DatabaseService;
-
-use PDOException;
+use helpers\Logger;
+use managers\DatabaseManager;
 
 class AdminRepository
 {
-    private DatabaseService $db;
+    private DatabaseManager $db;
 
 
     /**
      * Constructs an AdminRepository instance.
      *
-     * @param DatabaseService $db The database service instance for handling database operations.
+     * @param DatabaseManager $db The database service instance for handling database operations.
      */
-    public function __construct(DatabaseService $db)
+    public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
     }
@@ -35,11 +33,11 @@ class AdminRepository
     {
         $sql = "DELETE FROM users WHERE id = :id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $id);
 
         $logger = "Deleting user ID: $id";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 
@@ -54,11 +52,11 @@ class AdminRepository
     {
         $sql = "DELETE FROM messages WHERE id = :id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $messageId);
 
         $logger = "Deleting message ID: $messageId";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 
@@ -80,14 +78,14 @@ class AdminRepository
 
         $sql = "UPDATE messages SET content = :content, updated_at = NOW() WHERE id = :id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindArrayToSqlStmt($stmt, [':id', ':content'], [
             $messageId,
             InputValidator::sanitizeString($newContent)
         ]);
 
         $logger = "Updating message ID: $messageId";
-        return $this->db->executeSql($stmt, $logger);
+        return $this->db->executeStmt($stmt, $logger);
     }
 
 
@@ -103,7 +101,7 @@ class AdminRepository
                 LEFT JOIN reports r ON m.id = r.message_id
                 LEFT JOIN users u ON r.reported_by = u.id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $logger = "Fetching all reported messages";
 
         return $this->db->fetchAll($stmt, $logger);
@@ -121,7 +119,7 @@ class AdminRepository
     {
         $sql = "SELECT * FROM users WHERE role = :role";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":role", $role);
 
         $logger = "Fetching users with role: $role";
@@ -143,7 +141,7 @@ class AdminRepository
                 JOIN users u ON m.student_id = u.id
                 WHERE m.id = :id";
 
-        $stmt = $this->db->prepareSql($sql);
+        $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $messageId);
 
         $logger = "Finding sender for message ID: $messageId";

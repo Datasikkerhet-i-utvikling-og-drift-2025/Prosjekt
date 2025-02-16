@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 // Include database connection
-require_once __DIR__ . '/../../config/DatabaseService.php';
+require_once __DIR__ . '/../../config/DatabaseManager.php';
 
 // Function to sanitize output
 function sanitize($value) {

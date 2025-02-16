@@ -8,7 +8,7 @@ require_once __DIR__ . '/../controllers/GuestController.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/LecturerController.php';
 require_once __DIR__ . '/../controllers/AdminController.php';
-require_once __DIR__ . '/../services/DatabaseService.php';
+require_once __DIR__ . '/../services/DatabaseManager.php';
 require_once __DIR__ . '/../repositories/UserRepository.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
@@ -30,7 +30,7 @@ try {
     $db = new DatabaseService();
     $pdo = $db->connectToDb();
 
-    Logger::info('DatabaseService connection initialized successfully.');
+    Logger::info('DatabaseManager connection initialized successfully.');
 
     // Create controller instances
     $authController = new AuthController($db);

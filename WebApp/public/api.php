@@ -11,7 +11,7 @@ require_once __DIR__ . '/../src/config/api-routes.php'; // API routes
 require_once __DIR__ . '/../src/helpers/ApiHelper.php'; // API helper
 require_once __DIR__ . '/../src/helpers/AuthHelper.php'; // Authentication helper
 require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger
-require_once __DIR__ . '/../src/services/DatabaseService.php'; // Database service
+require_once __DIR__ . '/../src/services/DatabaseManager.php'; // Database service
 require_once __DIR__ . '/../src/repositories/UserRepository.php'; // User repository
 
 use helpers\ApiHelper;
