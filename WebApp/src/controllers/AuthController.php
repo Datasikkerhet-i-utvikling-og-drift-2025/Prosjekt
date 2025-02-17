@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../../vendor/autoload.php'; 
 require_once __DIR__ . '/../helpers/ApiHelper.php';
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../helpers/InputValidator.php';
@@ -8,6 +9,9 @@ require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
 require_once __DIR__ . '/../models/Course.php';
 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class AuthController
 {
@@ -177,37 +181,50 @@ class AuthController
         exit;
     }
 
-public function requestPasswordReset()
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: /reset-password');
-        exit;
-    }
-
-    $email = $_POST['email'] ?? '';
+    public function requestPasswordReset() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /forgot-password');
+            exit;
+        }
     
-    // Find user by email
-    $user = $this->userModel->getUserByEmail($email);
-    if (!$user) {
-        header('Location: /reset-password?error=' . urlencode('Email not found'));
-        exit;
-    }
-
-    // Generate reset token
-    $resetToken = bin2hex(random_bytes(32));
+        try {
+            $email = $_POST['email'] ?? '';
+            Logger::info("Starting password reset request for email: " . $email);
+            
+            // Finn bruker
+            $user = $this->userModel->getUserByEmail($email);
+            if (!$user) {
+                throw new Exception('If this email exists in our system, you will receive a reset link.');
+            }
     
-    // Save token to database
-    if ($this->userModel->savePasswordResetToken($user['id'], $resetToken)) {
-        // Send reset email
-        $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
-        // Her bør du implementere email-sending
-        
-        header('Location: /login?success=' . urlencode('Password reset instructions sent to your email'));
-    } else {
-        header('Location: /reset-password?error=' . urlencode('Failed to process reset request'));
+            // Generer token
+            $resetToken = bin2hex(random_bytes(32));
+            $tokenExpiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            
+            // Lagre token i databasen
+            if (!$this->userModel->savePasswordResetToken($user['id'], $resetToken, $tokenExpiry)) {
+                throw new Exception('Failed to process reset request');
+            }
+    
+            // Send email
+            $mailer = new Mailer();
+            Logger::info("Mailer instance created");
+            if (!$mailer->sendPasswordReset($email, $resetToken)) {
+                throw new Exception('Failed to send reset email');
+            }
+    
+            $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
+            header('Location: /');
+            Logger::info("Mail send attempt result: " . ($result ? 'success' : 'failed'));
+            exit;
+    
+        } catch (Exception $e) {
+            $_SESSION['errors'] = $e->getMessage();
+            header('Location: /reset-password');
+            Logger::error("Password reset error: " . $e->getMessage());
+            exit;
+        }
     }
-    exit;
-}
 
 public function resetPassword()
 {
