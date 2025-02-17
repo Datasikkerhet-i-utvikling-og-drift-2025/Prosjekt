@@ -1,24 +1,26 @@
-# Gruppe
+# Dokumentasjon
+
+## Gruppe
 
 **Gruppemedlemmer:**
-: 
+:
 * Ayub Abdirazak Ali
 * Jon Petter Harwiss
 * Mahamoud Ibrahim
 * Mats Hansen - math@hiof.no
 * Sander Thorstein Nilsen
 
-## Ansvarsområder
+### Ansvarsområder
 
 * Backend (2 stk)
-  * Sander
-  * Jon
+    * Sander
+    * Jon
 * Frontend
-  * Ayub
+    * Ayub
 * Server
-  * Mahamoud
+    * Mahamoud
 * Database + API
-  * Mats 
+    * Mats
 
-
-
+## Implementasjon
+bla bla bla
