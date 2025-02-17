@@ -92,7 +92,7 @@ $comments = $stmtComments->fetchAll();
 
 <!-- Button to view messages -->
 <div class="container">
-    <a href="/guest/view-messages.php" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
+<a href="/guests/view-messages?course_code=<?= $course['code'] ?>&pin_code=<?= $course['pin_code'] ?>" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
 </div>
 
 <!-- Report Modal -->
