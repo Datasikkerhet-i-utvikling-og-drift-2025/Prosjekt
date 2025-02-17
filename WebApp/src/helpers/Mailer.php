@@ -1,88 +1,67 @@
 <?php
 
-require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer/src/SMTP.php';
-require_once __DIR__ . '/PHPMailer/src/Exception.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../helpers/Logger.php';
+
+
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-class Mailer
-{
-    private $mailer;
+class Mailer {
+    private $mail;
 
-    public function __construct()
-    {
-        $this->mailer = new PHPMailer(true);
-
-        // Server settings
-        $this->mailer->isSMTP();
-        $this->mailer->Host = getenv('MAIL_HOST') ?: 'smtp.example.com';
-        $this->mailer->SMTPAuth = true;
-        $this->mailer->Username = getenv('MAIL_USERNAME') ?: 'your_email@example.com';
-        $this->mailer->Password = getenv('MAIL_PASSWORD') ?: 'your_password';
-        $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $this->mailer->Port = getenv('MAIL_PORT') ?: 587;
-
-        // Sender info
-        $this->mailer->setFrom(
-            getenv('MAIL_FROM_ADDRESS') ?: 'noreply@example.com',
-            getenv('MAIL_FROM_NAME') ?: 'Your App Name'
-        );
-    }
-
-    // Send an email
-    public function sendEmail($to, $subject, $body, $altBody = '')
-    {
+    public function __construct() {
         try {
-            // Validate email
-            if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("Invalid email address: $to");
-            }
+            $this->mail = new PHPMailer(true);
+            $this->mail->SMTPDebug = 2; // Aktiver SMTP debugging
+            $this->mail->Debugoutput = function($str, $level) {
+                Logger::info("SMTP Debug: " . $str);
+            };
 
-            // Recipient
-            $this->mailer->addAddress($to);
+            $this->mail->isSMTP();
+            $this->mail->Host = getenv('SMTP_HOST');
+            $this->mail->SMTPAuth = true;
+            $this->mail->Username = getenv('SMTP_USERNAME');
+            $this->mail->Password = getenv('SMTP_PASSWORD');
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mail->Port = getenv('SMTP_PORT');
 
-            // Email content
-            $this->mailer->isHTML(true);
-            $this->mailer->Subject = $subject;
-            $this->mailer->Body = $body;
-            $this->mailer->AltBody = $altBody;
-
-            // Send email
-            $this->mailer->send();
-            return ['success' => true];
+            Logger::info("SMTP Configuration: " . json_encode([
+                'host' => getenv('SMTP_HOST'),
+                'username' => getenv('SMTP_USERNAME'),
+                'port' => getenv('SMTP_PORT')
+            ]));
         } catch (Exception $e) {
-            $errorMessage = "Email could not be sent to $to. Error: " . $this->mailer->ErrorInfo;
-            Logger::error($errorMessage);
-            return ['success' => false, 'error' => $errorMessage];
+            Logger::error("Mailer initialization failed: " . $e->getMessage());
+            throw $e;
         }
     }
 
-    // Send a password reset email
-    public function sendPasswordReset($to, $resetLink)
-    {
-        $subject = 'Password Reset Request';
-        $body = "
-            <p>You requested a password reset. Click the link below to reset your password:</p>
-            <p><a href='$resetLink'>$resetLink</a></p>
-            <p>If you didn't request this, please ignore this email.</p>
-        ";
-        $altBody = "You requested a password reset. Visit this link to reset your password: $resetLink";
+    public function sendPasswordReset($email, $resetToken) {
+        try {
+            Logger::info("Attempting to send password reset email to: " . $email);
 
-        return $this->sendEmail($to, $subject, $body, $altBody);
-    }
+            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
+            Logger::info("Reset link generated: " . $resetLink);
 
-    // Send a user confirmation email
-    public function sendUserConfirmation($to, $confirmationLink)
-    {
-        $subject = 'Confirm Your Account';
-        $body = "
-            <p>Thank you for signing up. Please confirm your account by clicking the link below:</p>
-            <p><a href='$confirmationLink'>$confirmationLink</a></p>
-        ";
-        $altBody = "Thank you for signing up. Confirm your account here: $confirmationLink";
+            $this->mail->setFrom(getenv('SMTP_USERNAME'), 'Feedback System');
+            $this->mail->addAddress($email);
+            $this->mail->isHTML(true);
+            $this->mail->Subject = 'Password Reset Request';
+            $this->mail->Body = "
+                <h2>Password Reset Request</h2>
+                <p>Click the link below to reset your password:</p>
+                <p><a href='$resetLink'>Reset Password</a></p>
+                <p>If you didn't request this, please ignore this email.</p>
+            ";
 
-        return $this->sendEmail($to, $subject, $body, $altBody);
+            $this->mail->send();
+            Logger::info("Password reset email sent successfully to: " . $email);
+            return true;
+        } catch (Exception $e) {
+            Logger::error("Failed to send password reset email: " . $e->getMessage());
+            return false;
+        }
     }
 }
