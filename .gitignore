@@ -11,4 +11,4 @@ gen
 /public/uploads/
 !/WebApp/public/uploads/
 /WebApp/public/uploads/
-/WebApp/vendor/phpmailer/
+/WebApp/vendor/
