@@ -249,14 +249,15 @@ public function resetPassword()
         exit;
     }
 
-    // Update password
     $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
-        header('Location: /login?success=' . urlencode('Password has been reset successfully'));
-    } else {
-        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Failed to reset password'));
-    }
-    exit;
+        if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+            $_SESSION['success'] = 'Password changed successfully';
+        } else {
+            $_SESSION['errors'] = 'Failed to change password';
+        }
+    
+        header('Location: /');
+        exit;
 }
 
     public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void

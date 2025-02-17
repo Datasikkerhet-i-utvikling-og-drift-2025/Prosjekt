@@ -22,4 +22,16 @@
         </description>
         <accepts>Api.html</accepts>
     </rule>
+    <rule id="4b0eb851">
+        <description>Created after removal of "Gruppe" from Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift -
+            Gruppe 1
+        </description>
+        <accepts>Gruppe.html</accepts>
+    </rule>
+    <rule id="5456f4ef">
+        <description>Created after removal of "Prosjektoppgave" from Prosjekt Dokumentasjon: Datasikkerhet i Utvikling
+            og Drift - Gruppe 1
+        </description>
+        <accepts>Prosjektbeskrivelse.html</accepts>
+    </rule>
 </rules>
