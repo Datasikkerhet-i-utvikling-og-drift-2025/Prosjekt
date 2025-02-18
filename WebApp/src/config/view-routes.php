@@ -21,5 +21,7 @@ return [
     APP_BASE_URL.'/guests/dashboard' => __DIR__ . '/../views/guests/dashboard.php',
     APP_BASE_URL.'/auth/guest' => __DIR__ . '/../controllers/AuthController.php@guest', // Added route for guest handler
     APP_BASE_URL.'/profile' => __DIR__ . '/../views/profile/index.php',
+    '/dokumentasjon' => __DIR__ . '/../views/documentation/dokumentasjon.html',
+    API_BASE_URL => __DIR__ . '/../views/documentation/api.html',
 
 ];
