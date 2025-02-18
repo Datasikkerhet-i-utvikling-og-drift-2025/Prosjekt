@@ -136,7 +136,7 @@ require_once __DIR__ . '/../partials/header.php';
         </div>
     </form>
 
-    <p>Already have an account? <a href="<?= APP_BASE_URL ?>/">Login here</a>.</p>
+    <p>Already have an account? <a href="<?= APP_BASE_URL ?>">Login here</a>.</p>
 </div>
 
 <script>
