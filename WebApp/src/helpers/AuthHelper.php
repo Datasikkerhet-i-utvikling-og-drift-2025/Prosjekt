@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/../config/versionURL.php';
 
 
 class AuthHelper
@@ -84,7 +84,7 @@ class AuthHelper
     public static function requireLogin($redirectUrl = '/')
     {
         if (!self::isLoggedIn()) {
-            header("Location: $redirectUrl");
+            header("Location: " .APP_BASE_URL. "$redirectUrl");
             exit;
         }
     }
@@ -93,7 +93,7 @@ class AuthHelper
     public static function requireRole($role, $redirectUrl = '/unauthorized')
     {
         if (!self::isRole($role)) {
-            header("Location: $redirectUrl");
+            header("Location: " .APP_BASE_URL. "$redirectUrl");
             exit;
         }
     }
@@ -104,7 +104,7 @@ class AuthHelper
         self::startSession();
         if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout) {
             self::logoutUser();
-            header("Location: /login?timeout=true");
+            header("Location: " .APP_BASE_URL. "/login?timeout=true");
             exit;
         }
         $_SESSION['last_activity'] = time();
@@ -126,7 +126,7 @@ class AuthHelper
         self::startSession();
         if (!isset($_SESSION['csrf_token']) || $_SESSION['csrf_token'] !== $token) {
             self::logoutUser();
-            header("Location: /login?csrf_error=true");
+            header("Location: " .APP_BASE_URL. "/login?csrf_error=true");
             exit;
         }
     }

@@ -4,6 +4,7 @@ session_start();
 // Include required files using __DIR__
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../config/versionURL.php';
 
 // Sanitize input
 function sanitize($value) {
@@ -66,8 +67,8 @@ try {
                     <p><strong>Reply:</strong> <?php echo sanitize($message['reply'] ?? 'No reply yet'); ?></p>
                     <p><strong>Sent At:</strong> <?php echo sanitize($message['created_at']); ?></p>
                     <div class="message-actions">
-                        <a href="/guest/report-message.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-secondary">Report</a>
-                        <a href="/guest/comment.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-primary">Comment</a>
+                        <a href="<?= APP_BASE_URL ?>/guest/report-message.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-secondary">Report</a>
+                        <a href="<?= APP_BASE_URL ?>/guest/comment.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-primary">Comment</a>
                     </div>
                     <hr>
                 </div>
@@ -77,7 +78,7 @@ try {
 
     <!-- Back to Courses Link -->
     <p>
-        <a href="/guest/view-courses" class="btn btn-secondary">Back to Courses</a>
+        <a href="<?= APP_BASE_URL ?>/guest/view-courses" class="btn btn-secondary">Back to Courses</a>
     </p>
 </div>
 
