@@ -1,9 +1,9 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/../../config/versionURL.php';
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: /auth/login');
+    header('Location: ' .API_BASE_URL. '/auth/login');
     exit;
 }
 
@@ -32,19 +32,19 @@ require_once __DIR__ . '/../partials/navbar.php';
         <section class="action-section">
             <h2>Manage Users</h2>
             <p>View, edit, or remove users in the system.</p>
-            <a href="/admin/manage-users" class="btn btn-primary">Manage Users</a>
+            <a href="<?= APP_BASE_URL ?>/admin/manage-users" class="btn btn-primary">Manage Users</a>
         </section>
 
         <section class="action-section">
             <h2>Manage Messages</h2>
             <p>View all messages, respond to them, or delete inappropriate ones.</p>
-            <a href="/admin/manage-messages" class="btn btn-primary">Manage Messages</a>
+            <a href="<?= APP_BASE_URL ?>/admin/manage-messages" class="btn btn-primary">Manage Messages</a>
         </section>
 
         <section class="action-section">
             <h2>View Reports</h2>
             <p>Review and resolve reports on inappropriate messages.</p>
-            <a href="/admin/reports" class="btn btn-primary">View Reports</a>
+            <a href="<?= APP_BASE_URL ?>/admin/reports" class="btn btn-primary">View Reports</a>
         </section>
     </div>
 </div>
