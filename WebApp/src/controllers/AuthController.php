@@ -66,7 +66,7 @@ class AuthController
         $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
 
         ApiHelper::sendResponse(200, [
-            'redirect' => APP_BASE_URL,
+            'redirect' => APP_BASE_URL.'/',
             'message' => 'Registration successful'
         ]);
     }
@@ -84,7 +84,7 @@ class AuthController
 
         // Enkel sjekk for at e-post og passord er sendt med
         if (empty($email) || empty($password)) {
-            header("Location: " .APP_BASE_URL. "login?error=" . urlencode("Email and password are required."));
+            header("Location: " .APP_BASE_URL. "/login?error=" . urlencode("Email and password are required."));
             exit;
         }
 
@@ -93,7 +93,7 @@ class AuthController
         if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
             Logger::error("Login failed for email: " . $input['email']);
             //ApiHelper::sendError(401, 'Invalid email or password.');
-            header("Location: " .APP_BASE_URL. "?error=" . urlencode("Invalid email or password."));
+            header("Location: " .APP_BASE_URL. "/?error=" . urlencode("Invalid email or password."));
             exit;
         }
 
@@ -122,7 +122,7 @@ class AuthController
     {
         AuthHelper::logoutUser();
         Logger::info("User logged out.");
-        header('Location: ' .APP_BASE_URL);
+        header('Location: ' .APP_BASE_URL. '/');
     }
 
     public function getUserById($userId)
@@ -215,7 +215,7 @@ class AuthController
             }
     
             $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
-            header('Location: ' .APP_BASE_URL);
+            header('Location: ' .APP_BASE_URL. '/');
             Logger::info("Mail send attempt result: " . ($result ? 'success' : 'failed'));
             exit;
     
@@ -257,7 +257,7 @@ public function resetPassword()
             $_SESSION['errors'] = 'Failed to change password';
         }
     
-        header('Location: ' .APP_BASE_URL);
+        header('Location: ' .APP_BASE_URL. '/');
         exit;
 }
 
@@ -304,7 +304,7 @@ public function resetPassword()
 
             $this->pdo->commit();
             $_SESSION['success'] = "Registration successful. Please log in.";
-            header("Location: " .APP_BASE_URL);
+            header("Location: " .APP_BASE_URL. "/");
             exit;
 
         } catch (Exception $e) {

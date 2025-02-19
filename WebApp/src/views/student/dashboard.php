@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../config/versionURL.php';
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
     Logger::info("Unauthorized access attempt to student dashboard. Session data: " . var_export($_SESSION, true));
-    header('Location: ' .APP_BASE_URL);
+    header('Location: ' .APP_BASE_URL. '/');
     exit;
 }
 

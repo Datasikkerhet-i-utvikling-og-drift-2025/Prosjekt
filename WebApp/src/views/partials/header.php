@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../config/versionURL.php';
     <div class="header-container">
         <!-- Logo Section -->
         <div class="logo">
-            <a href="<?= APP_BASE_URL ?>" title="Feedback System Home">Feedback System</a>
+            <a href="<?= APP_BASE_URL ?>/" title="Feedback System Home">Feedback System</a>
         </div>
 
 
@@ -46,7 +46,7 @@ require_once __DIR__ . '/../../config/versionURL.php';
                     <?php endif; ?>
                         <li><a href="<?= API_BASE_URL ?>/auth/logout" class="logout-link">Logout</a></li>
                     <?php else: ?>
-                        <li><a href="<?= APP_BASE_URL ?>">Login</a></li>
+                        <li><a href="<?= APP_BASE_URL ?>/">Login</a></li>
                         <li><a href="<?= APP_BASE_URL ?>/register">Register</a></li>
                     <?php endif; ?>
             </ul>
