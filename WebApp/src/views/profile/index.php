@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user'])) {
@@ -49,7 +48,7 @@ $user = $authController->getUserById($_SESSION['user']['id']);
 
     <div class="change-password-section">
         <h2>Change Password</h2>
-        <form action="<?= API_BASE_URL ?>/auth/change-password" method="POST" class="form">
+        <form action="/auth/change-password" method="POST" class="form">
             <div class="form-group">
                 <label for="current_password">Current Password</label>
                 <input type="password" id="current_password" name="current_password" required>

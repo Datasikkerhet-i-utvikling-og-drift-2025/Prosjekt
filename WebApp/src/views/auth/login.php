@@ -1,16 +1,15 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'] ?? '';
     if ($role === 'student') {
-        header('Location: ' .APP_BASE_URL. '/student/dashboard');
+        header('Location: /student/dashboard');
         exit;
     } elseif ($role === 'lecturer') {
-        header('Location: ' .APP_BASE_URL. '/lecturer/dashboard');
+        header('Location: /lecturer/dashboard');
         exit;
     } elseif ($role === 'admin') {
-        header('Location: ' .APP_BASE_URL. '/admin/dashboard');
+        header('Location: /admin/dashboard');
         exit;
     } 
 }
@@ -43,7 +42,7 @@ if (isset($_SESSION['user'])) {
     <?php endif; ?>
 
     <!-- Login Form -->
-    <form action="<?= API_BASE_URL ?>/auth/login" method="POST" class="form">
+    <form action="/auth/login" method="POST" class="form">
         <div class="form-group">
             <label for="email">Email Address</label>
             <input
@@ -67,11 +66,11 @@ if (isset($_SESSION['user'])) {
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Login</button>
-            <a href="<?= APP_BASE_URL ?>/register" class="btn btn-secondary">Register</a>
+            <a href="/register" class="btn btn-secondary">Register</a>
         </div>
     </form>
 
-    <form action="<?= APP_BASE_URL ?>/guests/dashboard" method="POST" class="form">
+    <form action="/guests/dashboard" method="POST" class="form">
         <div class="form-actions">
             <button type="submit" class="btn btn-guest">Continue as Guest</button>
         </div>
@@ -79,7 +78,7 @@ if (isset($_SESSION['user'])) {
 
     <!-- Forgot Password Link -->
     <div class="additional-links">
-    <p><a href="<?= APP_BASE_URL ?>/reset-password">Forgot your password?</a></p>
+    <p><a href="/reset-password">Forgot your password?</a></p>
 </div>
 </div>
 

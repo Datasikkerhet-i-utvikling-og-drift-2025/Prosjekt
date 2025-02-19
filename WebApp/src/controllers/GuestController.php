@@ -6,7 +6,6 @@ require_once __DIR__ . '/../models/Message.php';
 require_once __DIR__ . '/../models/Course.php';
 require_once __DIR__ . '/../models/Comment.php';
 require_once __DIR__ . '/../helpers/Logger.php';
-require_once __DIR__ . '/../config/versionURL.php';
 
 class GuestController
 {
@@ -114,7 +113,7 @@ class GuestController
 
         if ($result) {
             Logger::info("Comment added successfully to message ID: {$sanitized['message_id']}");
-            header('Location: ' .APP_BASE_URL. '/guests/dashboard');
+            header('Location: /guests/dashboard');
         } else {
             Logger::error("Failed to add comment to message ID: {$sanitized['message_id']}");
             ApiHelper::sendError(500, 'Failed to add comment.');

@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
+
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: ' .API_BASE_URL. '/auth/login');
+    header('Location: /auth/login');
     exit;
 }
 

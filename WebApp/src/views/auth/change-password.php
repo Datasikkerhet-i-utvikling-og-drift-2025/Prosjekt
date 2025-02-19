@@ -1,5 +1,4 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-require_once __DIR__ . '/../../config/versionURL.php';
 
 <div class="form-container">
     <h1>Change Password</h1>
@@ -16,7 +15,7 @@ require_once __DIR__ . '/../../config/versionURL.php';
     <?php endif; ?>
 
     <!-- Change Password Form -->
-    <form action="<?= API_BASE_URL ?>/auth/change-password" method="POST" class="form">
+    <form action="/auth/change-password" method="POST" class="form">
         <div class="form-group">
             <label for="current_password">Current Password</label>
             <input

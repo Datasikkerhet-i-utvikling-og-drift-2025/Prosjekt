@@ -3,7 +3,6 @@ session_start();
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
-require_once __DIR__ . '/../../config/versionURL.php';
 
 // Sanitize output
 function sanitize($value) {
@@ -44,7 +43,7 @@ try {
                     <div class="course-item">
                         <p><strong>Course Code:</strong> <?php echo sanitize($course['code']); ?></p>
                         <p><strong>Course Name:</strong> <?php echo sanitize($course['name']); ?></p>
-                        <form action="<?= API_BASE_URL ?>/guest/view-messages.php" method="get">
+                        <form action="/guest/view-messages.php" method="get">
                             <input type="hidden" name="course_code" value="<?php echo sanitize($course['code']); ?>">
                             <div class="form-group">
                                 <label for="pin_code">Enter PIN Code:</label>

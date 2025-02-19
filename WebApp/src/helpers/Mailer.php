@@ -42,7 +42,7 @@ class Mailer {
         try {
             Logger::info("Attempting to send password reset email to: " . $email);
 
-            $resetLink = "http://" . $_SERVER['HTTP_HOST'].APP_BASE_URL."/reset-password?token=" . $resetToken;
+            $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
             Logger::info("Reset link generated: " . $resetLink);
 
             $this->mail->setFrom(getenv('SMTP_USERNAME'), 'Feedback System');
