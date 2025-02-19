@@ -34,7 +34,7 @@ class UserRepository
     public function createUser(User $user): bool
     {
         $sql = "INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at) 
-                VALUES (:first_name, :last_name, :full_name, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
+                VALUES (:firstName, :lastName, :fullName, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
 
         $this->db->prepareStmt(
             $sql,
@@ -59,9 +59,9 @@ class UserRepository
         }
 
         $sql = "UPDATE users 
-                SET first_name = :first_name,
-                    last_name = :last_name,
-                    full_name = :full_name,
+                SET first_name = :firstName,
+                    last_name = :lastName,
+                    full_name = :fullName,
                     email = :email,
                     password = :password,
                     role = :role,
@@ -189,7 +189,8 @@ class UserRepository
     public function savePasswordResetToken(string $userId, string $token): bool
     {
         $sql = "UPDATE users 
-                SET reset_token = :token, reset_token_created_at = NOW() 
+                SET reset_token = :token, 
+                    reset_token_created_at = NOW() 
                 WHERE id = :id";
 
         $this->db->prepareStmt($sql,
@@ -213,7 +214,8 @@ class UserRepository
     {
         $sql = "SELECT * 
                 FROM users 
-                WHERE reset_token = :token AND reset_token_created_at >= NOW() - INTERVAL 1 HOUR";
+                WHERE reset_token = :token 
+                  AND reset_token_created_at >= NOW() - INTERVAL 1 HOUR";
 
         $this->db->prepareStmt(
             $sql,
@@ -235,7 +237,9 @@ class UserRepository
     public function updatePasswordAndClearToken(string $userId, string $hashedPassword): bool
     {
         $sql = "UPDATE users 
-                SET password = :password, reset_token = NULL, reset_token_created_at = NULL 
+                SET password = :password, 
+                    reset_token = NULL, 
+                    reset_token_created_at = NULL 
                 WHERE id = :id";
 
         $this->db->prepareStmt(
@@ -246,5 +250,38 @@ class UserRepository
         );
 
         return $this->db->executeStmt("Updating password and clearing reset token for user ID: $userId");
+    }
+
+
+    // Save a password reset token
+    public function v1savePasswordResetToken($userId, $resetToken)
+    {
+        $sql = "UPDATE users SET reset_token = :resetToken, reset_token_created_at = NOW() WHERE id = :userId";
+        $stmt = $this->pdo->prepare($sql);
+
+        try {
+            return $stmt->execute([
+                ':resetToken' => $resetToken,
+                ':userId' => $userId,
+            ]);
+        } catch (Exception $e) {
+            Logger::error("Failed to save password reset token: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Retrieve a user by reset token
+    public function v1getUserByResetToken($resetToken)
+    {
+        $sql = "SELECT * FROM users WHERE reset_token = :resetToken AND reset_token_created_at >= (NOW() - INTERVAL 1 HOUR)";
+        $stmt = $this->pdo->prepare($sql);
+
+        try {
+            $stmt->execute([':resetToken' => $resetToken]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            Logger::error("Failed to retrieve user by reset token: " . $e->getMessage());
+            return null;
+        }
     }
 }

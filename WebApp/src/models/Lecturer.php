@@ -41,7 +41,7 @@ class Lecturer extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->imagePath = $userData['image_path'];
+        $this->imagePath = $userData['imagePath'];
     }
 
 
@@ -63,6 +63,26 @@ class Lecturer extends User
 
         $stmt->bindValue(':studyProgram', $this->studyProgram ?? null, isset($this->studyProgram) ? PDO::PARAM_STR : PDO::PARAM_NULL);
         $stmt->bindValue(':enrollmentYear', $this->enrollmentYear ?? null, isset($this->enrollmentYear) ? PDO::PARAM_INT : PDO::PARAM_NULL);
+    }
+
+    /**
+     * Converts the user object to an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'fullName' => $this->fullName,
+            'email' => $this->email,
+            'role' => $this->role->value,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+            'imagePath' => $this->imagePath
+        ];
     }
 
 }

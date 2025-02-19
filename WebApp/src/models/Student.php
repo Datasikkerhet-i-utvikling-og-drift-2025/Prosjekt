@@ -61,8 +61,8 @@ class Student extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->studyProgram = $userData['study_program'];
-        $this->enrollmentYear = $userData['cohort_year'] ?? (int)date("Y");
+        $this->studyProgram = $userData['studyProgram'];
+        $this->enrollmentYear = $userData['enrollmentYear'] ?? (int)date("Y");
     }
 
 
@@ -81,9 +81,30 @@ class Student extends User
         parent::bindUserDataForDbStmt($stmt);
 
         $stmt->bindValue(':studyProgram', $this->studyProgram, PDO::PARAM_STR);
-        $stmt->bindValue(':studyYear', $this->enrollmentYear, PDO::PARAM_INT);
+        $stmt->bindValue(':enrollmentYear', $this->enrollmentYear, PDO::PARAM_INT);
 
         $stmt->bindValue(':imagePath', $this->imagePath ?? null, isset($this->imagePath) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+    }
+
+    /**
+     * Converts the user object to an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'fullName' => $this->fullName,
+            'email' => $this->email,
+            'role' => $this->role->value,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+            'studyProgram' => $this->studyProgram,
+            'enrollmentYear' => $this->enrollmentYear
+        ];
     }
 
 }
