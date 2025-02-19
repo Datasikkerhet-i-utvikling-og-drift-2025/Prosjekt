@@ -136,8 +136,7 @@ class Message
 
     // Report a message as inappropriate
     // is_reported lagt til i funksjonen!
-public function reportMessage($messageId, $reason)
-{
+    public function reportMessage($messageId, $reason) {
     if (!InputValidator::isNotEmpty($reason)) {
         Logger::error("Report reason is empty for message ID $messageId");
         return false;
@@ -148,7 +147,7 @@ public function reportMessage($messageId, $reason)
         return false;
     }
 
-    // Check if the message has already been reported ISREPORTED
+    // Check if the message has already been reported
     $checkSql = "SELECT is_reported FROM messages WHERE id = :messageId";
     $checkStmt = $this->pdo->prepare($checkSql);
     $checkStmt->execute([':messageId' => (int)$messageId]);
@@ -184,9 +183,8 @@ public function reportMessage($messageId, $reason)
         // Rollback transaction
         $this->pdo->rollBack();
         Logger::error("Failed to report message ID $messageId: " . $e->getMessage());
-        return false;
+        return false;  }
     }
-}
 
     // Delete a message by ID
     public function deleteMessage($messageId)

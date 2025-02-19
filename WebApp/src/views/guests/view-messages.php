@@ -65,10 +65,7 @@ try {
                     <p><strong>Message:</strong> <?php echo sanitize($message['content']); ?></p>
                     <p><strong>Reply:</strong> <?php echo sanitize($message['reply'] ?? 'No reply yet'); ?></p>
                     <p><strong>Sent At:</strong> <?php echo sanitize($message['created_at']); ?></p>
-                    <div class="message-actions">
-                        <a href="/guest/report-message.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-secondary">Report</a>
-                        <a href="/guest/comment.php?message_id=<?php echo sanitize($message['id']); ?>" class="btn btn-primary">Comment</a>
-                    </div>
+
                     <hr>
                 </div>
             <?php endforeach; ?>
@@ -77,7 +74,7 @@ try {
 
     <!-- Back to Courses Link -->
     <p>
-        <a href="/guest/view-courses" class="btn btn-secondary">Back to Courses</a>
+        <a href="/guests/dashboard" class="btn btn-secondary">Back to Courses</a>
     </p>
 </div>
 

@@ -23,15 +23,23 @@ try {
 
     $studentId = $_SESSION['user']['id'];
 
-    // Fetch student messages with replies
+    // Fetch student messages with replies and course names
     $stmt = $pdo->prepare("
-        SELECT content, reply, created_at 
-        FROM messages 
-        WHERE student_id = :student_id 
-        ORDER BY created_at DESC
+        SELECT m.id, m.content, m.reply, m.created_at, c.name AS course_name
+        FROM messages m
+        JOIN courses c ON m.course_id = c.id
+        WHERE m.student_id = :student_id
+        ORDER BY m.created_at DESC
     ");
     $stmt->execute([':student_id' => $studentId]);
-    $responses = $stmt->fetchAll();
+    $responses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch guest comments for each message
+    foreach ($responses as &$response) {
+        $stmtComments = $pdo->prepare("SELECT guest_name, content FROM comments WHERE message_id = :message_id");
+        $stmtComments->execute([':message_id' => $response['id']]);
+        $response['comments'] = $stmtComments->fetchAll(PDO::FETCH_ASSOC);
+    }
 } catch (Exception $e) {
     $errorMessage = 'Failed to load messages and responses. Please try again later.';
     Logger::error('Error fetching student responses: ' . $e->getMessage());
@@ -59,9 +67,20 @@ try {
         <?php else: ?>
             <?php foreach ($responses as $response): ?>
                 <div class="message-item">
-                    <p><strong>Message:</strong> <?php echo htmlspecialchars($response['content'], ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p><strong>Response:</strong> <?php echo htmlspecialchars($response['reply'] ?? 'No response yet', ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p><strong>Sent At:</strong> <?php echo htmlspecialchars(date('F j, Y, g:i a', strtotime($response['created_at'])), ENT_QUOTES, 'UTF-8'); ?></p>
+                <p><strong>Sent At:</strong> <?php echo htmlspecialchars(date('F j, Y, g:i a', strtotime($response['created_at'])), ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Course:</strong> <?php echo htmlspecialchars($response['course_name'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>your message:</strong> <?php echo htmlspecialchars($response['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Lecturer's Response:</strong> <?php echo htmlspecialchars($response['reply'] ?? 'No response yet', ENT_QUOTES, 'UTF-8'); ?></p>
+                    <?php if (!empty($response['comments'])): ?>
+                        <?php foreach ($response['comments'] as $comment): ?>
+                            <div class="guest-item">
+                                <p><strong>Guest name:</strong> <?php echo htmlspecialchars($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym', ENT_QUOTES, 'UTF-8'); ?></p>
+                                <p><strong>Comment:</strong> <?php echo htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No comments yet.</p>
+                    <?php endif; ?>
                     <hr>
                 </div>
             <?php endforeach; ?>
