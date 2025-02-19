@@ -99,6 +99,21 @@ abstract class User
     protected ?DateTime $resetTokenCreatedAt {
         get {
             return $this->resetTokenCreatedAt;
+    public function savePasswordResetToken($userId, $token) {
+        try {
+            $sql = "UPDATE users 
+                    SET reset_token = :token,
+                        reset_token_created_at = CURRENT_TIMESTAMP
+                    WHERE id = :id";
+                    
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([
+                ':token' => $token,
+                ':id' => $userId
+            ]);
+        } catch (Exception $e) {
+            Logger::error("Failed to save reset token: " . $e->getMessage());
+            return false;
         }
         set {
             $this->resetTokenCreatedAt = $value;
@@ -159,6 +174,19 @@ abstract class User
         $this->resetTokenCreatedAt = isset($userData['resetTokenCreatedAt']) ? new DateTime($userData['resetTokenCreatedAt']) : null;
         $this->createdAt = new DateTime($userData['createdAt'] ?? 'now');
         $this->updatedAt = new DateTime($userData['updatedAt'] ?? 'now');
+    public function getUserByResetToken($token) {
+    try {
+        // Sjekk om token eksisterer og ikke er eldre enn 1 time
+        $sql = "SELECT * FROM users 
+                WHERE reset_token = :token 
+                AND reset_token_created_at >= NOW() - INTERVAL 1 HOUR";
+                
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':token' => $token]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        Logger::error("Failed to get user by reset token: " . $e->getMessage());
+        return null;
     }
 
 
@@ -195,6 +223,8 @@ abstract class User
      * @return array
      */
     public function toArray(): array
+}
+    public function updatePassword($userId, $hashedPassword)  // Endre parameternavn for å være tydeligere
     {
         return [
             'id' => $this->id,

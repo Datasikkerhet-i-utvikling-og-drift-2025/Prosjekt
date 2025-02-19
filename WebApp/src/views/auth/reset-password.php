@@ -19,7 +19,7 @@
 
     <?php if (empty($_GET['token'])): ?>
         <!-- Steg 1: Be om email -->
-        <form action="/auth/password-reset/request" method="POST" class="form">
+        <form action="<?= API_BASE_URL ?>/auth/password-reset/request" method="POST" class="form">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input
@@ -37,10 +37,10 @@
         </form>
     <?php else: ?>
         <!-- Steg 2: Reset passordet med token -->
-        <form action="/auth/password-reset" method="POST" class="form">
-            <input
-                type="hidden"
-                name="token"
+        <form action="<?= API_BASE_URL ?>/auth/password-reset" method="POST" class="form">
+            <input 
+                type="hidden" 
+                name="token" 
                 value="<?= htmlspecialchars($_GET['token'], ENT_QUOTES, 'UTF-8') ?>">
 
             <div class="form-group">
@@ -71,7 +71,7 @@
         </form>
     <?php endif; ?>
 
-    <p>Remember your password? <a href="/">Login here</a></p>
+    <p>Remember your password? <a href="<?= APP_BASE_URL ?>/">Login here</a></p>
 </div>
 
 <!-- Legg til klient-side validering -->
@@ -82,23 +82,5 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             const newPassword = document.getElementById('new_password');
             const confirmPassword = document.getElementById('confirm_password');
-
-            if (newPassword && confirmPassword) {
-                if (newPassword.value.length < 8) {
-                    e.preventDefault();
-                    alert('Password must be at least 8 characters long');
-                    return;
-                }
-
-                if (newPassword.value !== confirmPassword.value) {
-                    e.preventDefault();
-                    alert('Passwords do not match');
-                    return;
-                }
-            }
-        });
-    }
-});
-</script>
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>
