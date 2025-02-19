@@ -19,15 +19,15 @@ use controllers\LecturerController;
 use controllers\StudentController;
 use Exception;
 use helpers\Logger;
+use managers\DatabaseManager;
 use repositories\UserRepository;
-use service\DatabaseService;
 
 // Log application startup
 Logger::info('Initializing application...');
 
 try {
     // Initialize database service and repository
-    $db = new DatabaseService();
+    $db = new DatabaseManager();
     $pdo = $db->connectToDb();
 
     Logger::info('DatabaseManager connection initialized successfully.');

@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
 
-
+use helpers\Logger;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -28,10 +28,10 @@ class Mailer {
             $this->mail->Port = getenv('SMTP_PORT');
 
             Logger::info("SMTP Configuration: " . json_encode([
-                'host' => getenv('SMTP_HOST'),
-                'username' => getenv('SMTP_USERNAME'),
-                'port' => getenv('SMTP_PORT')
-            ]));
+                    'host' => getenv('SMTP_HOST'),
+                    'username' => getenv('SMTP_USERNAME'),
+                    'port' => getenv('SMTP_PORT')
+                ], JSON_THROW_ON_ERROR));
         } catch (Exception $e) {
             Logger::error("Mailer initialization failed: " . $e->getMessage());
             throw $e;

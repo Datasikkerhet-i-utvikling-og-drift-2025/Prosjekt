@@ -253,6 +253,8 @@ class UserRepository
     }
 
 
+
+    // FIXME look at the implementation here
     // Save a password reset token
     public function v1savePasswordResetToken($userId, $resetToken)
     {

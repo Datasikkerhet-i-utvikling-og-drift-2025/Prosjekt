@@ -23,7 +23,6 @@ use Mailer;
 use Random\RandomException;
 use repositories\UserRepository;
 use RuntimeException;
-use service\DatabaseService;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
