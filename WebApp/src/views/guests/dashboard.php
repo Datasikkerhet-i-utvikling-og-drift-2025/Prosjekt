@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
+require_once __DIR__ . '/../../config/versionURL.php';
 
 // Sanitize output
 function sanitize($value) {
@@ -48,6 +49,10 @@ $lecturer = $stmt->fetch();
 $stmt = $pdo->prepare("SELECT id, content FROM messages WHERE course_id = :course_id");
 $stmt->execute([':course_id' => $course['id']]);
 $messages = $stmt->fetchAll();
+
+// Fetch comments for the messages
+$stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
+$comments = $stmtComments->fetchAll();
 ?>
 <div class="container">
     <h1>Course Messages</h1>
@@ -64,17 +69,31 @@ $messages = $stmt->fetchAll();
             </div>
             
             <h3>Leave a Comment Down Below!</h3>
-            <form action="/guest/messages/comment" method="POST">
+            <form action="<?= API_BASE_URL ?>/guest/messages/comment" method="POST">
                 <input type="hidden" name="message_id" value="<?= $message['id'] ?>">
                 <label>Your Name (Optional):</label>
                 <input type="text" name="guest_name">
                 <label>Your Comment:</label>
                 <textarea name="comment" required></textarea>
                 <button type="submit" class="btn btn-small" style="padding: 6px 5px; font-size: 12px; width: 40px; height: 30px;">Send</button>
+            </form>
 
-             </form>
+            <p><strong>Guest comments:</strong></p>
+            <?php foreach ($comments as $comment): ?>
+                <?php if ($comment['message_id'] === $message['id']): ?>
+                    <div class="guest-item">
+                        <p><strong>Guest name: </strong> <?= sanitize($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym') ?></p>
+                        <p><strong>Comment: </strong> <?= sanitize($comment['content']) ?></p>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
     <?php endforeach; ?>
+</div>
+
+<!-- Button to view messages -->
+<div class="container">
+<a href="<?= APP_BASE_URL ?>/guests/view-messages?course_code=<?= $course['code'] ?>&pin_code=<?= $course['pin_code'] ?>" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
 </div>
 
 <!-- Report Modal -->
@@ -82,7 +101,7 @@ $messages = $stmt->fetchAll();
     <div class="modal-content">
         <span class="close" onclick="closeReportModal()">&times;</span>
         <h2>Report Message</h2>
-        <form id="reportForm" action="/guest/messages/report" method="POST">
+        <form id="reportForm" action="<?= API_BASE_URL ?>/guest/messages/report" method="POST">
             <input type="hidden" name="message_id" id="reportMessageId">
             <label for="reported_by">Reported By (Optional):</label>
             <input type="text" name="reported_by" id="reported_by">

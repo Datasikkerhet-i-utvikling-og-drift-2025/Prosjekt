@@ -1,4 +1,7 @@
-<?php include __DIR__ . '/../partials/header.php'; ?>
+<?php include __DIR__ . '/../partials/header.php';
+require_once __DIR__ . '/../../config/versionURL.php';
+ ?>
+
 
 <div class="form-container">
     <h1>Reset Your Password</h1>
@@ -19,7 +22,7 @@
 
     <?php if (empty($_GET['token'])): ?>
         <!-- Steg 1: Be om email -->
-        <form action="/auth/password-reset/request" method="POST" class="form">
+        <form action="<?= API_BASE_URL ?>/auth/password-reset/request" method="POST" class="form">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input 
@@ -27,6 +30,7 @@
                     id="email" 
                     name="email" 
                     placeholder="Enter your email"
+                      autocomplete="email"
                     required>
             </div>
 
@@ -36,7 +40,7 @@
         </form>
     <?php else: ?>
         <!-- Steg 2: Reset passordet med token -->
-        <form action="/auth/password-reset" method="POST" class="form">
+        <form action="<?= API_BASE_URL ?>/auth/password-reset" method="POST" class="form">
             <input 
                 type="hidden" 
                 name="token" 
@@ -49,6 +53,7 @@
                     id="new_password" 
                     name="new_password" 
                     placeholder="Enter your new password"
+                    autocomplete="new-password"
                     required>
             </div>
 
@@ -59,6 +64,7 @@
                     id="confirm_password" 
                     name="confirm_password" 
                     placeholder="Confirm your new password"
+                    autocomplete="new-password"
                     required>
             </div>
 
@@ -68,9 +74,8 @@
         </form>
     <?php endif; ?>
 
-    <p>Remember your password? <a href="/login">Login here</a></p>
+    <p>Remember your password? <a href="<?= APP_BASE_URL ?>/">Login here</a></p>
 </div>
-<?php endif; ?>
 
 <!-- Legg til klient-side validering -->
 <script>

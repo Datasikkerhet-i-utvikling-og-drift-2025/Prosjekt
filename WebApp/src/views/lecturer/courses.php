@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../helpers/Logger.php';
 require_once __DIR__ . '/../../config/versionURL.php';
+require_once __DIR__ . '/../../helpers/Logger.php';
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
     header('Location: ' .API_BASE_URL. '/auth/login');
@@ -18,8 +18,6 @@ $errorMessage = '';
 require_once __DIR__ . '/../../config/Database.php';
 try {
    
-   
-
     $db = new \db\Database();
     $pdo = $db->getConnection();
 
@@ -48,9 +46,6 @@ try {
     $errorMessage = 'Failed to load courses and messages. Please try again later.';
     Logger::error('Error fetching lecturer dashboard data: ' . $e->getMessage());
 }
-    //Fetch guest comments
-    $stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
-    $comments = $stmtComments->fetchAll();
 
 ?>
 
@@ -59,7 +54,7 @@ try {
 
 <div class="container">
     <h1>Welcome, <?php echo htmlspecialchars($lecturerName, ENT_QUOTES, 'UTF-8'); ?>!</h1>
-    <p>This is your dashboard. Here you can manage your courses and view messages from students.</p>
+    <p>This is your courses. Here you can manage your courses</p>
 
     <!-- Error Message -->
     <?php if (!empty($errorMessage)): ?>
@@ -87,36 +82,6 @@ try {
             </div>
         <?php endif; ?>
     </section>
-
-    <!-- Messages Section -->
-    <section>
-        <h2>Student Messages</h2>
-        <?php if (empty($messages)): ?>
-            <p>No messages found.</p>
-        <?php else: ?>
-            <div id="messages-container">
-                <?php foreach ($messages as $message): ?>
-                    <div class="message-item">
-                        <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><strong>Course:</strong> <?php echo htmlspecialchars($message['course_name'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <?php foreach ($comments as $comment): ?>
-                            <?php if ($comment['message_id'] === $message['id']): ?>
-                                <div class="guest-item">
-                                    <p><strong>Guest name: </strong> <?php echo htmlspecialchars($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym', ENT_QUOTES, 'UTF-8'); ?></p>
-                                    <p> <strong>comment: </strong> <?php echo htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                </div>
-                            <?php else: ?>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                        <a href="<?= APP_BASE_URL ?>/lecturer/reply?message_id=<?php echo htmlspecialchars($message['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary">Reply</a>
-                        <hr>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </section>
-    
-    
 </div>
 
 

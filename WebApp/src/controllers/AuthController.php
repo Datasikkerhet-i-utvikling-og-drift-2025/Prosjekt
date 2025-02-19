@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../../vendor/autoload.php'; 
 require_once __DIR__ . '/../helpers/ApiHelper.php';
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../helpers/InputValidator.php';
@@ -7,7 +8,11 @@ require_once __DIR__ . '/../helpers/Logger.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
 require_once __DIR__ . '/../models/Course.php';
+require_once __DIR__ . '/../config/versionURL.php';
 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class AuthController
 {
@@ -61,7 +66,7 @@ class AuthController
         $this->createUserInTheDatabase($validation['sanitized'], $hashedPassword, $profilePicturePath);
 
         ApiHelper::sendResponse(200, [
-            'redirect' => '/',
+            'redirect' => APP_BASE_URL.'/',
             'message' => 'Registration successful'
         ]);
     }
@@ -79,7 +84,7 @@ class AuthController
 
         // Enkel sjekk for at e-post og passord er sendt med
         if (empty($email) || empty($password)) {
-            header("Location: /login?error=" . urlencode("Email and password are required."));
+            header("Location: " .APP_BASE_URL. "/login?error=" . urlencode("Email and password are required."));
             exit;
         }
 
@@ -88,7 +93,7 @@ class AuthController
         if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
             Logger::error("Login failed for email: " . $input['email']);
             //ApiHelper::sendError(401, 'Invalid email or password.');
-            header("Location: /?error=" . urlencode("Invalid email or password."));
+            header("Location: " .APP_BASE_URL. "/?error=" . urlencode("Invalid email or password."));
             exit;
         }
 
@@ -98,13 +103,13 @@ class AuthController
 
         // Redirect to the user page based on role
         if ($user['role'] === 'student') {
-            header('Location: /student/dashboard');
+            header('Location: ' .APP_BASE_URL. '/student/dashboard');
             exit;
         } elseif ($user['role'] === 'lecturer') {
-            header('Location: /lecturer/dashboard');
+            header('Location: ' .APP_BASE_URL. '/lecturer/dashboard');
             exit;
         } elseif ($user['role'] === 'admin') {
-            header('Location: /admin/dashboard');
+            header('Location: ' .APP_BASE_URL. '/admin/dashboard');
             exit;
         } else {
             Logger::error("Unknown role for user ID: " . $user['id']);
@@ -117,7 +122,7 @@ class AuthController
     {
         AuthHelper::logoutUser();
         Logger::info("User logged out.");
-        header('Location: /');
+        header('Location: ' .APP_BASE_URL. '/');
     }
 
     public function getUserById($userId)
@@ -129,7 +134,7 @@ class AuthController
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['errors'] = 'Invalid request method';
-            header('Location: /profile');
+            header('Location: ' .APP_BASE_URL. '/profile');
             exit;
         }
     
@@ -141,19 +146,19 @@ class AuthController
         // Validate input
         if (!$userId) {
             $_SESSION['errors'] = 'User not logged in';
-            header('Location: /profile');
+            header('Location: ' .APP_BASE_URL. '/profile');
             exit;
         }
     
         if (strlen($newPassword) < 8) {
             $_SESSION['errors'] = 'New password must be at least 8 characters long';
-            header('Location: /profile');
+            header('Location: ' .APP_BASE_URL. '/profile');
             exit;
         }
     
         if ($newPassword !== $confirmPassword) {
             $_SESSION['errors'] = 'New passwords do not match';
-            header('Location: /profile');
+            header('Location: ' .APP_BASE_URL. '/profile');
             exit;
         }
     
@@ -161,7 +166,7 @@ class AuthController
         $user = $this->userModel->getUserById($userId);
         if (!$user || !AuthHelper::verifyPassword($currentPassword, $user['password'])) {
             $_SESSION['errors'] = 'Current password is incorrect';
-            header('Location: /profile');
+            header('Location: ' .APP_BASE_URL. '/profile');
             exit;
         }
     
@@ -173,101 +178,59 @@ class AuthController
             $_SESSION['errors'] = 'Failed to update password';
         }
     
-        header('Location: /profile');
+        header('Location: ' .APP_BASE_URL. '/profile');
         exit;
     }
 
-    $currentPassword = $_POST['current_password'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
-    $userId = $_SESSION['user']['id'] ?? null;
-
-    Logger::info("Attempting to change password for user ID: " . $userId);
-
-    // Valider input
-    if (!$userId) {
-        $_SESSION['errors'] = 'User not logged in';
-        header('Location: /profile');
-        exit;
-    }
-
-    if (strlen($newPassword) < 8) {
-        $_SESSION['errors'] = 'New password must be at least 8 characters long';
-        header('Location: /profile');
-        exit;
-    }
-
-    if ($newPassword !== $confirmPassword) {
-        $_SESSION['errors'] = 'New passwords do not match';
-        header('Location: /profile');
-        exit;
-    }
-
-    // Verifiser nåværende passord
-    $user = $this->userModel->getUserById($userId);
-    if (!$user || !AuthHelper::verifyPassword($currentPassword, $user['password'])) {
-        $_SESSION['errors'] = 'Current password is incorrect';
-        header('Location: /profile');
-        exit;
-    }
-
-    // Oppdater passord
-    $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($userId, $hashedPassword)) {
-        $_SESSION['success'] = 'Password updated successfully';
-    } else {
-        $_SESSION['errors'] = 'Failed to update password';
-    }
-
-    header('Location: /profile');
-    exit;
-}
-
-public function requestPasswordReset() {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: /forgot-password');
-        exit;
-    }
-
-    try {
-        $email = $_POST['email'] ?? '';
-        
-        // Finn bruker
-        $user = $this->userModel->getUserByEmail($email);
-        if (!$user) {
-            throw new Exception('If this email exists in our system, you will receive a reset link.');
+    public function requestPasswordReset() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' .APP_BASE_URL. '/forgot-password');
+            exit;
         }
-
-        // Generer token
-        $resetToken = bin2hex(random_bytes(32));
-        $tokenExpiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-        
-        // Lagre token i databasen
-        if (!$this->userModel->savePasswordResetToken($user['id'], $resetToken, $tokenExpiry)) {
-            throw new Exception('Failed to process reset request');
+    
+        try {
+            $email = $_POST['email'] ?? '';
+            Logger::info("Starting password reset request for email: " . $email);
+            
+            // Finn bruker
+            $user = $this->userModel->getUserByEmail($email);
+            if (!$user) {
+                throw new Exception('If this email exists in our system, you will receive a reset link.');
+            }
+    
+            // Generer token
+            $resetToken = bin2hex(random_bytes(32));
+            $tokenExpiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            
+            // Lagre token i databasen
+            if (!$this->userModel->savePasswordResetToken($user['id'], $resetToken, $tokenExpiry)) {
+                throw new Exception('Failed to process reset request');
+            }
+    
+            // Send email
+            $mailer = new Mailer();
+            Logger::info("Mailer instance created");
+            if (!$mailer->sendPasswordReset($email, $resetToken)) {
+                throw new Exception('Failed to send reset email');
+            }
+    
+            $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
+            header('Location: ' .APP_BASE_URL. '/');
+            Logger::info("Mail send attempt result: " . ($result ? 'success' : 'failed'));
+            exit;
+    
+        } catch (Exception $e) {
+            $_SESSION['errors'] = $e->getMessage();
+            header('Location: ' .APP_BASE_URL. '/reset-password');
+            Logger::error("Password reset error: " . $e->getMessage());
+            exit;
         }
-
-        // Send email
-        $mailer = new Mailer();
-        if (!$mailer->sendPasswordReset($email, $resetToken)) {
-            throw new Exception('Failed to send reset email');
-        }
-
-        $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
-        header('Location: /login');
-        exit;
-
-    } catch (Exception $e) {
-        $_SESSION['errors'] = $e->getMessage();
-        header('Location: /forgot-password');
-        exit;
     }
-}
 
 public function resetPassword()
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: /reset-password');
+        header('Location: ' .APP_BASE_URL. '/reset-password');
         exit;
     }
 
@@ -276,25 +239,26 @@ public function resetPassword()
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
     if ($newPassword !== $confirmPassword) {
-        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match'));
+        header('Location: ' .APP_BASE_URL. '/reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match'));
         exit;
     }
 
     // Verify token and get user
     $user = $this->userModel->getUserByResetToken($token);
     if (!$user) {
-        header('Location: /reset-password?error=' . urlencode('Invalid or expired reset token'));
+        header('Location: ' .APP_BASE_URL. '/reset-password?error=' . urlencode('Invalid or expired reset token'));
         exit;
     }
 
-    // Update password
     $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
-        header('Location: /login?success=' . urlencode('Password has been reset successfully'));
-    } else {
-        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Failed to reset password'));
-    }
-    exit;
+        if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+            $_SESSION['success'] = 'Password changed successfully';
+        } else {
+            $_SESSION['errors'] = 'Failed to change password';
+        }
+    
+        header('Location: ' .APP_BASE_URL. '/');
+        exit;
 }
 
     public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
@@ -340,13 +304,13 @@ public function resetPassword()
 
             $this->pdo->commit();
             $_SESSION['success'] = "Registration successful. Please log in.";
-            header("Location: /");
+            header("Location: " .APP_BASE_URL. "/");
             exit;
 
         } catch (Exception $e) {
             $this->pdo->rollBack();
             $_SESSION['errors'] = [$e->getMessage()];
-            header("Location: /register");
+            header("Location: " .APP_BASE_URL. "/register");
             exit;
         }
     }
@@ -399,7 +363,7 @@ public function resetPassword()
     {
         if (!empty($validation['errors'])) {
             $_SESSION['errors'] = $validation['errors'];
-            header("Location: /register");
+            header("Location: " .APP_BASE_URL. "/register");
             exit;
         }
         return $validation;
@@ -416,7 +380,7 @@ public function resetPassword()
         Logger::info("Guest user logged in. Session data: " . var_export($_SESSION, true));
 
         // Redirect to guest dashboard
-        header('Location: /guests/dashboard');
+        header('Location: ' .APP_BASE_URL. '/guests/dashboard');
         exit;
     }
 }

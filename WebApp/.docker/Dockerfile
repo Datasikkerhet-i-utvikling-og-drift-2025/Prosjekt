@@ -1,38 +1,53 @@
-# Use the official PHP image with Apache
 FROM php:8.4-apache
 
-# Install required PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+# Installer nødvendige pakker og rydd opp
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
+        gnupg \
+        git \
+        zip \
+        unzip \
+        libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite for clean URLs
-RUN a2enmod rewrite
+# Installer PHP-utvidelser
+RUN docker-php-ext-install mysqli pdo pdo_mysql zip
 
-
-# Set the working directory
-WORKDIR /var/www/html
-
-# Install Composer
+# Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy composer files first
-COPY composer.json composer.lock* ./
+# Aktiver mod_rewrite
+RUN a2enmod rewrite
 
-# Install dependencies
-RUN composer install --no-scripts --no-autoloader
+# Sett arbeidsmappe
+WORKDIR /var/www/html
 
-# Copy the application code to the container
-COPY public /var/www/html/public
-COPY src /var/www/html/src
+# Kopier composer-filer FØRST for caching
+COPY composer.json composer.lock ./
 
-# Generate autoloader
+# Installer avhengigheter
+RUN composer install --no-dev --optimize-autoloader
+
+# Endre eierskap av vendor-mappen ETTER installasjon
+RUN chown -R www-data:www-data /var/www/html/vendor
+
+
+# Kopier applikasjonsfiler
+COPY public ./public
+COPY src ./src
+
+
+# Optimaliser autoloading
 RUN composer dump-autoload --optimize
 
-
-
-
-# Update the DocumentRoot for Apache
+# Sett DocumentRoot for Apache
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
-RUN mkdir -p /var/www/html/logs && chmod -R 777 /var/www/html/logs
 
-# Expose the default web server port
+# Opprett loggmappe og endre eierskap
+RUN mkdir -p /var/www/html/logs && chown -R www-data:www-data /var/www/html/logs
+
+# Eksponer port
 EXPOSE 80
+
+# Bytt til www-data bruker
+USER www-data

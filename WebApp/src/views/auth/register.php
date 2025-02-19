@@ -1,15 +1,16 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config/versionURL.php';
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'] ?? '';
     if ($role === 'student') {
-        header('Location: /student/dashboard');
+        header('Location: ' .APP_BASE_URL. '/student/dashboard');
         exit;
     } elseif ($role === 'lecturer') {
-        header('Location: /lecturer/dashboard');
+        header('Location: ' .APP_BASE_URL. '/lecturer/dashboard');
         exit;
     } elseif ($role === 'admin') {
-        header('Location: /admin/dashboard');
+        header('Location: ' .APP_BASE_URL. '/admin/dashboard');
         exit;
     }
 }
@@ -39,10 +40,8 @@ require_once __DIR__ . '/../partials/header.php';
     <?php if (!empty($_SESSION['errors'])): ?>
         <div id="error-message" class="error">
             <ul>
-                <?php foreach ($_SESSION['errors'] as $fieldErrors): ?>
-                    <?php foreach ($fieldErrors as $error): ?>
-                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
-                    <?php endforeach; ?>
+                <?php foreach ($_SESSION['errors'] as $error): ?>
+                    <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -94,50 +93,50 @@ require_once __DIR__ . '/../partials/header.php';
         <div id="student-fields" style="display: <?= ($_POST['role'] ?? '') === 'student' ? 'block' : 'none' ?>;">
             <div class="form-group">
                 <label for="study_program">Study Program</label>
-                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="cohort_year">Cohort Year</label>
-                <input type="number" id="cohort_year" name="cohort_year" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <input type="number" id="cohort_year" name="cohort_year" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
         </div>
         <div id="lecturer-fields" style="display: <?= ($_POST['role'] ?? '') === 'lecturer' ? 'block' : 'none' ?>;">
-            <div class="form-group">
-                <label for="profile_picture">Profile Picture</label>
-                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-            </div>
-            
-            <div class="form-group">
-                <label for="course_code">Course Code</label>
-                <input type="text" id="course_code" name="course_code" 
-                       placeholder="ITF12345" 
-                       value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-            </div>
+    <div class="form-group">
+        <label for="profile_picture">Profile Picture</label>
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    </div>
+    
+    <div class="form-group">
+        <label for="course_code">Course Code</label>
+        <input type="text" id="course_code" name="course_code" 
+               placeholder="ITF12345" 
+               value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+    </div>
 
-            <div class="form-group">
-                <label for="course_name">Course Name</label>
-                <input type="text" id="course_name" name="course_name" 
-                       placeholder="Datasikkerhet i utvikling og drift" 
-                       value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-            </div>
+    <div class="form-group">
+        <label for="course_name">Course Name</label>
+        <input type="text" id="course_name" name="course_name" 
+               placeholder="Datasikkerhet i utvikling og drift" 
+               value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+    </div>
 
-            <div class="form-group">
-                <label for="course_pin">Course PIN</label>
-                <input type="text" id="course_pin" name="course_pin" 
-                       placeholder="1337" 
-                       pattern="[0-9]{4}" 
-                       title="Please enter a 4-digit PIN code"
-                       value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-            </div>
-        </div>
+    <div class="form-group">
+        <label for="course_pin">Course PIN</label>
+        <input type="text" id="course_pin" name="course_pin" 
+               placeholder="1337" 
+               pattern="[0-9]{4}" 
+               title="Please enter a 4-digit PIN code"
+               value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" reguired>
+    </div>
+</div>
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Register</button>
         </div>
     </form>
 
-    <p>Already have an account? <a href="/">Login here</a>.</p>
+    <p>Already have an account? <a href="<?= APP_BASE_URL ?>/">Login here</a>.</p>
 </div>
 
 <script>
@@ -145,6 +144,17 @@ require_once __DIR__ . '/../partials/header.php';
         const role = this.value;
         document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
         document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
+        
+        const studentFields = document.querySelectorAll('#student-fields input');
+    const lecturerFields = document.querySelectorAll('#lecturer-fields input');
+
+    if (role === 'student') {
+        studentFields.forEach(field => field.setAttribute('required', 'true'));
+        lecturerFields.forEach(field => field.removeAttribute('required'));
+    } else if (role === 'lecturer') {
+        lecturerFields.forEach(field => field.setAttribute('required', 'true'));
+        studentFields.forEach(field => field.removeAttribute('required'));
+    }
     });
 
     // Funksjon for å vise feilmelding
