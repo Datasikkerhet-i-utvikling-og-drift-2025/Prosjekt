@@ -3,7 +3,6 @@ session_start();
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
-require_once __DIR__ . '/../../config/versionURL.php';
 
 // Sanitize output
 function sanitize($value) {
@@ -46,7 +45,7 @@ $stmt->execute([':lecturer_id' => $course['lecturer_id']]);
 $lecturer = $stmt->fetch();
 
 // Fetch messages for the course
-$stmt = $pdo->prepare("SELECT id, content FROM messages WHERE course_id = :course_id");
+$stmt = $pdo->prepare("SELECT id, content, is_reported FROM messages WHERE course_id = :course_id");
 $stmt->execute([':course_id' => $course['id']]);
 $messages = $stmt->fetchAll();
 
@@ -64,12 +63,16 @@ $comments = $stmtComments->fetchAll();
         <hr>
         <div class="message-box">
             <div class="message-header">
-                <button class="btn btn-danger btn-small" onclick="showReportModal(<?= $message['id'] ?>)">Report</button>
+                <?php if($message['is_reported'] === 1): ?>
+                    <button disabled class="btn btn-grayed btn-small" onclick="showReportModal(<?= $message['id'] ?>)">Reported</button>
+                <?php elseif($message['is_reported'] === 0): ?>
+                    <button class="btn btn-danger btn-small" onclick="showReportModal(<?= $message['id'] ?>)">Report</button>
+                <?php endif ?>
                 <p><strong>Message:</strong> <?= sanitize($message['content']) ?></p>
             </div>
             
             <h3>Leave a Comment Down Below!</h3>
-            <form action="<?= API_BASE_URL ?>/guest/messages/comment" method="POST">
+            <form action="/guest/messages/comment" method="POST">
                 <input type="hidden" name="message_id" value="<?= $message['id'] ?>">
                 <label>Your Name (Optional):</label>
                 <input type="text" name="guest_name">
@@ -93,7 +96,7 @@ $comments = $stmtComments->fetchAll();
 
 <!-- Button to view messages -->
 <div class="container">
-<a href="<?= APP_BASE_URL ?>/guests/view-messages?course_code=<?= $course['code'] ?>&pin_code=<?= $course['pin_code'] ?>" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
+<a href="/guests/view-messages?course_code=<?= $course['code'] ?>&pin_code=<?= $course['pin_code'] ?>" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
 </div>
 
 <!-- Report Modal -->
@@ -101,7 +104,7 @@ $comments = $stmtComments->fetchAll();
     <div class="modal-content">
         <span class="close" onclick="closeReportModal()">&times;</span>
         <h2>Report Message</h2>
-        <form id="reportForm" action="<?= API_BASE_URL ?>/guest/messages/report" method="POST">
+        <form id="reportForm" action="/guest/messages/report" method="POST">
             <input type="hidden" name="message_id" id="reportMessageId">
             <label for="reported_by">Reported By (Optional):</label>
             <input type="text" name="reported_by" id="reported_by">

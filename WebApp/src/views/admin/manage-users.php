@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
+
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: ' .API_BASE_URL. '/auth/login');
+    header('Location: /auth/login');
     exit;
 }
 
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
                     <td><?= sanitize($user['email']) ?></td>
                     <td><?= sanitize($user['role']) ?></td>
                     <td>
-                        <a href="<?= APP_BASE_URL ?>/admin/edit-user?user_id=<?= sanitize($user['id']) ?>" class="btn btn-edit">Edit</a>
+                        <a href="/admin/edit-user?user_id=<?= sanitize($user['id']) ?>" class="btn btn-edit">Edit</a>
                         <form action="" method="POST" style="display: inline;">
                             <input type="hidden" name="delete_user_id" value="<?= sanitize($user['id']) ?>">
                             <button type="submit" class="btn btn-delete">Delete</button>

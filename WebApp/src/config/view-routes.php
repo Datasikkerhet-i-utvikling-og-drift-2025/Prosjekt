@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/versionURL.php';
+
 return [
     APP_BASE_URL.'/' => __DIR__ . '/../views/auth/login.php',
     APP_BASE_URL => __DIR__ . '/../views/auth/login.php',

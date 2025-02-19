@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
+
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: ' .API_BASE_URL. '/auth/login');
+    header('Location: /auth/login');
     exit;
 }
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_message_id']))
     try {
         $stmt = $pdo->prepare("DELETE FROM messages WHERE id = :id");
         $stmt->execute(['id' => $messageId]);
-        header("Location: " .APP_BASE_URL. "/admin/manage-messages?success=Message deleted successfully.");
+        header("Location: /admin/manage-messages?success=Message deleted successfully.");
         exit;
     } catch (PDOException $e) {
         $errorMessage = "Failed to delete message: " . sanitize($e->getMessage());
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_message_id']))
                             <input type="hidden" name="delete_message_id" value="<?= sanitize($message['id']) ?>">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
-                        <a href="<?= APP_BASE_URL ?>/admin/view-message?message_id=<?= sanitize($message['id']) ?>" class="btn btn-info">View</a>
+                        <a href="/admin/view-message?message_id=<?= sanitize($message['id']) ?>" class="btn btn-info">View</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

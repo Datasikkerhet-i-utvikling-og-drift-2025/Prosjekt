@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
+
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
-    header('Location: ' .API_BASE_URL. '/auth/login');
+    header('Location: /auth/login');
     exit;
 }
 
@@ -81,7 +81,7 @@ $comments = $stmtComments->fetchAll();
                         <?php else: ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
-                    <a href="<?= APP_BASE_URL ?>/lecturer/reply?message_id=<?php echo htmlspecialchars($message['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">Reply</a>
+                    <a href="/lecturer/reply?message_id=<?php echo htmlspecialchars($message['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">Reply</a>
                     <hr>
                 </div>
             <?php endforeach; ?>

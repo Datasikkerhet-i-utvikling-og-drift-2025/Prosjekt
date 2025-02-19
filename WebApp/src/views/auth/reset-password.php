@@ -1,7 +1,4 @@
-<?php include __DIR__ . '/../partials/header.php';
-require_once __DIR__ . '/../../config/versionURL.php';
- ?>
-
+<?php include __DIR__ . '/../partials/header.php'; ?>
 
 <div class="form-container">
     <h1>Reset Your Password</h1>
@@ -22,7 +19,7 @@ require_once __DIR__ . '/../../config/versionURL.php';
 
     <?php if (empty($_GET['token'])): ?>
         <!-- Steg 1: Be om email -->
-        <form action="<?= API_BASE_URL ?>/auth/password-reset/request" method="POST" class="form">
+        <form action="/auth/password-reset/request" method="POST" class="form">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input 
@@ -40,7 +37,7 @@ require_once __DIR__ . '/../../config/versionURL.php';
         </form>
     <?php else: ?>
         <!-- Steg 2: Reset passordet med token -->
-        <form action="<?= API_BASE_URL ?>/auth/password-reset" method="POST" class="form">
+        <form action="/auth/password-reset" method="POST" class="form">
             <input 
                 type="hidden" 
                 name="token" 

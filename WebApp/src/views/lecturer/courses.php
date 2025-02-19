@@ -1,10 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
 require_once __DIR__ . '/../../helpers/Logger.php';
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
-    header('Location: ' .API_BASE_URL. '/auth/login');
+    header('Location: /auth/login');
     exit;
 }
 
@@ -75,7 +74,7 @@ try {
                         <p><strong>Course Code:</strong> <?php echo htmlspecialchars($course['code'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Course Name:</strong> <?php echo htmlspecialchars($course['name'], ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Pin code:</strong> <?php echo htmlspecialchars($course['pin_code'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <a href="<?= APP_BASE_URL ?>/lecturer/read-messages?course_id=<?php echo htmlspecialchars($course['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">View Messages</a>
+                        <a href="/lecturer/read-messages?course_id=<?php echo htmlspecialchars($course['id'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">View Messages</a>
                         <hr>
                     </div>
                 <?php endforeach; ?>

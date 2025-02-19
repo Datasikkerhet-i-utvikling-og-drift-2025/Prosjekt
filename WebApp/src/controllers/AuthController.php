@@ -8,7 +8,6 @@ require_once __DIR__ . '/../helpers/Logger.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../helpers/Mailer.php';
 require_once __DIR__ . '/../models/Course.php';
-require_once __DIR__ . '/../config/versionURL.php';
 
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -103,13 +102,13 @@ class AuthController
 
         // Redirect to the user page based on role
         if ($user['role'] === 'student') {
-            header('Location: ' .APP_BASE_URL. '/student/dashboard');
+            header('Location: /student/dashboard');
             exit;
         } elseif ($user['role'] === 'lecturer') {
-            header('Location: ' .APP_BASE_URL. '/lecturer/dashboard');
+            header('Location: /lecturer/dashboard');
             exit;
         } elseif ($user['role'] === 'admin') {
-            header('Location: ' .APP_BASE_URL. '/admin/dashboard');
+            header('Location: /admin/dashboard');
             exit;
         } else {
             Logger::error("Unknown role for user ID: " . $user['id']);
@@ -134,7 +133,7 @@ class AuthController
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['errors'] = 'Invalid request method';
-            header('Location: ' .APP_BASE_URL. '/profile');
+            header('Location: /profile');
             exit;
         }
     
@@ -146,19 +145,19 @@ class AuthController
         // Validate input
         if (!$userId) {
             $_SESSION['errors'] = 'User not logged in';
-            header('Location: ' .APP_BASE_URL. '/profile');
+            header('Location: /profile');
             exit;
         }
     
         if (strlen($newPassword) < 8) {
             $_SESSION['errors'] = 'New password must be at least 8 characters long';
-            header('Location: ' .APP_BASE_URL. '/profile');
+            header('Location: /profile');
             exit;
         }
     
         if ($newPassword !== $confirmPassword) {
             $_SESSION['errors'] = 'New passwords do not match';
-            header('Location: ' .APP_BASE_URL. '/profile');
+            header('Location: /profile');
             exit;
         }
     
@@ -166,7 +165,7 @@ class AuthController
         $user = $this->userModel->getUserById($userId);
         if (!$user || !AuthHelper::verifyPassword($currentPassword, $user['password'])) {
             $_SESSION['errors'] = 'Current password is incorrect';
-            header('Location: ' .APP_BASE_URL. '/profile');
+            header('Location: /profile');
             exit;
         }
     
@@ -178,13 +177,13 @@ class AuthController
             $_SESSION['errors'] = 'Failed to update password';
         }
     
-        header('Location: ' .APP_BASE_URL. '/profile');
+        header('Location: /profile');
         exit;
     }
 
     public function requestPasswordReset() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' .APP_BASE_URL. '/forgot-password');
+            header('Location: /forgot-password');
             exit;
         }
     
@@ -221,7 +220,7 @@ class AuthController
     
         } catch (Exception $e) {
             $_SESSION['errors'] = $e->getMessage();
-            header('Location: ' .APP_BASE_URL. '/reset-password');
+            header('Location: /reset-password');
             Logger::error("Password reset error: " . $e->getMessage());
             exit;
         }
@@ -230,7 +229,7 @@ class AuthController
 public function resetPassword()
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: ' .APP_BASE_URL. '/reset-password');
+        header('Location: /reset-password');
         exit;
     }
 
@@ -239,14 +238,14 @@ public function resetPassword()
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
     if ($newPassword !== $confirmPassword) {
-        header('Location: ' .APP_BASE_URL. '/reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match'));
+        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Passwords do not match'));
         exit;
     }
 
     // Verify token and get user
     $user = $this->userModel->getUserByResetToken($token);
     if (!$user) {
-        header('Location: ' .APP_BASE_URL. '/reset-password?error=' . urlencode('Invalid or expired reset token'));
+        header('Location: /reset-password?error=' . urlencode('Invalid or expired reset token'));
         exit;
     }
 
@@ -310,7 +309,7 @@ public function resetPassword()
         } catch (Exception $e) {
             $this->pdo->rollBack();
             $_SESSION['errors'] = [$e->getMessage()];
-            header("Location: " .APP_BASE_URL. "/register");
+            header("Location: /register");
             exit;
         }
     }
@@ -363,7 +362,7 @@ public function resetPassword()
     {
         if (!empty($validation['errors'])) {
             $_SESSION['errors'] = $validation['errors'];
-            header("Location: " .APP_BASE_URL. "/register");
+            header("Location: /register");
             exit;
         }
         return $validation;
@@ -380,7 +379,7 @@ public function resetPassword()
         Logger::info("Guest user logged in. Session data: " . var_export($_SESSION, true));
 
         // Redirect to guest dashboard
-        header('Location: ' .APP_BASE_URL. '/guests/dashboard');
+        header('Location: /guests/dashboard');
         exit;
     }
 }

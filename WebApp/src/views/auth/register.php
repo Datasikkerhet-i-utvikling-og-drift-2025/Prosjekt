@@ -1,16 +1,15 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/versionURL.php';
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'] ?? '';
     if ($role === 'student') {
-        header('Location: ' .APP_BASE_URL. '/student/dashboard');
+        header('Location: /student/dashboard');
         exit;
     } elseif ($role === 'lecturer') {
-        header('Location: ' .APP_BASE_URL. '/lecturer/dashboard');
+        header('Location: /lecturer/dashboard');
         exit;
     } elseif ($role === 'admin') {
-        header('Location: ' .APP_BASE_URL. '/admin/dashboard');
+        header('Location: /admin/dashboard');
         exit;
     }
 }
