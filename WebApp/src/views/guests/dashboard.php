@@ -45,7 +45,7 @@ $stmt->execute([':lecturer_id' => $course['lecturer_id']]);
 $lecturer = $stmt->fetch();
 
 // Fetch messages for the course
-$stmt = $pdo->prepare("SELECT id, content FROM messages WHERE course_id = :course_id");
+$stmt = $pdo->prepare("SELECT id, content, is_reported FROM messages WHERE course_id = :course_id");
 $stmt->execute([':course_id' => $course['id']]);
 $messages = $stmt->fetchAll();
 
@@ -63,7 +63,11 @@ $comments = $stmtComments->fetchAll();
         <hr>
         <div class="message-box">
             <div class="message-header">
-                <button class="btn btn-danger btn-small" onclick="showReportModal(<?= $message['id'] ?>)">Report</button>
+                <?php if($message['is_reported'] === 1): ?>
+                    <button disabled class="btn btn-grayed btn-small" onclick="showReportModal(<?= $message['id'] ?>)">Reported</button>
+                <?php elseif($message['is_reported'] === 0): ?>
+                    <button class="btn btn-danger btn-small" onclick="showReportModal(<?= $message['id'] ?>)">Report</button>
+                <?php endif ?>
                 <p><strong>Message:</strong> <?= sanitize($message['content']) ?></p>
             </div>
             
