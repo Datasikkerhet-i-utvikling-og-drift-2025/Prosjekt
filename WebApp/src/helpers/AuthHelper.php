@@ -135,12 +135,8 @@ class AuthHelper
         return $_SESSION['user']['role'] ?? null;
     }
 
-    /**
-     * Redirect to a specific page if the user is not logged in.
-     *
-     * @param string $redirectUrl The URL to redirect to.
-     */
-    public static function requireLogin(string $redirectUrl = '/login'): void
+    // Redirect to a specific page if the user is not logged in
+    public static function requireLogin($redirectUrl = '/login')
     {
         if (!self::isLoggedIn()) {
             header("Location: $redirectUrl");

@@ -81,7 +81,10 @@ class GuestController
 
         if ($result) {
             Logger::info("Message ID: {$input['message_id']} reported successfully.");
-            ApiHelper::sendResponse(200, [], 'Message reported successfully.');
+            
+            header('Location: /guests/dashboard');
+            exit;
+
         } else {
             Logger::error("Failed to report message ID: {$input['message_id']}");
             ApiHelper::sendError(500, 'Failed to report the message.');

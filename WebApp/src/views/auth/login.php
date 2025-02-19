@@ -20,6 +20,20 @@ if (isset($_SESSION['user'])) {
 <div class="form-container">
     <h1>Login</h1>
 
+    <?php if (!empty($_SESSION['errors'])): ?>
+        <div class="alert alert-error">
+            <?= htmlspecialchars($_SESSION['errors'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+        <?php unset($_SESSION['errors']); ?>
+    <?php endif; ?>
+
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="alert alert-success">
+            <?= htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8') ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    
     <!-- Error Message Placeholder -->
     <?php if (!empty($_GET['error'])): ?>
         <div id="error-message" class="error">

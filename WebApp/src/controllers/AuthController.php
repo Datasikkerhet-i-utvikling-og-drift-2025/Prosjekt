@@ -236,7 +236,7 @@ public function requestPasswordReset()
     }
 
     $email = $_POST['email'] ?? '';
-    
+
     // Find user by email
     $user = $this->userModel->getUserByEmail($email);
     if (!$user) {
@@ -246,13 +246,13 @@ public function requestPasswordReset()
 
     // Generate reset token
     $resetToken = bin2hex(random_bytes(32));
-    
+
     // Save token to database
     if ($this->userModel->savePasswordResetToken($user['id'], $resetToken)) {
         // Send reset email
         $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=" . $resetToken;
         // Her bør du implementere email-sending
-        
+
         header('Location: /login?success=' . urlencode('Password reset instructions sent to your email'));
     } else {
         header('Location: /reset-password?error=' . urlencode('Failed to process reset request'));
@@ -279,10 +279,63 @@ public function requestPasswordReset()
             ApiHelper::sendError(400, 'Passwords do not match.');
         }
 
-        $user = $this->userRepository->getUserByResetToken($input['token']);
-        if (!$user) {
-            ApiHelper::sendError(400, 'Invalid or expired reset token.');
-        }
+    // Verify token and get user
+    $user = $this->userModel->getUserByResetToken($token);
+    if (!$user) {
+        header('Location: /reset-password?error=' . urlencode('Invalid or expired reset token'));
+        exit;
+    }
+
+    // Update password
+    $hashedPassword = AuthHelper::hashPassword($newPassword);
+    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+        header('Location: /login?success=' . urlencode('Password has been reset successfully'));
+    } else {
+        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Failed to reset password'));
+    }
+    exit;
+}
+
+    public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
+    {
+        try {
+            $this->pdo->beginTransaction();
+
+            // Opprett bruker
+            $userCreated = $this->userModel->createUser(
+                $sanitized['name'],
+                $sanitized['email'],
+                $hashedPassword,
+                $sanitized['role'],
+                $sanitized['study_program'] ?? null,
+                $sanitized['cohort_year'] ?? null,
+                $profilePicturePath
+            );
+
+            if (!$userCreated) {
+                throw new Exception("Failed to create user");
+            }
+
+            // Hvis det er en foreleser og kursinformasjon er gitt, opprett kurs
+            if ($sanitized['role'] === 'lecturer' && 
+                isset($sanitized['course_code']) && 
+                isset($sanitized['course_name']) && 
+                isset($sanitized['course_pin'])) {
+                
+                $courseModel = new Course($this->pdo);
+                $userId = $this->pdo->lastInsertId();
+                
+                $courseCreated = $courseModel->createCourse(
+                    $sanitized['course_code'],
+                    $sanitized['course_name'],
+                    $userId,
+                    $sanitized['course_pin']
+                );
+
+                if (!$courseCreated) {
+                    throw new Exception("Failed to create course");
+                }
+            }
 
         $hashedPassword = AuthHelper::hashPassword($input['new_password']);
         $this->userRepository->updatePasswordAndClearToken($user->id, $hashedPassword);

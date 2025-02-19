@@ -20,13 +20,18 @@ try {
     $pdo = $db->pdo;
 
     // Fetch student messages
-    $stmtMessages = $pdo->prepare("SELECT id, content, reply FROM messages WHERE student_id = :student_id");
+    $stmtMessages = $pdo->prepare("SELECT id, course_id, content, reply FROM messages WHERE student_id = :student_id");
     $stmtMessages->execute([':student_id' => $_SESSION['user']['id']]);
     $messages = $stmtMessages->fetchAll();
 
     // Fetch available courses
     $stmtCourses = $pdo->query("SELECT id, code, name FROM courses");
     $courses = $stmtCourses->fetchAll();
+
+    $courseMap = [];
+    foreach ($courses as $course) {
+        $courseMap[$course['id']] = $course['code'];
+    }
     //Fetch guest comments
     $stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
     $comments = $stmtComments->fetchAll();
@@ -56,18 +61,19 @@ try {
             <?php if (!empty($messages)): ?>
                 <?php foreach ($messages as $message): ?>
                     <div class="message-item">
+                        <p><strong>Course:</strong> <?php echo htmlspecialchars($courseMap[$message['course_id']] ?? 'Unknown', ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><strong>Lecturer's reply:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No reply yet', ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p><strong>Guest comments:</strong></p>
-                            <?php foreach ($comments as $comment): ?>
-                                <?php if ($comment['message_id'] === $message['id']): ?>
-                                    <div class="guest-item">
-                                        <p><strong>Guest name: </strong> <?php echo htmlspecialchars($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym', ENT_QUOTES, 'UTF-8'); ?></p>
-                                        <p> <strong>comment: </strong> <?php echo htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    </div>
-                                <?php else: ?>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
+                            <p><strong>Lecturer's reply:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No reply yet', ENT_QUOTES, 'UTF-8'); ?></p>
+                            <p><strong>Guest comments:</strong></p>
+                                <?php foreach ($comments as $comment): ?>
+                                    <?php if ($comment['message_id'] === $message['id']): ?>
+                                        <div class="guest-item">
+                                            <p><strong>Guest name: </strong> <?php echo htmlspecialchars($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym', ENT_QUOTES, 'UTF-8'); ?></p>
+                                            <p> <strong>comment: </strong> <?php echo htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                        </div>
+                                    <?php else: ?>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
