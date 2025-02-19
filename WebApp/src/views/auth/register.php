@@ -1,15 +1,16 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config/versionURL.php';
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'] ?? '';
     if ($role === 'student') {
-        header('Location: /student/dashboard');
+        header('Location: ' .APP_BASE_URL. '/student/dashboard');
         exit;
     } elseif ($role === 'lecturer') {
-        header('Location: /lecturer/dashboard');
+        header('Location: ' .APP_BASE_URL. '/lecturer/dashboard');
         exit;
     } elseif ($role === 'admin') {
-        header('Location: /admin/dashboard');
+        header('Location: ' .APP_BASE_URL. '/admin/dashboard');
         exit;
     }
 }
@@ -135,7 +136,7 @@ require_once __DIR__ . '/../partials/header.php';
         </div>
     </form>
 
-    <p>Already have an account? <a href="/">Login here</a>.</p>
+    <p>Already have an account? <a href="<?= APP_BASE_URL ?>">Login here</a>.</p>
 </div>
 
 <script>

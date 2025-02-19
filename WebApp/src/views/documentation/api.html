@@ -1,0 +1,565 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="en-US" data-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex"><meta name="built-on" content="2025-02-17T22:31:40.9117059"><title>Api | Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1</title><script type="application/json" id="virtual-toc-data" data-toc-floating="true">[{"id":"uo2pw_32","level":0,"title":"Register a new user","anchor":"#uo2pw_32"},{"id":"uo2pw_48","level":0,"title":"Login a user","anchor":"#uo2pw_48"},{"id":"uo2pw_63","level":0,"title":"Logout the current user","anchor":"#uo2pw_63"},{"id":"uo2pw_76","level":0,"title":"Change the user’s password","anchor":"#uo2pw_76"},{"id":"uo2pw_96","level":0,"title":"Request a password reset link","anchor":"#uo2pw_96"},{"id":"uo2pw_117","level":0,"title":"Reset the user’s password","anchor":"#uo2pw_117"},{"id":"uo2pw_136","level":0,"title":"Get a list of all courses (for students)","anchor":"#uo2pw_136"},{"id":"uo2pw_147","level":0,"title":"Get messages sent by the current student","anchor":"#uo2pw_147"},{"id":"uo2pw_160","level":0,"title":"Send a new message to a course","anchor":"#uo2pw_160"},{"id":"uo2pw_178","level":0,"title":"Get all courses assigned to the current lecturer","anchor":"#uo2pw_178"},{"id":"uo2pw_192","level":0,"title":"Get messages for a specific course","anchor":"#uo2pw_192"},{"id":"uo2pw_217","level":0,"title":"Reply to a message","anchor":"#uo2pw_217"},{"id":"uo2pw_241","level":0,"title":"Mark a message as resolved","anchor":"#uo2pw_241"},{"id":"uo2pw_262","level":0,"title":"Get all users","anchor":"#uo2pw_262"},{"id":"uo2pw_276","level":0,"title":"Delete a user by ID","anchor":"#uo2pw_276"},{"id":"uo2pw_294","level":0,"title":"Get all reported messages","anchor":"#uo2pw_294"},{"id":"uo2pw_307","level":0,"title":"Delete a message by ID","anchor":"#uo2pw_307"},{"id":"uo2pw_327","level":0,"title":"Update (e.g. censor) a message","anchor":"#uo2pw_327"},{"id":"uo2pw_348","level":0,"title":"Get details for a specific user","anchor":"#uo2pw_348"},{"id":"uo2pw_367","level":0,"title":"Get all public messages","anchor":"#uo2pw_367"},{"id":"uo2pw_377","level":0,"title":"View messages for a specific course (requires PIN code)","anchor":"#uo2pw_377"},{"id":"uo2pw_397","level":0,"title":"Report a message","anchor":"#uo2pw_397"},{"id":"uo2pw_417","level":0,"title":"Add a comment to a message","anchor":"#uo2pw_417"}]</script><script type="application/json" id="topic-shortcuts"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.10.0-b575/app.css" rel="stylesheet"><meta name="msapplication-TileColor" content="#000000"><link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"><meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="Api | Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1"><meta property="og:description" content=""><meta property="og:image" content=""><meta property="og:site_name" content="Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1 Help"><meta property="og:type" content="website"><meta property="og:locale" content="en_US"><meta property="og:url" content="writerside-documentation/api.html"><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="Api | Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json">{
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "@id": "writerside-documentation/api.html#webpage",
+    "url": "writerside-documentation/api.html",
+    "name": "Api | Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1",
+    "description": "",
+    "image": "",
+    "inLanguage":"en-US"
+}</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json">{
+    "@type": "WebSite",
+    "@id": "writerside-documentation/#website",
+    "url": "writerside-documentation/",
+    "name": "Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1 Help"
+}</script><!-- End Schema.org --></head><body data-id="Api" data-main-title="Api" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}" data-template="article" data-breadcrumbs=""><div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Api" id="Api.md">Api</h1><p id="uo2pw_3">URL: <a href="http://158.39.188.204/steg1/api" id="uo2pw_5" data-external="true" rel="noopener noreferrer">http://158.39.188.204/steg1/api</a></p><section class="chapter"><h2 id="uo2pw_32" data-toc="uo2pw_32">Register a new user</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /auth/register"><span>/auth/register</span></copier></div><section class="chapter"><h3 id="uo2pw_34" data-toc="uo2pw_34">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_37" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_9","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"first_name","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"last_name","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"email","typeName":"string email","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_4","name":"password","typeName":"string password","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_8","name":"role","typeName":"Enum","typeKind":"ENUM","recursive":false,"contentsLabel":"Enum elements","contents":[{"id":"api_doc_5","name":"student","typeKind":"PRIMITIVE"},{"id":"api_doc_6","name":"lecturer","typeKind":"PRIMITIVE"},{"id":"api_doc_7","name":"admin","typeKind":"PRIMITIVE"}]}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;first_name&quot;: &quot;example&quot;,
+  &quot;last_name&quot;: &quot;example&quot;,
+  &quot;email&quot;: &quot;email@example.com&quot;,
+  &quot;password&quot;: &quot;example&quot;,
+  &quot;role&quot;: &quot;student&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_35" data-toc="uo2pw_35">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_39" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Registration successful","description":"Registration successful","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;User registered successfully.&quot;,
+  &quot;data&quot;: {
+    &quot;user_id&quot;: 123,
+    &quot;email&quot;: &quot;john.doe@example.com&quot;,
+    &quot;role&quot;: &quot;student&quot;
+  }
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Missing or invalid fields.&quot;,
+  &quot;data&quot;: {
+    &quot;missing_fields&quot;: [
+      &quot;email&quot;
+    ]
+  }
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_48" data-toc="uo2pw_48">Login a user</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /auth/login"><span>/auth/login</span></copier></div><section class="chapter"><h3 id="uo2pw_50" data-toc="uo2pw_50">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_53" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_3","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"email","typeName":"string email","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"password","typeName":"string password","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;email&quot;: &quot;email@example.com&quot;,
+  &quot;password&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_51" data-toc="uo2pw_51">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_55" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Login successful","description":"Login successful","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Login successful.&quot;,
+  &quot;data&quot;: {
+    &quot;user_id&quot;: 123,
+    &quot;role&quot;: &quot;student&quot;
+  }
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Invalid email or password.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_63" data-toc="uo2pw_63">Logout the current user</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /auth/logout"><span>/auth/logout</span></copier></div><section class="chapter"><h3 id="uo2pw_65" data-toc="uo2pw_65">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_66" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Logout successful","description":"Logout successful","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized (no active session)","description":"Unauthorized (no active session)","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Logout successful.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Not logged in.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_76" data-toc="uo2pw_76">Change the user&rsquo;s password</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /auth/change-password"><span>/auth/change-password</span></copier></div><section class="chapter"><h3 id="uo2pw_78" data-toc="uo2pw_78">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_81" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_4","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"current_password","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"new_password","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"confirm_password","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;current_password&quot;: &quot;example&quot;,
+  &quot;new_password&quot;: &quot;example&quot;,
+  &quot;confirm_password&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_79" data-toc="uo2pw_79">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_83" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Password changed successfully","description":"Password changed successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error or mismatched passwords","description":"Validation error or mismatched passwords","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Password changed successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Passwords do not match.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_96" data-toc="uo2pw_96">Request a password reset link</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /auth/password-reset/request"><span>/auth/password-reset/request</span></copier></div><p id="uo2pw_98">Sends an email containing reset instructions if the user exists.</p><section class="chapter"><h3 id="uo2pw_99" data-toc="uo2pw_99">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_102" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_2","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"email","typeName":"string email","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;email&quot;: &quot;email@example.com&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_100" data-toc="uo2pw_100">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_104" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Password reset email sent","description":"Password reset email sent","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Email is missing or invalid","description":"Email is missing or invalid","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"404","statusType":"ERROR","name":"Email not found","description":"Email not found","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Password reset instructions sent to your email.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Email is missing or invalid.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="404" data-title="404" data-title-class="api-status-error"><div class="code-block" data-title="404" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Email not found.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_117" data-toc="uo2pw_117">Reset the user&rsquo;s password</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /auth/reset-password"><span>/auth/reset-password</span></copier></div><p id="uo2pw_119">Resets a user&rsquo;s password, typically after verifying a token.</p><section class="chapter"><h3 id="uo2pw_120" data-toc="uo2pw_120">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_123" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_4","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"email","typeName":"string email","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"new_password","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"confirm_password","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;email&quot;: &quot;email@example.com&quot;,
+  &quot;new_password&quot;: &quot;example&quot;,
+  &quot;confirm_password&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_121" data-toc="uo2pw_121">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_125" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Password has been reset successfully","description":"Password has been reset successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error (e.g., passwords don’t match)","description":"Validation error (e.g., passwords don’t match)","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"404","statusType":"ERROR","name":"Email not found","description":"Email not found","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Password reset successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Passwords do not match.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="404" data-title="404" data-title-class="api-status-error"><div class="code-block" data-title="404" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Email not found.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_136" data-toc="uo2pw_136">Get a list of all courses (for students)</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /student/courses"><span>/student/courses</span></copier></div><section class="chapter"><h3 id="uo2pw_138" data-toc="uo2pw_138">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_139" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Courses retrieved successfully","description":"Courses retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Courses retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;course_id&quot;: 1,
+      &quot;course_name&quot;: &quot;Intro to Security&quot;
+    },
+    {
+      &quot;course_id&quot;: 2,
+      &quot;course_name&quot;: &quot;Advanced Networking&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a student.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_147" data-toc="uo2pw_147">Get messages sent by the current student</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /student/messages"><span>/student/messages</span></copier></div><section class="chapter"><h3 id="uo2pw_149" data-toc="uo2pw_149">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_150" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Messages retrieved successfully","description":"Messages retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Messages retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;message_id&quot;: 101,
+      &quot;content&quot;: &quot;Hello, I need help with the assignment.&quot;
+    },
+    {
+      &quot;message_id&quot;: 102,
+      &quot;content&quot;: &quot;Is the exam schedule out?&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a student.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_160" data-toc="uo2pw_160">Send a new message to a course</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /student/message/send"><span>/student/message/send</span></copier></div><section class="chapter"><h3 id="uo2pw_162" data-toc="uo2pw_162">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_165" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_3","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"course_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"content","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;course_id&quot;: 58,
+  &quot;content&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_163" data-toc="uo2pw_163">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_167" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"201","statusType":"OK","name":"Message created successfully","description":"Message created successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="201" data-title="201" data-title-class="api-status-success"><div class="code-block" data-title="201" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Message sent successfully.&quot;,
+  &quot;data&quot;: {
+    &quot;message_id&quot;: 999
+  }
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Content cannot be empty.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a student.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_178" data-toc="uo2pw_178">Get all courses assigned to the current lecturer</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /lecturer/courses"><span>/lecturer/courses</span></copier></div><section class="chapter"><h3 id="uo2pw_180" data-toc="uo2pw_180">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_181" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Courses retrieved successfully","description":"Courses retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Courses retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;course_id&quot;: 10,
+      &quot;course_name&quot;: &quot;Data Structures&quot;
+    },
+    {
+      &quot;course_id&quot;: 11,
+      &quot;course_name&quot;: &quot;Operating Systems&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a lecturer.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_192" data-toc="uo2pw_192">Get messages for a specific course</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /lecturer/messages"><span>/lecturer/messages</span></copier></div><p id="uo2pw_194">Expects a course_id in the request body</p><section class="chapter"><h3 id="uo2pw_195" data-toc="uo2pw_195">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_198" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_2","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"course_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;course_id&quot;: 58
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_196" data-toc="uo2pw_196">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_200" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Messages retrieved successfully","description":"Messages retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"403","statusType":"ERROR","name":"Forbidden (course doesn’t belong to this lecturer)","description":"Forbidden (course doesn’t belong to this lecturer)","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Messages retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;message_id&quot;: 201,
+      &quot;content&quot;: &quot;Hello from Student.&quot;
+    },
+    {
+      &quot;message_id&quot;: 202,
+      &quot;content&quot;: &quot;Another question from Student.&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Missing or invalid course_id.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a lecturer.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="403" data-title="403" data-title-class="api-status-error"><div class="code-block" data-title="403" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Forbidden: You do not have access to this course.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_217" data-toc="uo2pw_217">Reply to a message</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /lecturer/message/reply"><span>/lecturer/message/reply</span></copier></div><section class="chapter"><h3 id="uo2pw_219" data-toc="uo2pw_219">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_222" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_3","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"message_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"reply","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;message_id&quot;: 58,
+  &quot;reply&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_220" data-toc="uo2pw_220">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_224" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Reply sent successfully","description":"Reply sent successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"403","statusType":"ERROR","name":"Forbidden","description":"Forbidden","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Reply sent successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Missing reply text.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a lecturer.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="403" data-title="403" data-title-class="api-status-error"><div class="code-block" data-title="403" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Forbidden: You do not have access to this message.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_241" data-toc="uo2pw_241">Mark a message as resolved</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /lecturer/message/resolve"><span>/lecturer/message/resolve</span></copier></div><section class="chapter"><h3 id="uo2pw_243" data-toc="uo2pw_243">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_246" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_2","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"message_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;message_id&quot;: 58
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_244" data-toc="uo2pw_244">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_248" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Message marked as resolved","description":"Message marked as resolved","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"403","statusType":"ERROR","name":"Forbidden","description":"Forbidden","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Message marked as resolved.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: message_id is required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: You must be logged in as a lecturer.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="403" data-title="403" data-title-class="api-status-error"><div class="code-block" data-title="403" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Forbidden: This message is not from your course.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_262" data-toc="uo2pw_262">Get all users</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /admin/users"><span>/admin/users</span></copier></div><p id="uo2pw_264">Optionally filter users by role via query parameter (?role=)</p><section class="chapter"><h3 id="uo2pw_265" data-toc="uo2pw_265">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_266" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Users retrieved successfully","description":"Users retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Users retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;user_id&quot;: 1,
+      &quot;role&quot;: &quot;admin&quot;,
+      &quot;email&quot;: &quot;admin@example.com&quot;
+    },
+    {
+      &quot;user_id&quot;: 2,
+      &quot;role&quot;: &quot;student&quot;,
+      &quot;email&quot;: &quot;student@example.com&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: Admin role required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_276" data-toc="uo2pw_276">Delete a user by ID</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /admin/user/delete"><span>/admin/user/delete</span></copier></div><section class="chapter"><h3 id="uo2pw_278" data-toc="uo2pw_278">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_281" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_2","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"user_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;user_id&quot;: 58
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_279" data-toc="uo2pw_279">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_283" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"User deleted successfully","description":"User deleted successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;User deleted successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Missing or invalid user_id.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: Admin role required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_294" data-toc="uo2pw_294">Get all reported messages</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /admin/messages/reported"><span>/admin/messages/reported</span></copier></div><section class="chapter"><h3 id="uo2pw_296" data-toc="uo2pw_296">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_297" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Reported messages retrieved successfully","description":"Reported messages retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Reported messages retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;message_id&quot;: 300,
+      &quot;content&quot;: &quot;Offensive content&quot;,
+      &quot;report_reason&quot;: &quot;Spam&quot;
+    },
+    {
+      &quot;message_id&quot;: 301,
+      &quot;content&quot;: &quot;Another issue&quot;,
+      &quot;report_reason&quot;: &quot;Harassment&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: Admin role required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_307" data-toc="uo2pw_307">Delete a message by ID</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /admin/message/delete"><span>/admin/message/delete</span></copier></div><section class="chapter"><h3 id="uo2pw_309" data-toc="uo2pw_309">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_312" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_2","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"message_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;message_id&quot;: 58
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_310" data-toc="uo2pw_310">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_314" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Message deleted successfully","description":"Message deleted successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Message deleted successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Missing or invalid message_id.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: Admin role required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_327" data-toc="uo2pw_327">Update (e.g. censor) a message</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /admin/message/update"><span>/admin/message/update</span></copier></div><section class="chapter"><h3 id="uo2pw_329" data-toc="uo2pw_329">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_332" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_3","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"message_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"content","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;message_id&quot;: 58,
+  &quot;content&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_330" data-toc="uo2pw_330">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_334" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Message updated successfully","description":"Message updated successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Message updated successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Missing or invalid fields.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: Admin role required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_348" data-toc="uo2pw_348">Get details for a specific user</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /admin/user/details"><span>/admin/user/details</span></copier></div><section class="chapter"><h3 id="uo2pw_350" data-toc="uo2pw_350">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_353" master-collapse="true" data-chapter-level="3"><script type="application/json">{"header":"Query","contents":[{"id":"api_doc_1","name":"user_id","required":"true","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_351" data-toc="uo2pw_351">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_354" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"User details retrieved successfully","description":"User details retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Missing user_id","description":"Missing user_id","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"401","statusType":"ERROR","name":"Unauthorized","description":"Unauthorized","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"404","statusType":"ERROR","name":"User not found","description":"User not found","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;User details retrieved successfully.&quot;,
+  &quot;data&quot;: {
+    &quot;user_id&quot;: 7,
+    &quot;email&quot;: &quot;someone@example.com&quot;,
+    &quot;role&quot;: &quot;student&quot;
+  }
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Missing user_id parameter.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="401" data-title="401" data-title-class="api-status-error"><div class="code-block" data-title="401" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Unauthorized: Admin role required.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="404" data-title="404" data-title-class="api-status-error"><div class="code-block" data-title="404" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;User not found.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_367" data-toc="uo2pw_367">Get all public messages</h2><div class="api-endpoint"><img alt="GET method" src="https://img.shields.io/badge/-GET-167DFF" title="GET method"><copier tooltip-text="Copy path: /guest/messages"><span>/guest/messages</span></copier></div><section class="chapter"><h3 id="uo2pw_369" data-toc="uo2pw_369">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_370" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Public messages retrieved successfully","description":"Public messages retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Public messages retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;message_id&quot;: 400,
+      &quot;content&quot;: &quot;Public message #1&quot;
+    },
+    {
+      &quot;message_id&quot;: 401,
+      &quot;content&quot;: &quot;Public message #2&quot;
+    }
+  ]
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_377" data-toc="uo2pw_377">View messages for a specific course (requires PIN code)</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /guest/messages/view"><span>/guest/messages/view</span></copier></div><section class="chapter"><h3 id="uo2pw_379" data-toc="uo2pw_379">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_382" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_3","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"course_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"pin_code","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;course_id&quot;: 58,
+  &quot;pin_code&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_380" data-toc="uo2pw_380">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_384" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Messages retrieved successfully","description":"Messages retrieved successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"Array of object","typeKind":"ARRAY","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"403","statusType":"ERROR","name":"Invalid course ID or PIN code","description":"Invalid course ID or PIN code","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Messages retrieved successfully.&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;message_id&quot;: 500,
+      &quot;content&quot;: &quot;Hello from the course.&quot;
+    },
+    {
+      &quot;message_id&quot;: 501,
+      &quot;content&quot;: &quot;Another message.&quot;
+    }
+  ]
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Missing or invalid course_id/pin_code.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="403" data-title="403" data-title-class="api-status-error"><div class="code-block" data-title="403" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Invalid course ID or PIN code.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_397" data-toc="uo2pw_397">Report a message</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /guest/messages/report"><span>/guest/messages/report</span></copier></div><section class="chapter"><h3 id="uo2pw_399" data-toc="uo2pw_399">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_402" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_3","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"message_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"report_reason","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;message_id&quot;: 58,
+  &quot;report_reason&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_400" data-toc="uo2pw_400">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_404" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Message reported successfully","description":"Message reported successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Report reason is empty","description":"Report reason is empty","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"500","statusType":"ERROR","name":"Failed to report the message","description":"Failed to report the message","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Message reported successfully.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Report reason cannot be empty.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="500" data-title="500" data-title-class="api-status-error"><div class="code-block" data-title="500" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;An internal server error occurred while reporting.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><section class="chapter"><h2 id="uo2pw_417" data-toc="uo2pw_417">Add a comment to a message</h2><div class="api-endpoint"><img alt="POST method" src="https://img.shields.io/badge/-POST-28B8A0" title="POST method"><copier tooltip-text="Copy path: /guest/messages/comment"><span>/guest/messages/comment</span></copier></div><section class="chapter"><h3 id="uo2pw_419" data-toc="uo2pw_419">Request parameters</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_422" master-collapse="true" data-chapter-level="3"><script type="application/json">{"contentType":["application/json"],"header":"Body","contents":[{"id":"api_doc_4","name":"application/json","required":"true","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"message_id","typeName":"integer","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"guest_name","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"comment","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"}]}],"kind":"ApiParamGroup"}</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-title="JSON example" data-sync-tabs="tab-json-example"><div class="code-block" data-title="JSON example" data-lang="json">
+{
+  &quot;message_id&quot;: 58,
+  &quot;guest_name&quot;: &quot;example&quot;,
+  &quot;comment&quot;: &quot;example&quot;
+}
+</div></div></div></secondary-column></api-block></section><section class="chapter"><h3 id="uo2pw_420" data-toc="uo2pw_420">Responses</h3><api-block data-chapter-level="3"><primary-column><api-param-group id="uo2pw_424" master-collapse="true" data-chapter-level="3"><script type="application/json">{ "contents" : [{"statusCode":"200","statusType":"OK","name":"Comment added successfully","description":"Comment added successfully","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"400","statusType":"ERROR","name":"Validation error","description":"Validation error","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}, {"statusCode":"500","statusType":"ERROR","name":"Failed to add comment","description":"Failed to add comment","contentType":["application/json"],"contents":[{"id":"api_doc_4","name":"application/json","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[{"id":"api_doc_1","name":"success","typeName":"boolean","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_2","name":"message","typeName":"string","typeKind":"PRIMITIVE","contentsLabel":"Child attributes"},{"id":"api_doc_3","name":"data","typeName":"object","typeKind":"OBJECT","recursive":false,"contentsLabel":"Child attributes","contents":[]}]}],"kind":"ApiResponse"}] }</script></api-param-group></primary-column><secondary-column><div class="tabs" data-tabs-class="api-tabs"><div class="tabs__content" data-sync-tabs="200" data-title="200" data-title-class="api-status-success"><div class="code-block" data-title="200" data-lang="json">
+{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Comment added successfully.&quot;,
+  &quot;data&quot;: {
+    &quot;comment_id&quot;: 700
+  }
+}
+</div></div><div class="tabs__content" data-sync-tabs="400" data-title="400" data-title-class="api-status-error"><div class="code-block" data-title="400" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Validation error: Missing required fields.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div><div class="tabs__content" data-sync-tabs="500" data-title="500" data-title-class="api-status-error"><div class="code-block" data-title="500" data-lang="json">
+{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;Server error: Failed to add comment.&quot;,
+  &quot;data&quot;: {}
+}
+</div></div></div></secondary-column></api-block></section></section><div class="last-modified">Last modified: 17 februar 2025</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom"><a href="implementasjon.html" class="navigation-links__prev">Dokumentasjon</a></div></article><div id="disqus_thread"></div></div></section></main></div><script src="https://resources.jetbrains.com/writerside/apidoc/6.10.0-b575/app.js"></script></body></html>

@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
+require_once __DIR__ . '/../../config/versionURL.php';
 
 // Sanitize output
 function sanitize($value) {
@@ -68,7 +69,7 @@ $comments = $stmtComments->fetchAll();
             </div>
             
             <h3>Leave a Comment Down Below!</h3>
-            <form action="/guest/messages/comment" method="POST">
+            <form action="<?= API_BASE_URL ?>/guest/messages/comment" method="POST">
                 <input type="hidden" name="message_id" value="<?= $message['id'] ?>">
                 <label>Your Name (Optional):</label>
                 <input type="text" name="guest_name">
@@ -92,7 +93,7 @@ $comments = $stmtComments->fetchAll();
 
 <!-- Button to view messages -->
 <div class="container">
-<a href="/guests/view-messages?course_code=<?= $course['code'] ?>&pin_code=<?= $course['pin_code'] ?>" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
+<a href="<?= APP_BASE_URL ?>/guests/view-messages?course_code=<?= $course['code'] ?>&pin_code=<?= $course['pin_code'] ?>" class="btn btn-large btn-primary" style="display: block; width: 100%; text-align: center; padding: 15px; font-size: 18px; margin-top: 20px;">View All Messages</a>
 </div>
 
 <!-- Report Modal -->
@@ -100,7 +101,7 @@ $comments = $stmtComments->fetchAll();
     <div class="modal-content">
         <span class="close" onclick="closeReportModal()">&times;</span>
         <h2>Report Message</h2>
-        <form id="reportForm" action="/guest/messages/report" method="POST">
+        <form id="reportForm" action="<?= API_BASE_URL ?>/guest/messages/report" method="POST">
             <input type="hidden" name="message_id" id="reportMessageId">
             <label for="reported_by">Reported By (Optional):</label>
             <input type="text" name="reported_by" id="reported_by">
