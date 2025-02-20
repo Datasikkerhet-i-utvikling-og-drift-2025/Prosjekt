@@ -83,16 +83,10 @@ class AuthController
             ApiHelper::sendError(500, 'Failed to create user.');
         }
 
-        // **Handle Web vs API Request**
-        if (!empty($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
-            // API request (mobile app)
-            ApiHelper::sendResponse(201, ['redirect' => '/'], 'Registration successful.');
-        } else {
-            // Web request (form submission)
-            $_SESSION['success'] = 'Registration successful.';
-            header("Location: /");
-            exit();
-        }
+        ApiHelper::sendResponse(200, [
+            'redirect' => APP_BASE_URL.'/',
+            'message' => 'Registration successful'
+        ]);
     }
 
 
@@ -115,46 +109,19 @@ class AuthController
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $uploadDir));
             }
 
-            // Validate file type and size
-            $allowedTypes = ['image/jpeg', 'image/png'];
-            if ($file['error'] !== UPLOAD_ERR_OK) {
-                $validation['errors'][] = "Profile picture upload failed.";
-                Logger::error("Profile picture upload error: " . var_export($file, true));
-            } elseif (!in_array($file['type'], $allowedTypes, true)) {
-                $validation['errors'][] = "Invalid file type for profile picture. Only JPG and PNG are allowed.";
-                Logger::error("Invalid profile picture type: " . $file['type']);
-            } elseif ($file['size'] > 2 * 1024 * 1024) { // 2MB limit
-                $validation['errors'][] = "Profile picture size must not exceed 2MB.";
-                Logger::error("Profile picture size exceeds limit: " . $file['size'] . " bytes");
-            } else {
-                // Generate a unique filename
-                $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
-                $uniqueFileName = uniqid('profile_', true) . '.' . $fileExtension;
-                $profilePicturePath = $uploadDir . $uniqueFileName;
-
-                if (!move_uploaded_file($file['tmp_name'], $profilePicturePath)) {
-                    $validation['errors'][] = "Failed to save profile picture.";
-                    Logger::error("Failed to move uploaded file for profile picture.");
-                }
-            }
-
-            return ['/uploads/profile_pictures/' . $uniqueFileName, $validation];
+        // Enkel sjekk for at e-post og passord er sendt med
+        if (empty($email) || empty($password)) {
+            header("Location: " .APP_BASE_URL. "/login?error=" . urlencode("Email and password are required."));
+            exit;
         }
 
-        return [$profilePicturePath, $validation];
-    }
-
-
-    /**
-     * Authenticate and log in a user.
-     *
-     * @return void
-     * @throws JsonException|DateMalformedStringException
-     */
-    public function login()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ApiHelper::sendError(405, 'Invalid request method.');
+        // Find user by email
+        $user = $this->userModel->getUserByEmail($input['email']);
+        if (!$user || !AuthHelper::verifyPassword($input['password'], $user['password'])) {
+            Logger::error("Login failed for email: " . $input['email']);
+            //ApiHelper::sendError(401, 'Invalid email or password.');
+            header("Location: " .APP_BASE_URL. "/?error=" . urlencode("Invalid email or password."));
+            exit;
         }
 
         $input = ApiHelper::getJsonInput();
@@ -192,7 +159,7 @@ class AuthController
     {
         AuthHelper::logoutUser();
         Logger::info("User logged out.");
-        ApiHelper::sendResponse(200, [], 'Logout successful.');
+        header('Location: ' .APP_BASE_URL. '/');
     }
 
     /**
@@ -220,11 +187,44 @@ class AuthController
         if ($input['new_password'] !== $input['confirm_password']) {
             ApiHelper::sendError(400, 'New passwords do not match.');
         }
-
-        $hashedPassword = AuthHelper::hashPassword($input['new_password']);
-        $this->userRepository->updatePassword($userId, $hashedPassword);
-
-        ApiHelper::sendResponse(200, [], 'Password updated successfully.');
+    
+        try {
+            $email = $_POST['email'] ?? '';
+            Logger::info("Starting password reset request for email: " . $email);
+            
+            // Finn bruker
+            $user = $this->userModel->getUserByEmail($email);
+            if (!$user) {
+                throw new Exception('If this email exists in our system, you will receive a reset link.');
+            }
+    
+            // Generer token
+            $resetToken = bin2hex(random_bytes(32));
+            $tokenExpiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            
+            // Lagre token i databasen
+            if (!$this->userModel->savePasswordResetToken($user['id'], $resetToken, $tokenExpiry)) {
+                throw new Exception('Failed to process reset request');
+            }
+    
+            // Send email
+            $mailer = new Mailer();
+            Logger::info("Mailer instance created");
+            if (!$mailer->sendPasswordReset($email, $resetToken)) {
+                throw new Exception('Failed to send reset email');
+            }
+    
+            $_SESSION['success'] = 'If this email exists in our system, you will receive a reset link.';
+            header('Location: ' .APP_BASE_URL. '/');
+            Logger::info("Mail send attempt result: " . ($result ? 'success' : 'failed'));
+            exit;
+    
+        } catch (Exception $e) {
+            $_SESSION['errors'] = $e->getMessage();
+            header('Location: /reset-password');
+            Logger::error("Password reset error: " . $e->getMessage());
+            exit;
+        }
     }
 
 public function requestPasswordReset()
@@ -287,12 +287,14 @@ public function requestPasswordReset()
 
     // Update password
     $hashedPassword = AuthHelper::hashPassword($newPassword);
-    if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
-        header('Location: /login?success=' . urlencode('Password has been reset successfully'));
-    } else {
-        header('Location: /reset-password?token=' . urlencode($token) . '&error=' . urlencode('Failed to reset password'));
-    }
-    exit;
+        if ($this->userModel->updatePassword($user['id'], $hashedPassword)) {
+            $_SESSION['success'] = 'Password changed successfully';
+        } else {
+            $_SESSION['errors'] = 'Failed to change password';
+        }
+    
+        header('Location: ' .APP_BASE_URL. '/');
+        exit;
 }
 
     public function createUserInTheDatabase($sanitized, string $hashedPassword, ?string $profilePicturePath): void
@@ -336,8 +338,10 @@ public function requestPasswordReset()
                 }
             }
 
-        $hashedPassword = AuthHelper::hashPassword($input['new_password']);
-        $this->userRepository->updatePasswordAndClearToken($user->id, $hashedPassword);
+            $this->pdo->commit();
+            $_SESSION['success'] = "Registration successful. Please log in.";
+            header("Location: " .APP_BASE_URL. "/");
+            exit;
 
         ApiHelper::sendResponse(200, [], 'Password reset successful.');
     }
