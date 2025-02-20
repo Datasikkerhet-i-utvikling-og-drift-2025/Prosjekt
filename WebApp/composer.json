@@ -2,7 +2,7 @@
     "name": "snils/web-app",
     "autoload": {
         "psr-4": {
-            "Snils\\WebApp\\": "src/"
+            "Prosjekt\\WebApp\\": "src/"
         }
     },
     "authors": [

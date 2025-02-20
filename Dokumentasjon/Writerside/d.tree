@@ -4,9 +4,8 @@
 
 <instance-profile id="d"
                  name="Prosjekt Dokumentasjon: Datasikkerhet i Utvikling og Drift - Gruppe 1"
-                 start-page="Gruppe.md">
+                 start-page="Implementasjon.md">
 
-    <toc-element topic="Gruppe.md"/>
-    <toc-element topic="Prosjektbeskrivelse.md"/>
+    <toc-element topic="Implementasjon.md"/>
     <toc-element topic="Api.md"/>
 </instance-profile>
