@@ -71,7 +71,7 @@
         </form>
     <?php endif; ?>
 
-    <p>Remember your password? <a href="/">Login here</a></p>
+    <p>Remember your password? <a href="<?= APP_BASE_URL ?>/">Login here</a></p>
 </div>
 
 <!-- Legg til klient-side validering -->
