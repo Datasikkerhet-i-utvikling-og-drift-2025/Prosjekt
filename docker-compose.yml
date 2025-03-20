@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   mysql:
     build:
@@ -13,7 +15,6 @@ services:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASS}
-
     env_file:
       - .env
     volumes:
@@ -38,11 +39,36 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
-        # Legg til SMTP miljøvariabler
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_PORT=${SMTP_PORT}
+    env_file:
+      - .env
+
+  webappv2:
+    build:
+      context: ./WebAppV2
+      dockerfile: .docker/Dockerfile
+    container_name: webappv2
+    ports:
+      - "8081:80"
+    networks:
+      - project_network
+    volumes:
+      - ./WebAppV2:/var/www/html
+    depends_on:
+      - mysql
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_NAME}
+      - DB_USERNAME=${DB_USER}
+      - DB_PASSWORD=${DB_PASS}
     env_file:
       - .env
 

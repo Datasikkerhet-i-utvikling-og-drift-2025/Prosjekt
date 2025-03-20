@@ -40,3 +40,36 @@ Nettsidene har følgende funksjoner:
 * For nå, så er frontend og backend i et. Dette skal endret snart™️
 
 Vi bruker docker for å teste nettsiden.
+
+## Div
+
+| Funksjonalitet                         | Student | Foreleser | Administrator | Gjestebruker |
+|-----------------------------------------|---------|-----------|--------------|--------------|
+| **Brukerregistrering**                  | ✅      | ✅        | ❌           | ❌           |
+| Registrere navn og e-post               | ✅      | ✅        | ❌           | ❌           |
+| Registrere studieretning/studiekull      | ✅      | ❌        | ❌           | ❌           |
+| Registrere bilde                         | ❌      | ✅        | ❌           | ❌           |
+| Angi undervisningsemne ved registrering  | ❌      | ✅        | ❌           | ❌           |
+| **Autentisering og kontoadministrasjon** |         |           |              |              |
+| Logge inn                                | ✅      | ✅        | ✅           | ❌           |
+| Bytte passord                            | ✅      | ✅        | ❌           | ❌           |
+| Glemt passord                            | ✅      | ✅        | ❌           | ❌           |
+| **Meldinger og kommunikasjon**           |         |           |              |              |
+| Sende anonym melding om et emne          | ✅      | ❌        | ❌           | ❌           |
+| Lese egne meldinger og svar              | ✅      | ❌        | ❌           | ❌           |
+| Lese meldinger fra studenter i egne emner| ❌      | ✅        | ❌           | ❌           |
+| Svare på studentmeldinger (ett svar)     | ❌      | ✅        | ❌           | ❌           |
+| **Administratorfunksjoner**              |         |           |              |              |
+| Finne ut hvem som har sendt en melding   | ❌      | ❌        | ✅           | ❌           |
+| Slette/endre student- og ansattbrukere   | ❌      | ❌        | ✅           | ❌           |
+| Slette meldinger og svar                 | ❌      | ❌        | ✅           | ❌           |
+| Se rapporterte meldinger                 | ❌      | ❌        | ✅           | ❌           |
+| **Gjestebrukerfunksjoner**               |         |           |              |              |
+| Se meldinger og svar med PIN-kode        | ❌      | ❌        | ❌           | ✅           |
+| Rapportere upassende meldinger           | ❌      | ❌        | ❌           | ✅           |
+| Kommentere på meldinger                  | ❌      | ❌        | ❌           | ✅           |
+| **Mobilapp-funksjoner (kun for studenter)** | ✅ (uten passordfunksjoner) | ❌ | ❌ | ❌ |
+| **API-dokumentasjon**                     | ❌      | ❌        | ✅           | ❌           |
+
+![Alt text](../../pictures/DatasikkerhetIUtviklingOgDriftArkitektur.png)
+
