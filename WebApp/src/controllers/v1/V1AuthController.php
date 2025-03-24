@@ -2,107 +2,96 @@
 
 namespace controllers\v1;
 
+use JetBrains\PhpStorm\NoReturn;
 use services\AuthService;
 use helpers\ApiHelper;
 use helpers\ApiResponse;
-use Exception;
+use managers\SessionManager;
 use JsonException;
+use Exception;
 
+/**
+ * Class V1AuthController
+ * Provides secure endpoints for user authentication.
+ * Includes registration, login, and logout using session and JWT.
+ */
 class V1AuthController
 {
     private AuthService $authService;
+    private SessionManager $sessionManager;
 
-    public function __construct(AuthService $authService)
+    /**
+     * V1AuthController constructor.
+     *
+     * @param AuthService $authService
+     * @param SessionManager $sessionManager
+     */
+    public function __construct(AuthService $authService, SessionManager $sessionManager)
     {
         $this->authService = $authService;
+        $this->sessionManager = $sessionManager;
     }
 
     /**
-     * Handles user registration.
+     * Registers a new user via API.
+     * Accepts form-data and optional profile picture.
+     * Responds with success status and JWT.
      *
+     * @return void
      * @throws JsonException
      */
     public function register(): void
     {
-        try {
-            // Validate that request method is POST
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                ApiHelper::sendError(405, 'Method Not Allowed. Use POST.');
-            }
+        ApiHelper::requirePost();
 
-            $input = ApiHelper::getJsonInput();
+        try {
+            $input = $_POST;
             $response = $this->authService->register($input);
 
             if ($response->success) {
-                // Generate JWT token if user data contains ID and email
-                if (!empty($response->data['id']) && !empty($response->data['email'])) {
-                    $token = ApiHelper::generateJwtToken([
-                        'user_id' => $response->data['id'],
-                        'email' => $response->data['email']
-                    ]);
-                    $response->data['token'] = $token;
-                }
+                $this->sessionManager->storeUser($response->data, $response->data['token'] ?? null);
+            }
 
-                // Handle response based on request type (API or Web)
-                if (ApiHelper::isApiRequest()) {
-                    ApiHelper::sendApiResponse(201, $response);
-                } else {
-                    $_SESSION['success'] = 'User registered successfully.';
-                    header("Location: /");
-                    exit();
-                }
-            } else if (ApiHelper::isApiRequest()) {
-                ApiHelper::sendApiResponse(400, $response);
-            } else {
-                $_SESSION['error'] = $response->message;
-                header("Location: /register");
-                exit();
-            }
+            ApiHelper::sendApiResponse($response->success ? 201 : 400, $response);
         } catch (Exception $e) {
-            // Handle exceptions based on request type
-            if (ApiHelper::isApiRequest()) {
-                ApiHelper::sendError(500, 'Internal server error.', ['error' => $e->getMessage()]);
-            } else {
-                $_SESSION['error'] = 'An internal error occurred.';
-                header("Location: /register");
-                exit();
-            }
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
     }
 
     /**
-     * Handles user login.
+     * Logs in an existing user.
+     * Accepts JSON with email and password.
+     *
+     * @return void
+     * @throws JsonException
      */
     public function login(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ApiHelper::sendError(405, 'Method Not Allowed. Use POST.');
-        }
+        ApiHelper::requirePost();
 
-        // Implementation for login logic
+        try {
+            $input = ApiHelper::getJsonInput();
+            $response = $this->authService->login($input);
+
+            if ($response->success) {
+                $this->sessionManager->storeUser($response->data, $response->data['token'] ?? null);
+            }
+
+            ApiHelper::sendApiResponse($response->success ? 200 : 401, $response);
+        } catch (JsonException|Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
     }
 
     /**
-     * Handles password change requests.
+     * Logs out the current user and destroys session.
+     *
+     * @return void
+     * @throws JsonException
      */
-    public function changePassword(): void
+    #[NoReturn] public function logout(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ApiHelper::sendError(405, 'Method Not Allowed. Use POST.');
-        }
-
-        // Implementation for changing password
-    }
-
-    /**
-     * Handles password reset requests.
-     */
-    public function forgotPassword(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            ApiHelper::sendError(405, 'Method Not Allowed. Use POST.');
-        }
-
-        // Implementation for forgot password functionality
+        $this->sessionManager->destroy();
+        ApiHelper::sendApiResponse(200, new ApiResponse(true, 'Successfully logged out.'));
     }
 }

@@ -14,19 +14,19 @@ if (isset($_SESSION['user'])) {
     }
 }
 
-require_once __DIR__ . '/../../controllers/AuthController.php';
-require_once __DIR__ . '/../../config/Database.php';
+//require_once __DIR__ . '/../../controllers/AuthController.php';
+//require_once __DIR__ . '/../../config/Database.php';
 
-use db\Database;  // Flytt use statement til toppen
+//use db\Database;  // Flytt use statement til toppen
 
 // Prosesser form submission først
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $db = new Database();
-    $pdo = $db->getConnection();
-    $authController = new AuthController($pdo);
-    $authController->register();
+//if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//    $db = new Database();
+//    $pdo = $db->getConnection();
+//    $authController = new AuthController($pdo);
+//    $authController->register();
     // Hvis registreringen feiler, vil den redirecte tilbake hit
-}
+//}
 
 // Hvis vi kommer hit, er det enten en GET request eller registreringen feilet
 // Nå er det trygt å inkludere header og vise HTML
@@ -54,15 +54,15 @@ require_once __DIR__ . '/../partials/header.php';
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="/api/v1/auth/register" method="POST" enctype="multipart/form-data">
         <div class="form-group">
-            <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </div>
 
         <div class="form-group">
             <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" placeholder="Nätt" value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            <input type="text" id="lastName" name="lastName" placeholder="Nätt" value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </div>
 
         <div class="form-group">
@@ -76,8 +76,8 @@ require_once __DIR__ . '/../partials/header.php';
         </div>
 
         <div class="form-group">
-            <label for="repeat_password">Repeat Password</label>
-            <input type="password" id="repeat_password" name="repeat_password" placeholder="Password123!" required>
+            <label for="repeatPassword">Repeat Password</label>
+            <input type="password" id="repeatPassword" name="repeatPassword" placeholder="Password123!" required>
         </div>
 
         <div class="form-group">
@@ -91,42 +91,42 @@ require_once __DIR__ . '/../partials/header.php';
 
         <div id="student-fields" style="display: <?= ($_POST['role'] ?? '') === 'student' ? 'block' : 'none' ?>;">
             <div class="form-group">
-                <label for="study_program">Study Program</label>
-                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <label for="studyProgram">Study Program</label>
+                <input type="text" id="studyProgram" name="studyProgram" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="cohort_year">Cohort Year</label>
-                <input type="number" id="cohort_year" name="cohort_year" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <label for="enrollmentYear">Cohort Year</label>
+                <input type="number" id="enrollmentYear" name="enrollmentYear" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
         </div>
         <div id="lecturer-fields" style="display: <?= ($_POST['role'] ?? '') === 'lecturer' ? 'block' : 'none' ?>;">
     <div class="form-group">
-        <label for="profile_picture">Profile Picture</label>
-        <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+        <label for="profilePicture">Profile Picture</label>
+        <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
     </div>
     
     <div class="form-group">
         <label for="course_code">Course Code</label>
-        <input type="text" id="course_code" name="course_code" 
+        <input type="text" id="courseCode" name="courseCode"
                placeholder="ITF12345" 
-               value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+               value="<?= htmlspecialchars($_POST['courseCode'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
         <label for="course_name">Course Name</label>
-        <input type="text" id="course_name" name="course_name" 
+        <input type="text" id="courseName" name="courseName"
                placeholder="Datasikkerhet i utvikling og drift" 
-               value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+               value="<?= htmlspecialchars($_POST['courseName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
-        <label for="course_pin">Course PIN</label>
-        <input type="text" id="course_pin" name="course_pin" 
+        <label for="coursePin">Course PIN</label>
+        <input type="text" id="coursePin" name="coursePin"
                placeholder="1337" 
                pattern="[0-9]{4}" 
                title="Please enter a 4-digit PIN code"
-               value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" reguired>
+               value="<?= htmlspecialchars($_POST['coursePin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" reguired>
     </div>
 </div>
 
@@ -135,7 +135,7 @@ require_once __DIR__ . '/../partials/header.php';
         </div>
     </form>
 
-    <p>Already have an account? <a href="<?= APP_BASE_URL ?>/">Login here</a>.</p>
+    <p>Already have an account? <a href="/">Login here</a>.</p>
 </div>
 
 <script>

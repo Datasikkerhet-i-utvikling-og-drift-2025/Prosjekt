@@ -92,7 +92,7 @@ class DatabaseManager
      * @param string|null $loggerMessage Optional message for logging the query execution.
      * @return bool Returns true if execution was successful, false otherwise.
      */
-    public function executeStmt(?string $loggerMessage = null): bool
+    public function executeTransaction(?string $loggerMessage = null): bool
     {
         if ($this->pdo === null || $this->stmt === null) {
             Logger::error("Execution failed: No prepared statement or database connection.");
@@ -120,6 +120,46 @@ class DatabaseManager
     }
 
     /**
+     * Executes a raw SQL statement without using transactions.
+     *
+     * This is useful for simple operations like INSERT, UPDATE, DELETE or DDL statements
+     * where transaction management is not necessary.
+     *
+     * @param string $sql The SQL statement to execute.
+     * @param callable|null $bindDataMethod Optional callback to bind values to the statement.
+     * @param string|null $loggerMessage Optional message for logging success/failure.
+     * @return bool True if the statement executed successfully, false otherwise.
+     */
+    public function executeDirect(string $sql, ?callable $bindDataMethod = null, ?string $loggerMessage = null): bool
+    {
+        if ($this->pdo === null) {
+            $this->connectToDb();
+        }
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+
+            if ($bindDataMethod !== null) {
+                $bindDataMethod($stmt);
+            }
+
+            $success = $stmt->execute();
+
+            if ($success) {
+                $loggerMessage && Logger::success("Successfully executed: " . $loggerMessage);
+            } else {
+                $loggerMessage && Logger::error("Execution failed: " . $loggerMessage);
+            }
+
+            return $success;
+        } catch (PDOException $e) {
+            Logger::error(($loggerMessage ?? "Direct SQL execution") . " failed: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
+    /**
      * Executes the last prepared SQL statement and fetches all results.
      *
      * If no statement has been prepared, it logs an error and returns an empty array.
@@ -135,7 +175,7 @@ class DatabaseManager
         }
 
         try {
-            $success = $this->executeStmt($loggerMessage);
+            $success = $this->executeTransaction($loggerMessage);
             if (!$success) { return [];}
 
             $result = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -163,7 +203,7 @@ class DatabaseManager
         }
 
         try {
-            $success = $this->executeStmt($loggerMessage);
+            $success = $this->executeTransaction($loggerMessage);
             if (!$success) { return null; }
 
             $result = $this->stmt->fetch(PDO::FETCH_ASSOC);

@@ -31,13 +31,15 @@ class AdminRepository
      */
     public function deleteUserById(string $id): bool
     {
-        $sql = "DELETE FROM users WHERE id = :id";
+        $sql = "DELETE FROM users 
+                WHERE id = :id";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":id", $id);
+        $this->db->prepareStmt($sql, function ($stmt) use ($id) {
+            $stmt->bindValue(':id', $id);
+        });
 
         $logger = "Deleting user ID: $id";
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($logger);
     }
 
 
@@ -50,13 +52,15 @@ class AdminRepository
      */
     public function deleteMessage(string $messageId): bool
     {
-        $sql = "DELETE FROM messages WHERE id = :id";
+        $sql = "DELETE FROM messages 
+                WHERE id = :id";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":id", $messageId);
+        $this->db->prepareStmt($sql, function ($stmt) use ($messageId) {
+            $stmt->bindValue(':id', $messageId);
+        });
 
         $logger = "Deleting message ID: $messageId";
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($logger);
     }
 
 
@@ -70,22 +74,22 @@ class AdminRepository
      */
     public function updateMessage(string $messageId, string $newContent): bool
     {
-        // Validate new content
         if (!InputValidator::isNotEmpty($newContent)) {
             Logger::error("New content is empty for message ID: $messageId");
             return false;
         }
 
-        $sql = "UPDATE messages SET content = :content, updated_at = NOW() WHERE id = :id";
+        $sql = "UPDATE messages 
+                SET content = :content, updated_at = NOW() 
+                WHERE id = :id";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':id', ':content'], [
-            $messageId,
-            InputValidator::sanitizeString($newContent)
-        ]);
+        $this->db->prepareStmt($sql, function ($stmt) use ($messageId, $newContent) {
+            $stmt->bindValue(':id', $messageId);
+            $stmt->bindValue(':content', InputValidator::sanitizeString($newContent));
+        });
 
         $logger = "Updating message ID: $messageId";
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($logger);
     }
 
 
@@ -117,13 +121,15 @@ class AdminRepository
      */
     public function getAllUsersByRole(string $role): array
     {
-        $sql = "SELECT * FROM users WHERE role = :role";
+        $sql = "SELECT * FROM users 
+                WHERE role = :role";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":role", $role);
+        $this->db->prepareStmt($sql, function ($stmt) use ($role) {
+            $stmt->bindValue(':role', $role);
+        });
 
         $logger = "Fetching users with role: $role";
-        return $this->db->fetchAll($stmt, $logger);
+        return $this->db->fetchAll($logger);
     }
 
 
@@ -141,10 +147,11 @@ class AdminRepository
                 JOIN users u ON m.student_id = u.id
                 WHERE m.id = :id";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":id", $messageId);
+        $this->db->prepareStmt($sql, function ($stmt) use ($messageId) {
+            $stmt->bindValue(':id', $messageId);
+        });
 
         $logger = "Finding sender for message ID: $messageId";
-        return $this->db->fetchSingle($stmt, $logger);
+        return $this->db->fetchSingle($logger);
     }
 }

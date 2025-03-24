@@ -1,7 +1,12 @@
 {
   "require": {
     "phpmailer/phpmailer": "^6.9",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-fileinfo": "*"
+  }
+  ,
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
   },
   "autoload": {
     "psr-4": {

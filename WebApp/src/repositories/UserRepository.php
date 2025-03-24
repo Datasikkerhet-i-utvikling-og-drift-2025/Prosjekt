@@ -41,7 +41,27 @@ class UserRepository
             fn($stmt) => $user->bindUserDataForDbStmt($stmt)
         );
 
-        return $this->db->executeStmt("Saving user data in database");
+        return $this->db->executeTransaction("Saving user data in database");
+    }
+
+
+    /**
+     * Retrieves a user from the database by their email address.
+     *
+     * @param string $email The email address of the user to retrieve.
+     * @return User|null Returns a User object if found, otherwise null.
+     * @throws DateMalformedStringException
+     */
+    public function getUserByEmail(string $email): ?User
+    {
+        $sql = "SELECT * FROM users 
+                WHERE email = :email 
+                LIMIT 1";
+
+        $this->db->prepareStmt($sql, fn($stmt) => $stmt->bindValue(":email", $email, PDO::PARAM_STR));
+        $userData = $this->db->fetchSingle("Fetching user by email: $email");
+
+        return $userData ? UserFactory::createUser($userData) : null;
     }
 
 
@@ -76,8 +96,9 @@ class UserRepository
             fn($stmt) => $user->bindUserDataForDbStmt($stmt)
         );
 
-        return $this->db->executeStmt("Updating user data in database");
+        return $this->db->executeTransaction("Updating user data in database");
     }
+
 
     /**
      * Deletes a user from the database by their ID.
@@ -95,7 +116,7 @@ class UserRepository
             fn($stmt) => $stmt->bindValue(":id", $userId, PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Deleting user with ID: $userId");
+        return $this->db->executeTransaction("Deleting user with ID: $userId");
     }
 
 
@@ -115,7 +136,7 @@ class UserRepository
             fn($stmt) => $stmt->bindValue(":email", $userEmail, PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Deleting user with email: $userEmail");
+        return $this->db->executeTransaction("Deleting user with email: $userEmail");
     }
 
 
@@ -137,26 +158,6 @@ class UserRepository
             fn($stmt) => $stmt->bindValue(":id", $userId, PDO::PARAM_STR)
         );
         $userData = $this->db->fetchSingle("Fetching user by ID: $userId");
-
-        return $userData ? UserFactory::createUser($userData) : null;
-    }
-
-
-    /**
-     * Retrieves a user from the database by their email address.
-     *
-     * @param string $email The email address of the user to retrieve.
-     * @return User|null Returns a User object if found, otherwise null.
-     * @throws DateMalformedStringException
-     */
-    public function getUserByEmail(string $email): ?User
-    {
-        $sql = "SELECT * FROM users 
-                WHERE email = :email 
-                LIMIT 1";
-
-        $this->db->prepareStmt($sql, fn($stmt) => $stmt->bindValue(":email", $email, PDO::PARAM_STR));
-        $userData = $this->db->fetchSingle("Fetching user by email: $email");
 
         return $userData ? UserFactory::createUser($userData) : null;
     }
@@ -199,7 +200,7 @@ class UserRepository
                 ->bindValue(":id", $userId, PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Saving reset token for user ID: $userId");
+        return $this->db->executeTransaction("Saving reset token for user ID: $userId");
     }
 
 
@@ -249,41 +250,6 @@ class UserRepository
                 ->bindValue(":id", $userId, PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Updating password and clearing reset token for user ID: $userId");
-    }
-
-
-
-    // FIXME look at the implementation here
-    // Save a password reset token
-    public function v1savePasswordResetToken($userId, $resetToken)
-    {
-        $sql = "UPDATE users SET reset_token = :resetToken, reset_token_created_at = NOW() WHERE id = :userId";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            return $stmt->execute([
-                ':resetToken' => $resetToken,
-                ':userId' => $userId,
-            ]);
-        } catch (Exception $e) {
-            Logger::error("Failed to save password reset token: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    // Retrieve a user by reset token
-    public function v1getUserByResetToken($resetToken)
-    {
-        $sql = "SELECT * FROM users WHERE reset_token = :resetToken AND reset_token_created_at >= (NOW() - INTERVAL 1 HOUR)";
-        $stmt = $this->pdo->prepare($sql);
-
-        try {
-            $stmt->execute([':resetToken' => $resetToken]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            Logger::error("Failed to retrieve user by reset token: " . $e->getMessage());
-            return null;
-        }
+        return $this->db->executeTransaction("Updating password and clearing reset token for user ID: $userId");
     }
 }

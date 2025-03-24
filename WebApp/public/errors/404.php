@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../src/config/versionURL.php';
+//require_once __DIR__ . '/../../src/config/versionURL.php';
 http_response_code(404);
 ?>
 <!DOCTYPE html>

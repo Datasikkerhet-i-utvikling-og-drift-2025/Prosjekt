@@ -44,7 +44,7 @@ class InputValidator
         }
 
         // Ensure passwords match
-        if ($sanitized['password'] !== ($sanitized['repeat_password'] ?? '')) {
+        if ($sanitized['password'] !== ($sanitized['repeatPassword'] ?? '')) {
             $errors['password'][] = "Passwords do not match.";
         }
 

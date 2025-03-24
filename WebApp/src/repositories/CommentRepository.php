@@ -56,7 +56,7 @@ class CommentRepository
         );
 
         $logger = "Adding comment to message ID: $messageId";
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 
     /**
@@ -113,6 +113,6 @@ class CommentRepository
         $this->db->bindSingleValueToSqlStmt($stmt, ':id', (int)$commentId);
         $logger = "Deleting comment ID: $commentId";
 
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 }

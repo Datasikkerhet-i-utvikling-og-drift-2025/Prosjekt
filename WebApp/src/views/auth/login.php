@@ -11,7 +11,7 @@ if (isset($_SESSION['user'])) {
     } elseif ($role === 'admin') {
         header('Location: /admin/dashboard');
         exit;
-    } 
+    }
 }
 ?>
 
@@ -33,7 +33,7 @@ if (isset($_SESSION['user'])) {
         </div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
-    
+
     <!-- Error Message Placeholder -->
     <?php if (!empty($_GET['error'])): ?>
         <div id="error-message" class="error">
@@ -42,7 +42,7 @@ if (isset($_SESSION['user'])) {
     <?php endif; ?>
 
     <!-- Login Form -->
-    <form action="/auth/login" method="POST" class="form">
+    <form action="/api/v1/auth/login" method="POST" class="form">
         <div class="form-group">
             <label for="email">Email Address</label>
             <input

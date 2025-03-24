@@ -51,7 +51,7 @@ class MessageRepository
         $this->db->bindArrayToSqlStmt($stmt, $params, $values);
 
         $loggerMessage = "Creating a new message for student ID: $studentId in course ID: $courseId";
-        return $this->db->executeStmt($stmt, $loggerMessage);
+        return $this->db->executeTransaction($stmt, $loggerMessage);
     }
 
 
@@ -137,7 +137,7 @@ class MessageRepository
         $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':replyContent'], [$messageId, InputValidator::sanitizeString($replyContent)]);
 
         $loggerMessage = "Updating reply for message ID: $messageId";
-        return $this->db->executeStmt($stmt, $loggerMessage);
+        return $this->db->executeTransaction($stmt, $loggerMessage);
     }
 
 
@@ -160,7 +160,7 @@ class MessageRepository
         $this->db->bindSingleValueToSqlStmt($stmt, ':messageId', $messageId);
 
         $loggerMessage = "Reporting message ID: $messageId";
-        return $this->db->executeStmt($stmt, $loggerMessage);
+        return $this->db->executeTransaction($stmt, $loggerMessage);
     }
 
 
@@ -186,7 +186,7 @@ class MessageRepository
         $this->db->bindSingleValueToSqlStmt($stmt, ':message_id', $messageId);
         $logger = "Deleting message with ID: $messageId";
 
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 
 
@@ -235,7 +235,7 @@ class MessageRepository
         $this->db->bindArrayToSqlStmt($stmt, [':message_id', ':content'], [$message_id, $sanitizedContent]);
         $logger = "Updating message content for message ID: $message_id";
 
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 
 }

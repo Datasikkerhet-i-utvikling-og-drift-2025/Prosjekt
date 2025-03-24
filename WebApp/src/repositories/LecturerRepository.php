@@ -93,7 +93,7 @@ class LecturerRepository
                 ->bindValue(":replyContent", InputValidator::sanitizeString($replyContent), PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Replying to message ID: $messageId");
+        return $this->db->executeTransaction("Replying to message ID: $messageId");
     }
 
 
@@ -144,6 +144,6 @@ class LecturerRepository
                 ->bindValue(":reason", InputValidator::sanitizeString($reason), PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Reporting message ID: $messageId");
+        return $this->db->executeTransaction("Reporting message ID: $messageId");
     }
 }

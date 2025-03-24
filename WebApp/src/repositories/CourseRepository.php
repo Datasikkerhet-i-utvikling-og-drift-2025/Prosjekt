@@ -55,7 +55,7 @@ class CourseRepository
             [$code, $name, $lecturerId, $pinCode]);
         $logger = "Creating course with code: " . $code;
 
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 
 
@@ -142,7 +142,7 @@ class CourseRepository
             [$id, $code, $name, $lecturerId, $pinCode]);
         $logger = "Updating course ID: " . $id;
 
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 
 
@@ -165,6 +165,6 @@ class CourseRepository
         $this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
 
         $logger = "Deleting course ID: " . $courseId;
-        return $this->db->executeStmt($stmt, $logger);
+        return $this->db->executeTransaction($stmt, $logger);
     }
 }

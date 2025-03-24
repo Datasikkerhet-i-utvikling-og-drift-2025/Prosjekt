@@ -14,7 +14,7 @@ use repositories\UserRepository;
 require_once __DIR__ . '/../src/config/app.php'; // Application config
 require_once __DIR__ . '/../src/helpers/ApiHelper.php'; // API helpers
 require_once __DIR__ . '/../src/helpers/Logger.php'; // Logger for error tracking
-require_once __DIR__ . '/../src/services/DatabaseManager.php'; // Database connection
+require_once __DIR__ . '/../src/managers/DatabaseManager.php'; // Database connection
 require_once __DIR__ . '/../src/repositories/UserRepository.php'; // User repository
 require_once __DIR__ . '/../src/autoload.php'; // Autoloader for PSR-4 compliance
 
@@ -67,7 +67,11 @@ $routes = require __DIR__ . '/../src/config/api-routes.php';
 // Validate API routes configuration
 if (!is_array($routes) || empty($routes)) {
     Logger::error('API routes configuration is empty.');
-    ApiHelper::sendError(500, 'Internal Server Error: No API routes configured.');
+    try {
+        ApiHelper::sendError(500, 'Internal Server Error: No API routes configured.');
+    } catch (JsonException $e) {
+
+    }
     exit;
 }
 

@@ -51,7 +51,7 @@ class StudentRepository
                 ->bindValue(":content", InputValidator::sanitizeString($content), \PDO::PARAM_STR)
         );
 
-        return $this->db->executeStmt("Sending message from student ID: $studentId to course ID: $courseId");
+        return $this->db->executeTransaction("Sending message from student ID: $studentId to course ID: $courseId");
     }
 
 
