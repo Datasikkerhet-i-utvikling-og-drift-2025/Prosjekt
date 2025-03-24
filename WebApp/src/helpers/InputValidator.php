@@ -61,27 +61,27 @@ class InputValidator
     private static function getRegistrationRules(string $role): array
     {
         $commonRules = [
-            'first_name' => ['required' => true, 'min' => 3, 'max' => 50],
-            'last_name' => ['required' => true, 'min' => 3, 'max' => 50],
+            'firstName' => ['required' => true, 'min' => 3, 'max' => 50],
+            'lastName' => ['required' => true, 'min' => 3, 'max' => 50],
             'name' => ['required' => true, 'min' => 3, 'max' => 100],
             'email' => ['required' => true, 'email' => true],
             'password' => ['required' => true, 'min' => 8],
-            'repeat_password' => ['required' => true],
+            'repeatPassword' => ['required' => true],
             'role' => ['required' => true],
         ];
 
         if ($role === 'student') {
             return array_merge($commonRules, [
-                'study_program' => ['required' => true, 'max' => 100],
-                'cohort_year' => ['required' => true, 'integer' => true],
+                'studyProgram' => ['required' => true, 'max' => 100],
+                'enrollmentYear' => ['required' => true, 'integer' => true],
             ]);
         }
 
         if ($role === 'lecturer') {
             return array_merge($commonRules, [
-                'course_code' => ['required' => true, 'max' => 10],
-                'course_name' => ['required' => true, 'max' => 100],
-                'course_pin' => ['required' => true, 'regex' => '/^\d{4}$/'],
+                'courseCode' => ['required' => true, 'max' => 10],
+                'courseName' => ['required' => true, 'max' => 100],
+                'coursePin' => ['required' => true, 'regex' => '/^\d{4}$/'],
             ]);
         }
 
