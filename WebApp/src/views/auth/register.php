@@ -1,4 +1,6 @@
 <?php
+use managers\ApiManager;
+
 session_start();
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'] ?? '';
@@ -14,22 +16,22 @@ if (isset($_SESSION['user'])) {
     }
 }
 
-//require_once __DIR__ . '/../../controllers/AuthController.php';
-//require_once __DIR__ . '/../../config/Database.php';
+$apiToken = getenv('API_TOKEN');
+$apiManager = new ApiManager($apiToken);
 
-//use db\Database;  // Flytt use statement til toppen
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $responseData = $apiManager->post('/api/v1/auth/register', $_POST);
 
-// Prosesser form submission først
-//if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//    $db = new Database();
-//    $pdo = $db->getConnection();
-//    $authController = new AuthController($pdo);
-//    $authController->register();
-    // Hvis registreringen feiler, vil den redirecte tilbake hit
-//}
+    if ($responseData['success']) {
+        $_SESSION['success'] = $responseData['message'];
+        header('Location: /');
+        exit;
+    } else {
+        $_SESSION['errors'] = $responseData['errors'] ?? ['An unexpected error occurred.'];
+    }
+}
 
-// Hvis vi kommer hit, er det enten en GET request eller registreringen feilet
-// Nå er det trygt å inkludere header og vise HTML
+
 require_once __DIR__ . '/../partials/header.php';
 ?>
 
@@ -54,7 +56,7 @@ require_once __DIR__ . '/../partials/header.php';
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
-    <form action="/api/v1/auth/register" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="firstName">First Name</label>
             <input type="text" id="firstName" name="firstName" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
@@ -126,7 +128,7 @@ require_once __DIR__ . '/../partials/header.php';
                placeholder="1337" 
                pattern="[0-9]{4}" 
                title="Please enter a 4-digit PIN code"
-               value="<?= htmlspecialchars($_POST['coursePin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" reguired>
+               value="<?= htmlspecialchars($_POST['coursePin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 </div>
 

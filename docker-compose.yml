@@ -43,9 +43,10 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_PORT=${SMTP_PORT}
-      # Lagt til GRAYLOG miljøvariabler her.
-      - GRAYLOG_HOST=graylog
-      - GRAYLOG_PORT=12201
+      - SMTP_PORT=${SMTP_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - API_TOKEN=${API_TOKEN}
+      - URL=${URL}
     env_file:
       - .env
 

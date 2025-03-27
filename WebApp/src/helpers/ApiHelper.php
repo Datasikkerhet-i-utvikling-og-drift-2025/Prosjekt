@@ -26,6 +26,7 @@ class ApiHelper
         exit;
     }
 
+
     /**
      * Sends a formatted API error response.
      *
@@ -39,6 +40,7 @@ class ApiHelper
         self::sendApiResponse($statusCode, new ApiResponse(false, $message, null, $errors));
     }
 
+
     /**
      * Retrieves JSON input from the request body.
      *
@@ -50,6 +52,7 @@ class ApiHelper
         return json_decode(file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
     }
 
+
     /**
      * Checks if the request is an API call based on headers.
      *
@@ -59,6 +62,7 @@ class ApiHelper
     {
         return isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
     }
+
 
     /**
      * Ensures that the request method is POST, otherwise responds with 405.
@@ -70,4 +74,31 @@ class ApiHelper
             self::sendError(405, 'Method Not Allowed. Use POST.');
         }
     }
+
+
+    /**
+     * Validates the API Token provided in the Authorization header.
+     *
+     * @throws JsonException
+     */
+    public static function requireApiToken(): void
+    {
+        $expectedToken = $_ENV['API_TOKEN'] ?? null;
+
+        if (empty($expectedToken)) {
+            self::sendError(500, 'Internal server error. API token not configured.');
+        }
+
+        $headers = getallheaders();
+        if (!isset($headers['Authorization']) || !str_starts_with($headers['Authorization'], 'Bearer ')) {
+            self::sendError(401, 'Unauthorized. Missing or invalid token.');
+        }
+
+        $providedToken = trim(str_replace('Bearer', '', $headers['Authorization']));
+
+        if ($providedToken !== $expectedToken) {
+            self::sendError(403, 'Forbidden. Invalid API token.');
+        }
+    }
+
 }

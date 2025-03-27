@@ -43,6 +43,7 @@ class V1AuthController
     public function register(): void
     {
         ApiHelper::requirePost();
+        //ApiHelper::requireApiToken();
 
         try {
             $input = $_POST;
