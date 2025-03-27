@@ -80,8 +80,8 @@ Write-Host "
 ╔════════════════════════════════════════════════════════════════╗
 ║ Frontend is running at: http://localhost:8080                  ║
 ║ Backend API is accessible at: http://localhost:5000            ║
-║ API documentation is accessible at: http://localhost:5000/docs
-║ Graylog is accessible at : http://localhost:9000
+║ API documentation is accessible at: http://localhost:5000/docs ║
+║ Graylog is accessible at : http://localhost:9000               ║
 ╚════════════════════════════════════════════════════════════════╝
 " -ForegroundColor Blue
 Write-Host "[INFO] Open the above links in your browser to access the application." -ForegroundColor Yellow
