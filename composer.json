@@ -4,11 +4,9 @@
     "ext-pdo": "*",
     "ext-fileinfo": "*",
     "monolog/monolog": "^2.8",
-    "graylog2/gelf-php": "^1.7"
-  },
+    "graylog2/gelf-php": "^1.7",
     "ext-curl": "*"
-  }
-  ,
+  },
   "require-dev": {
     "roave/security-advisories": "dev-latest"
   },
