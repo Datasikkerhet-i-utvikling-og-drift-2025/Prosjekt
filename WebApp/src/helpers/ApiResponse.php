@@ -2,6 +2,8 @@
 
 namespace helpers;
 
+use JsonException;
+
 class ApiResponse
 {
     public bool $success;
@@ -9,6 +11,9 @@ class ApiResponse
     public ?array $errors;
     public mixed $data;
 
+    /**
+     * @throws JsonException
+     */
     public function __construct(bool $success, string $message, mixed $data = null, ?array $errors = null)
     {
         $this->success = $success;
