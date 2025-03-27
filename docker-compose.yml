@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   mysql:
@@ -43,8 +43,72 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_PORT=${SMTP_PORT}
+      # Lagt til GRAYLOG miljøvariabler her.
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     env_file:
       - .env
+
+  # MongoDB: Lagrer Graylog konfigurasjonsdata
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - project_network
+    restart: always
+
+  # OpenSearch: Lagrer og indekserer loggene
+  opensearch:
+    image: opensearchproject/opensearch:2.8.0
+    container_name: opensearch
+    volumes:
+      - os_data:/usr/share/opensearch/data
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - project_network
+    restart: always
+
+  # Graylog: Selve loggbehandlingssystemet
+  graylog:
+    image: graylog/graylog:5.0
+    container_name: graylog
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+    environment:
+      # Endre CHANGE_ME til en sikker hemmelig nøkkel
+      - GRAYLOG_PASSWORD_SECRET=thisIsASecretPasswordPepperFor2025Graylog
+      # Standard admin passord: admin (Passordet er admin i SHA-256 hash)
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9000/
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://opensearch:9200
+      - GRAYLOG_MONGODB_URI=mongodb://mongodb:27017/graylog
+    ports:
+      # Web grensesnitt
+      - "9000:9000"
+      # GELF UDP for logging
+      - "12201:12201/udp"
+      # Syslog
+      - "1514:1514/udp"
+    depends_on:
+      - mongodb
+      - opensearch
+    networks:
+      - project_network
+    restart: always
 
 networks:
   project_network:
@@ -52,3 +116,6 @@ networks:
 
 volumes:
   db_data:
+  mongodb_data:
+  os_data:
+  graylog_data:
