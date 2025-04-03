@@ -147,7 +147,7 @@ require_once __DIR__ . '/../partials/header.php';
         document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
         
         const studentFields = document.querySelectorAll('#student-fields input');
-    const lecturerFields = document.querySelectorAll('#lecturer-fields input');
+        const lecturerFields = document.querySelectorAll('#lecturer-fields input');
 
     if (role === 'student') {
         studentFields.forEach(field => field.setAttribute('required', 'true'));
@@ -193,7 +193,8 @@ require_once __DIR__ . '/../partials/header.php';
         }
     });
 
-    document.getElementById('repeat_password').addEventListener('input', function() {
+    // getElementById repeat_password samsvarte ikke med id på linje 82
+    document.getElementById('repeatPassword').addEventListener('input', function() {
         const password = document.getElementById('password').value;
         const repeatPassword = this.value;
         if (repeatPassword !== password) {
@@ -204,7 +205,8 @@ require_once __DIR__ . '/../partials/header.php';
     });
 
     // Valider fornavn mens brukeren skriver
-    document.getElementById('first_name').addEventListener('input', function() {
+    // getElementById first_name samsvarte ikke med id på linje 62
+    document.getElementById('firstName').addEventListener('input', function() {
         if (this.value.length < 3) {
             showError(this, 'First name must be at least 3 characters long');
         } else {
@@ -213,7 +215,8 @@ require_once __DIR__ . '/../partials/header.php';
     });
 
     // Valider etternavn mens brukeren skriver
-    document.getElementById('last_name').addEventListener('input', function() {
+    // getElementById last_name samsvarte ikke med id på linje 66
+    document.getElementById('lastName').addEventListener('input', function() {
         if (this.value.length < 3) {
             showError(this, 'Last name must be at least 3 characters long');
         } else {
@@ -232,7 +235,8 @@ require_once __DIR__ . '/../partials/header.php';
     });
 
     // Valider kurskode mens brukeren skriver
-    document.getElementById('course_code').addEventListener('input', function() {
+    // getElementById course_code samsvarte ikke med id på linje 113
+    document.getElementById('courseCode').addEventListener('input', function() {
         if (this.value.length > 10) {
             showError(this, 'Course code must not exceed 10 characters');
         } else {
@@ -241,13 +245,14 @@ require_once __DIR__ . '/../partials/header.php';
     });
 
     // Valider før innsending
+    // retter opp id referenaser til input-feltene i skjemaet
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
-        const repeatPassword = document.getElementById('repeat_password').value;
-        const firstName = document.getElementById('first_name').value;
-        const lastName = document.getElementById('last_name').value;
+        const repeatPassword = document.getElementById('repeatPassword').value;
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
-        const courseCode = document.getElementById('course_code').value;
+        const courseCode = document.getElementById('courseCode').value;
 
         if (password.length < 8) {
             e.preventDefault();
@@ -257,19 +262,19 @@ require_once __DIR__ . '/../partials/header.php';
 
         if (repeatPassword !== password) {
             e.preventDefault();
-            showError(document.getElementById('repeat_password'), 'Passwords must match');
+            showError(document.getElementById('repeatPassword'), 'Passwords must match');
             return false;
         }
 
         if (firstName.length < 3) {
             e.preventDefault();
-            showError(document.getElementById('first_name'), 'First name must be at least 3 characters long');
+            showError(document.getElementById('firstName'), 'First name must be at least 3 characters long');
             return false;
         }
 
         if (lastName.length < 3) {
             e.preventDefault();
-            showError(document.getElementById('last_name'), 'Last name must be at least 3 characters long');
+            showError(document.getElementById('lastName'), 'Last name must be at least 3 characters long');
             return false;
         }
 
@@ -282,7 +287,7 @@ require_once __DIR__ . '/../partials/header.php';
 
         if (courseCode.length > 10) {
             e.preventDefault();
-            showError(document.getElementById('course_code'), 'Course code must not exceed 10 characters');
+            showError(document.getElementById('courseCode'), 'Course code must not exceed 10 characters');
             return false;
         }
     });
