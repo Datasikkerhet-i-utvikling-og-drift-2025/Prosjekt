@@ -153,7 +153,7 @@ class MessageService
             return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
         }
 
-        $messages = $this->messageRepository->getMessagesByCourse($courseId);
+        $messages = $this->messageRepository->getMessagesFromCourse($courseId);
         if ($messages === false) {
             return new ApiResponse(false, 'Failed to retrieve messages.', null, ['courseId' => $courseId]);
         }
@@ -258,12 +258,12 @@ class MessageService
             return new ApiResponse(false, 'Invalid message ID.', null, ['messageId' => $messageId]);
         }
 
-    $comments = $this->commentRepository->getCommentsByMessageId($messageId);
-    if ($comments === false) {
-        return new ApiResponse(false, 'Failed to retrieve comments.', null, ['messageId' => $messageId]);
-    }
+        $comments = $this->commentRepository->getCommentsByMessageId($messageId);
+        if ($comments === false) {
+            return new ApiResponse(false, 'Failed to retrieve comments.', null, ['messageId' => $messageId]);
+        }
 
-    return new ApiResponse(true, 'Comments retrieved successfully.', $comments);
+        return new ApiResponse(true, 'Comments retrieved successfully.', $comments);
     }
 
     /// Retrieves all messages for a specific course.
@@ -274,14 +274,14 @@ class MessageService
     /// @return ApiResponse
     /// @throws RandomException|DateMalformedStringException
     /// @throws Exception
-    public function getMessagesForCourse(int $courseId): ApiResponse
+    public function getMessagesbyCourse(int $courseId): ApiResponse
     {
         // Validate courseID
         if (!InputValidator::isValidCourseId($courseId)) {
             return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
         }
 
-        $messages = $this->messageRepository->getMessagesByCourseId($courseId);
+        $messages = $this->messageRepository->getMessagesByCourse($courseId);
         if ($messages === false) {
             return new ApiResponse(false, 'Failed to retrieve messages.', null, ['courseId' => $courseId]);
         }

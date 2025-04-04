@@ -32,14 +32,14 @@ class V1GuestController
     }
     /**
      * Retrieves messages from a specific course.
-     * Accepts GET requests with course ID as a parameter.
+     * Accepts POST requests with course ID as a parameter.
      * Responds with success status and message data.
      *
      * @return void
      * @throws JsonException
      */
     
-    public function getMessagesFromCourse()
+    public function getMessagesByCourse()
     {
         ApiHelper::requirePost();
         //ApiHelper::requireApiToken();
@@ -52,7 +52,7 @@ class V1GuestController
                 return;
             }
 
-            $response = $this->messageService->getMessagesFromCourse($courseId);
+            $response = $this->messageService->getMessagesByCourse($courseId);
 
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {

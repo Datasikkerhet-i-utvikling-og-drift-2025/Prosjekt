@@ -51,7 +51,7 @@ class V1StudentController
                 return;
             }
 
-            $response = $this->messageService->getMessagesFromCourse($courseId);
+            $response = $this->messageService->getMessagesByourse($courseId);
 
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {
