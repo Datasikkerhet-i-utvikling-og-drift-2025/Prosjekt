@@ -46,7 +46,8 @@ class V1AuthController
         //ApiHelper::requireApiToken();
 
         try {
-            $input = $_POST;
+            $input = ApiHelper::getJsonInput();
+
             $response = $this->authService->register($input);
 
             if ($response->success) {
