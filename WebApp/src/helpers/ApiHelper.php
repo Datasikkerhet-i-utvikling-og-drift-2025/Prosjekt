@@ -11,6 +11,7 @@ use JsonException;
  */
 class ApiHelper
 {
+
     /**
      * Sends a JSON-formatted API response.
      *
@@ -20,6 +21,7 @@ class ApiHelper
      */
     #[NoReturn] public static function sendApiResponse(int $statusCode, ApiResponse $response): void
     {
+        Logger::info("Sending API response. Status: $statusCode, Message: " . $response->message);
         http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode($response->toArray(), JSON_THROW_ON_ERROR);
@@ -37,6 +39,7 @@ class ApiHelper
      */
     #[NoReturn] public static function sendError(int $statusCode, string $message, array $errors = []): void
     {
+        Logger::error("Sending API error response. Status: $statusCode, Message: $message");
         self::sendApiResponse($statusCode, new ApiResponse(false, $message, null, $errors));
     }
 
@@ -56,10 +59,14 @@ class ApiHelper
     public static function getInput(): array
     {
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        Logger::debug("ApiHelper::getInput called with Content-Type: $contentType");
 
         if (str_starts_with($contentType, 'application/json')) {
             $rawInput = file_get_contents('php://input');
+            Logger::debug("Raw JSON input: $rawInput");
+
             if (empty($rawInput)) {
+                Logger::warning("Empty JSON input received.");
                 throw new JsonException('Empty JSON input.');
             }
 
@@ -70,9 +77,11 @@ class ApiHelper
             str_starts_with($contentType, 'multipart/form-data') ||
             str_starts_with($contentType, 'application/x-www-form-urlencoded')
         ) {
+            Logger::info("Returning \$_POST from ApiHelper::getInput.");
             return $_POST;
         }
 
+        Logger::error("Unsupported Content-Type: $contentType");
         throw new JsonException("Unsupported Content-Type: {$contentType}");
     }
 
@@ -85,7 +94,9 @@ class ApiHelper
      */
     public static function getJsonInput(): array
     {
-        return json_decode(file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
+        $raw = file_get_contents('php://input');
+        Logger::debug("ApiHelper::getJsonInput raw: $raw");
+        return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
     }
 
 
@@ -96,7 +107,9 @@ class ApiHelper
      */
     public static function isApiRequest(): bool
     {
-        return isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
+        $isApi = isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
+        Logger::debug("ApiHelper::isApiRequest detected as " . ($isApi ? "true" : "false"));
+        return $isApi;
     }
 
 
@@ -107,6 +120,7 @@ class ApiHelper
     public static function requirePost(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Logger::warning("Method not allowed: " . $_SERVER['REQUEST_METHOD']);
             self::sendError(405, 'Method Not Allowed. Use POST.');
         }
     }
@@ -122,19 +136,26 @@ class ApiHelper
         $expectedToken = $_ENV['API_TOKEN'] ?? null;
 
         if (empty($expectedToken)) {
+            Logger::critical("API token is not configured in environment.");
             self::sendError(500, 'Internal server error. API token not configured.');
         }
 
         $headers = getallheaders();
+        Logger::debug("ApiHelper::requireApiToken header: " . json_encode($headers));
+
         if (!isset($headers['Authorization']) || !str_starts_with($headers['Authorization'], 'Bearer ')) {
+            Logger::warning("Missing or malformed Authorization header.");
             self::sendError(401, 'Unauthorized. Missing or invalid token.');
         }
 
         $providedToken = trim(str_replace('Bearer', '', $headers['Authorization']));
 
         if ($providedToken !== $expectedToken) {
+            Logger::warning("Invalid API token provided.");
             self::sendError(403, 'Forbidden. Invalid API token.');
         }
+
+        Logger::info("API token validated successfully.");
     }
 
 }

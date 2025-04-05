@@ -91,8 +91,8 @@ class Course
     public function __construct(array $courseData)
     {
         $this->id = $courseData['id'] ?? null;
-        $this->code = InputValidator::sanitizeString($courseData['code']);
-        $this->name = InputValidator::sanitizeString($courseData['name']);
+        $this->code = InputValidator::sanitizeString($courseData['courseCode']);
+        $this->name = InputValidator::sanitizeString($courseData['courseName']);
         $this->lecturerId = (int) $courseData['lecturerId'];
         $this->pinCode = InputValidator::sanitizeString($courseData['pinCode']);
         $this->createdAt = new DateTime($courseData['createdAt'] ?? 'now');
