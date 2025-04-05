@@ -59,7 +59,6 @@ class AuthService
 
         $data = $validation['sanitized'];
 
-        // Email must be unique
         if ($this->userRepository->getUserByEmail($data['email'])) {
             return new ApiResponse(false, 'Email already registered.');
         }
@@ -138,9 +137,9 @@ class AuthService
             return null;
         }
 
-        $file = $_FILES['profile_picture'];
+        $file = $_FILES['profilePicture'];
         $allowedTypes = ['image/jpeg', 'image/png'];
-        $maxSize = 10 * 1024 * 1024; // 10MB
+        $maxSize = 10 * 1024 * 1024;
 
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($file['tmp_name']);

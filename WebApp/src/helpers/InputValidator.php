@@ -51,7 +51,7 @@ class InputValidator
             ],
             'password' => [
                 'required' => true,
-                'min'      => 8
+                'regex'    => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'
             ],
             'repeatPassword' => [
                 'required' => true
@@ -140,9 +140,14 @@ class InputValidator
 
                     case 'regex':
                         if ($ruleValue && !preg_match($ruleValue, $value)) {
-                            $errors[$field][] = 'Invalid format.';
+                            if ($field === 'password') {
+                                $errors[$field][] = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.';
+                            } else {
+                                $errors[$field][] = 'Invalid format.';
+                            }
                         }
                         break;
+
                 }
             }
 
