@@ -46,13 +46,7 @@ class V1AuthController
         ApiHelper::requireApiToken();
 
         try {
-            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-
-            if (str_starts_with($contentType, 'application/json')) {
-                $input = ApiHelper::getJsonInput();
-            } else {
-                $input = $_POST;
-            }
+            $input = ApiHelper::getInput();
 
             $response = $this->authService->register($input);
 

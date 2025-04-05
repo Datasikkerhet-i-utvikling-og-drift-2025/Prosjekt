@@ -42,6 +42,42 @@ class ApiHelper
 
 
     /**
+     * Retrieves sanitized input data based on the request's Content-Type.
+     *
+     * This method handles both JSON payloads (`application/json`) and
+     * traditional form submissions (`multipart/form-data` or `application/x-www-form-urlencoded`).
+     *
+     * For JSON, it parses the body using `json_decode()` and throws if the payload is invalid.
+     * For form-data, it returns `$_POST` directly.
+     *
+     * @return array The parsed and sanitized input array.
+     * @throws JsonException If JSON is invalid or decoding fails.
+     */
+    public static function getInput(): array
+    {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        if (str_starts_with($contentType, 'application/json')) {
+            $rawInput = file_get_contents('php://input');
+            if (empty($rawInput)) {
+                throw new JsonException('Empty JSON input.');
+            }
+
+            return json_decode($rawInput, true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        if (
+            str_starts_with($contentType, 'multipart/form-data') ||
+            str_starts_with($contentType, 'application/x-www-form-urlencoded')
+        ) {
+            return $_POST;
+        }
+
+        throw new JsonException("Unsupported Content-Type: {$contentType}");
+    }
+
+
+    /**
      * Retrieves JSON input from the request body.
      *
      * @return array Parsed JSON as associative array.
