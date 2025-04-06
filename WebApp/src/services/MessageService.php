@@ -11,6 +11,7 @@ use helpers\Logger;
 use helpers\ApiResponse;
 use managers\JWTManager;
 use managers\SessionManager;
+use models\Message;
 use repositories\UserRepository;
 use RuntimeException;
 use Random\RandomException;
@@ -61,25 +62,30 @@ class MessageService
         $this->courseRepository = $courseRepository;
         $this->anonymousIdRepository = $anonymousIdRepository;
     }
-
+    /**
     /**
      * Handle the creation of a new message to a specific course.
      * Accepts POST requests with course ID and message content.
      * Responds with success status and message ID.
-     */
-    public function createMessage(): 
+     * @param array $userMassage
+
+    public function createMessage(string $userMassage): ApiResponse
     {
-        //Sanitize all input data
-        $_POST = array_map([InputValidator::class, 'sanitizeString'], $_POST);
 
         // Validate the input data
-       $validatedData = InputValidator::validateMessageCreation($_POST);
-        if ($validatedData['success']) {
+       $validatedMessage = InputValidator::sanitizeString($userMessage);
+       if (!empty($validatedMessage['errors'])) {
+           return new ApiResponse(false, 'Validation failed.', null, $message['errors']);
+       }
+
+       $data = $validatedMessage['sanitized'];
+
+        if ($validatedMessage['success']) {
             $message = new Message();
-            $message->courseId = $validatedData['data']['courseId'];
-            $message->studentId = $validatedData['data']['studentId'];
-            $message->anonymousId = $validatedData['data']['anonymousId'];
-            $message->content = $validatedData['data']['content'];
+            $message->courseId = $validatedMessage['data']['courseId'];
+            $message->studentId = $validatedMessage['data']['studentId'];
+            $message->anonymousId = $validatedMessage['data']['anonymousId'];
+            $message->content = $validatedMessage['data']['content'];
 
             $result = $this->messageRepository->createMessage($message);
             if ($result) {
@@ -90,49 +96,39 @@ class MessageService
         } else {
             ApiHelper::sendApiResponse(400, ['success' => false, 'error' => 'Validation failed.', 'details' => $validatedData['errors']]);
         }
+
+        return new ApiResponse(true, 'Message successfully created.', $message);
     }
+    */
 
     /**
      * Sends a message to a specific course.
      *
-     * @param int $courseId
-     * @param string $content
-     * @param int|null $studentId
-     * @param int|null $anonymousId
+     * @param array $messageData The message data (studentID, courseId, anonymousId, content)
+     *
      * @return ApiResponse
      * @throws Exception
      */
-    public function sendMessage(int $courseId, string $content, ?int $studentId = null, ?int $anonymousId = null): ApiResponse
+    public function sendMessage(array $messageData): ApiResponse
     {
         // Sanitize and validate input
-        $content = InputValidator::sanitizeString($content);
-        if (!InputValidator::isNotEmpty($content)) {
-            return new ApiResponse(false, 'Message content cannot be empty.', null, ['courseId' => $courseId]);
+        $validation = InputValidator::validateMessage($messageData);
+        if (!empty($validation['errors'])) {
+            return new ApiResponse(false, 'Message content cannot be empty.', null, $validation['errors']);
         }
 
-        if (!InputValidator::isValidInteger($courseId)) {
-            return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
+        $data = $validation['sanitized'];
+
+        $message = new Message($data);
+
+        $success = $this->messageRepository->createMessage($message);
+
+        if (!$success){
+            return new ApiResponse(false, 'Message content cannot be empty.');
         }
 
-        // Check if the course exists
-        $course = $this->courseRepository->getCourseById($courseId);
-        if (!$course) {
-            return new ApiResponse(false, 'Course not found.', null, ['courseId' => $courseId]);
-        }
+        return new ApiResponse(true, 'Message sent successfully.', $message);
 
-        // Create the message
-        $message = new Message();
-        $message->courseId = $courseId;
-        $message->content = $content;
-        $message->studentId = $studentId;
-        $message->anonymousId = $anonymousId;
-
-        $result = $this->messageRepository->createMessage($message);
-        if ($result) {
-            return new ApiResponse(true, 'Message sent successfully.', ['messageId' => $result]);
-        } else {
-            return new ApiResponse(false, 'Failed to send message.', null, ['courseId' => $courseId]);
-        }
     }
         
     

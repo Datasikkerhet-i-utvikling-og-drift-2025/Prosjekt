@@ -12,6 +12,7 @@ use helpers\ApiResponse;
 use managers\JWTManager;
 use managers\SessionManager;
 use repositories\UserRepository;
+use repositories\CourseRepository;
 use factories\UserFactory;
 use RuntimeException;
 use Random\RandomException;
@@ -25,6 +26,7 @@ use Random\RandomException;
 class AuthService
 {
     private UserRepository $userRepository;
+    private CourseRepository $courseRepository;
     private JWTManager $jwtManager;
     private SessionManager $sessionManager;
 
@@ -32,12 +34,14 @@ class AuthService
      * AuthService constructor.
      *
      * @param UserRepository $userRepository
+     * @param CourseRepository $courseRepository
      * @param JWTManager $jwtManager
      * @param SessionManager $sessionManager
      */
-    public function __construct(UserRepository $userRepository, JWTManager $jwtManager, SessionManager $sessionManager)
+    public function __construct(UserRepository $userRepository, CourseRepository $courseRepository , JWTManager $jwtManager, SessionManager $sessionManager)
     {
         $this->userRepository = $userRepository;
+        $this->courseRepository = $courseRepository;
         $this->jwtManager = $jwtManager;
         $this->sessionManager = $sessionManager;
     }
@@ -73,6 +77,7 @@ class AuthService
             return new ApiResponse(false, 'Registration failed.');
         }
 
+
         $token = $this->jwtManager->generateToken([
             'id' => $user->id,
             'email' => $user->email,
@@ -84,7 +89,17 @@ class AuthService
 
         $this->sessionManager->storeUser($userArray, $token);
 
+        // If the registered user is a Lecturer, create the course
+        if ($user-> role == 'lecturer') {
+            $course = $this->courseRepository->createCourse($data['code'], $data['name'], $user->id, $data['pinCode']);
+            if (!$course) {
+                return new ApiResponse(false, 'Course creation failed.');
+            }
+        }
+
         return new ApiResponse(true, 'Registration successful.', $userArray);
+
+
     }
 
     /**

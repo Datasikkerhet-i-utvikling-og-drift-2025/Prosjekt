@@ -5,6 +5,7 @@ namespace repositories;
 use helpers\InputValidator;
 use helpers\Logger;
 use managers\DatabaseManager;
+use models\Message;
 
 class MessageRepository
 {
@@ -24,34 +25,21 @@ class MessageRepository
     /**
      * Creates a new message in the database.
      *
-     * @param int $studentId The ID of the student sending the message.
-     * @param int $courseId The ID of the associated course.
-     * @param string $anonymousId The unique identifier for anonymous messages.
-     * @param string $content The content of the message.
-     * @return bool Returns true if the message was successfully inserted, false otherwise.
+     * @param Message $message The message object containing message details.
+     * @return bool Returns true if the user wasa created successfully, false otherwise.
      */
-    public function createMessage(int $studentId, int $courseId, string $anonymousId, string $content): bool
+    public function createMessage(Message $message): bool
     {
-        if (!InputValidator::isNotEmpty($content)) {
-            Logger::error("Message content is empty for student ID $studentId and course ID $courseId");
-            return false;
-        }
 
         $sql = "INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at, is_reported)
                 VALUES (:studentId, :courseId, :anonymousId, :content, NOW(), 0)";
-        $params = [':studentId', ':courseId', ':anonymousId', ':content'];
-        $values = [
-            $studentId,
-            $courseId,
-            InputValidator::sanitizeString($anonymousId),
-            InputValidator::sanitizeString($content)
-        ];
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt($stmt, $params, $values);
+        $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $message->bindMessageDataForDbStmt($stmt)
+        );
 
-        $loggerMessage = "Creating a new message for student ID: $studentId in course ID: $courseId";
-        return $this->db->executeTransaction($stmt, $loggerMessage);
+        return $this->db->executeTransaction("Saving message data in database");
     }
 
 
