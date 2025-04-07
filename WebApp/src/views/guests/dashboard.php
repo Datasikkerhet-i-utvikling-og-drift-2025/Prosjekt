@@ -11,7 +11,8 @@ function sanitize($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$pdo = new DatabaseManager();
+$dbManager = new DatabaseManager();
+$pdo = $dbManager->connectToDb();
 $pin = $_POST['pin'] ?? null;
 $authorized = false;
 $course = null;
