@@ -57,7 +57,7 @@ class V1StudentController
 
     }
 
-
+    /*
     public function getMessagesByCourse()
     {
         ApiHelper::requirePost();
@@ -79,7 +79,7 @@ class V1StudentController
             ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
 
-    }
+    }*/
 
 
 }
