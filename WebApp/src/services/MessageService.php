@@ -16,11 +16,12 @@ use repositories\UserRepository;
 use RuntimeException;
 use Random\RandomException;
 use repositories\MessageRepository;
+use repositories\LecturerRepository;
 use repositories\CommentRepository;
 use repositories\ReportRepository;
 use repositories\CourseRepository;
 use repositories\AnonymousIdRepository;
-use repositories\LecturerRepository;
+
 
 /** Class AuthService   
  * Handles authentication and message-related logic.
@@ -49,7 +50,9 @@ class MessageService
      */
     public function __construct(
         MessageRepository $messageRepository,
+
         CommentRepository $commentRepository,
+
         ReportRepository $reportRepository,
         CourseRepository $courseRepository,
         AnonymousIdRepository $anonymousIdRepository,
@@ -133,8 +136,8 @@ class MessageService
         
     
     /**
-    * Retrieves messages from a specificmCourse.
-    * Accepts POST requests withmCourse ID as a parameter.
+    * Retrieves messages from a specificCourse.
+    * Accepts POST requests with CourseID as a parameter.
     * Responds with success status and message data.
     *
     * @param int $courseId
@@ -250,7 +253,7 @@ class MessageService
     public function getCommentsForMessage(int $messageId): ApiResponse
     {
         // Validate courseID
-        if (!InputValidator::isValidMessageId($messageId)) {
+        if (!InputValidator::isValidInteger($messageId)) {
             return new ApiResponse(false, 'Invalid message ID.', null, ['messageId' => $messageId]);
         }
 
@@ -283,6 +286,36 @@ class MessageService
         }
 
         return new ApiResponse(true, 'Messages retrieved successfully.', $messages);
+    }
+
+    /**
+     * reply to a student's message
+     *
+     * @param string $messageId
+     * @param string $replyContent
+     *
+     * @return ApiResponse
+     * @throws Exception
+     */
+
+    public function replyToMessage(string $messageId, string $replyContent): ApiResponse
+    {
+        //validate messageId
+        if(!InputValidator::isValidInteger($messageId)) {
+            return new ApiResponse(false, 'Invalid message ID.', null, ['messageId' => $messageId]);
+        }
+
+
+        //Sanitize the reply
+        $sanitizedMessage = InputValidator::sanitizeString($replyContent);
+
+        //check it the input is empty
+        if (!InputValidator::isNotEmpty($sanitizedMessage)) {
+            return new ApiResponse(false, 'Message content cannot be empty.', null, ['messageId' => $messageId]);
+        }
+        $data = $sanitizedMessage;
+
+        return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId, 'data' => $data]);
     }
 }
    
