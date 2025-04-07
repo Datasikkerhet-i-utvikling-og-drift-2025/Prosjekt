@@ -290,7 +290,7 @@ class MessageService
 
     /**
      * reply to a student's message
-     *
+     * Used in LecturerController
      * @param string $messageId
      * @param string $reply
      *

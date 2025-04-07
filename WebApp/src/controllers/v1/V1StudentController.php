@@ -27,6 +27,7 @@ class V1StudentController
 
     //controller function for student users to interact with the system.
     // This includes sending messages, getting messages from a subject, reporting messages, and sending comments.
+    // sendMessage -> messageService -> sendMessage -> Message?
     /**
      * @return void
      * @throws JsonException

@@ -23,6 +23,7 @@ class V1LecturerController
     }
 
     /**
+     * Uses from Message-> LecturerRepository -> MessageService -> LecturerRepository -> Controller
      * @return void
      * @throws JsonException
      */
