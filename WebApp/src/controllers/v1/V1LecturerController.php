@@ -34,18 +34,16 @@ class V1LecturerController
 
         try {
             $input = ApiHelper::getJsonInput();
-
             //validate that input has messageId and replyContent
             if (!isset($input['messageId']) || !isset($input['replyContent'])) {
                 ApiHelper::sendError(400, 'Missinng required fields: messageId or replyContent.',
                     ['required' => ['messageId', 'replyContent'],
                         'received' => $input]);
             }
+
             $messageId = $input['messageId'];
-            $replyContent = $input['replyContent'];
-
-
-            $response = $this->messageService->replyToMessage($messageId, $replyContent);
+            $reply = $input['replyContent'];
+            $response = $this->messageService->replyToMessage($messageId, $reply);
 
             if ($response->success) {
                 ApiHelper::sendApiResponse(200, $response);
@@ -53,12 +51,11 @@ class V1LecturerController
                 ApiHelper::sendApiResponse(400, $response);
             }
 
-        }catch (\JsonException $e) {
+        }catch (JsonException $e) {
             ApiHelper::sendError(400, 'Invalid JSON input.', ['error' => $e->getMessage()]  );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             ApiHelper::sendError(500, 'Internal server error.', ['error' => $e->getMessage()]  );
         }
-
     }
 
 }

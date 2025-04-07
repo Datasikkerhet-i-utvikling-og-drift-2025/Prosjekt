@@ -292,30 +292,34 @@ class MessageService
      * reply to a student's message
      *
      * @param string $messageId
-     * @param string $replyContent
+     * @param string $reply
      *
      * @return ApiResponse
      * @throws Exception
      */
 
-    public function replyToMessage(string $messageId, string $replyContent): ApiResponse
+    public function replyToMessage(string $messageId, string $reply): ApiResponse
     {
         //validate messageId
         if(!InputValidator::isValidInteger($messageId)) {
             return new ApiResponse(false, 'Invalid message ID.', null, ['messageId' => $messageId]);
         }
 
-
         //Sanitize the reply
-        $sanitizedMessage = InputValidator::sanitizeString($replyContent);
+        $sanitizedReply = InputValidator::sanitizeString($reply);
 
         //check it the input is empty
-        if (!InputValidator::isNotEmpty($sanitizedMessage)) {
+        if (!InputValidator::isNotEmpty($sanitizedReply)) {
             return new ApiResponse(false, 'Message content cannot be empty.', null, ['messageId' => $messageId]);
         }
-        $data = $sanitizedMessage;
 
-        return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId, 'data' => $data]);
+        $success = $this->lecturerRepository->replyToMessage($messageId, $sanitizedReply);
+
+        if(!$success) {
+            return new ApiResponse(false, 'Failed to replied message.', null, ['messageId' => $messageId]);
+        }
+
+        return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId, 'data' => $success]);
     }
 }
    
