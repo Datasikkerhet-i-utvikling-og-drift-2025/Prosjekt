@@ -310,16 +310,16 @@ class MessageService
 
         //check it the input is empty
         if (!InputValidator::isNotEmpty($sanitizedReply)) {
-            return new ApiResponse(false, 'Message content cannot be empty.', null, ['messageId' => $messageId]);
+            return new ApiResponse(false, 'Message content cannot be empty.', ['messageId' => $messageId]);
         }
 
         $success = $this->lecturerRepository->replyToMessage($messageId, $sanitizedReply);
 
         if(!$success) {
-            return new ApiResponse(false, 'Failed to replied message.', null, ['messageId' => $messageId]);
+            return new ApiResponse(false, 'Failed to send reply.', ['messageId' => $messageId]);
         }
 
-        return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId, 'data' => $success]);
+        return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId]);
     }
 }
    
