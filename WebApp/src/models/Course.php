@@ -121,10 +121,10 @@ class Course
      */
     public function bindCourseDataForDbStmt(PDOStatement $stmt): void
     {
-        $stmt->bindValue(':id', $this->id ?? null, $this->id !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
         $stmt->bindValue(':code', $this->code, PDO::PARAM_STR);
         $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
         $stmt->bindValue(':lecturerId', $this->lecturerId, PDO::PARAM_INT);
         $stmt->bindValue(':pinCode', $this->pinCode, PDO::PARAM_STR);
     }
+
 }

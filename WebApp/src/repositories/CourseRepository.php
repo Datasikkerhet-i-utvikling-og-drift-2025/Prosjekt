@@ -35,27 +35,17 @@ class CourseRepository
      *
      * @return bool Returns true if the course was created successfully, false otherwise.
      */
-    public function createCourse(string $code, string $name, int $lecturerId, string $pinCode): bool
+    public function createCourse(Course $course): bool
     {
-        if (!InputValidator::isNotEmpty($code) || !InputValidator::isNotEmpty($name) || !InputValidator::isNotEmpty($pinCode)) {
-            Logger::error("Course creation failed: Missing required fields");
-            return false;
-        }
-
-        if (!InputValidator::isValidInteger($lecturerId)) {
-            Logger::error("Course creation failed: Invalid lecturer ID");
-            return false;
-        }
-
         $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
                 VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':code', ':name', ':lecturerId', ':pinCode'],
-            [$code, $name, $lecturerId, $pinCode]);
-        $logger = "Creating course with code: " . $code;
+        $stmt = $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $course->bindCourseDataForDbStmt($stmt)
+        );
 
-        return $this->db->executeTransaction($stmt, $logger);
+        return $this->db->executeTransaction("Saving user data in database");
     }
 
 
@@ -75,7 +65,7 @@ class CourseRepository
 
         $sql = "SELECT * FROM courses WHERE id = :id";
         $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
+        //$this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
 
         $logger = "Fetching course by ID: " . $courseId;
         $data = $this->db->fetchSingle($stmt, $logger);
@@ -134,12 +124,12 @@ class CourseRepository
                     name = :name, 
                     lecturer_id = :lecturerId, 
                     pin_code = :pinCode, 
-                    updated_at = NOW()
+                    created_at = NOW()
                 WHERE id = :id";
 
         $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':id', ':code', ':name', ':lecturerId', ':pinCode'],
-            [$id, $code, $name, $lecturerId, $pinCode]);
+        //$this->db->bindArrayToSqlStmt($stmt, [':id', ':code', ':name', ':lecturerId', ':pinCode'],
+        //    [$id, $code, $name, $lecturerId, $pinCode]);
         $logger = "Updating course ID: " . $id;
 
         return $this->db->executeTransaction($stmt, $logger);
@@ -162,7 +152,7 @@ class CourseRepository
 
         $sql = "DELETE FROM courses WHERE id = :id";
         $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
+        //$this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
 
         $logger = "Deleting course ID: " . $courseId;
         return $this->db->executeTransaction($stmt, $logger);
