@@ -41,7 +41,7 @@ class Lecturer extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->imagePath = $userData['imagePath'];
+        $this->imagePath = $userData['imagePath'] ?? "";
     }
 
 
