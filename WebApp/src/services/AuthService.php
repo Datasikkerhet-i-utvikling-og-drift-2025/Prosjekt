@@ -18,6 +18,7 @@ use repositories\CourseRepository;
 use factories\UserFactory;
 use RuntimeException;
 use Random\RandomException;
+use Throwable;
 
 /**
  * Class AuthService
@@ -91,26 +92,44 @@ class AuthService
 
         Logger::success('User saved to database: ' . $user->email);
 // TODO fix this shit
+        Logger::debug($user->role->value);
         if ($user->role->value === 'lecturer') {
             Logger::info('User is lecturer, creating course.');
-            $lecturer = $this->userRepository->getUserByEmail($data['email']);
-            //$course = new Course();
+            Logger::debug("1");
+            try {
+                Logger::debug("2");
+                $lecturer = $this->userRepository->getUserByEmail($data['email']);
+                Logger::debug("3");
+                $data['lecturerId'] = $lecturer->id ?? null;
+                Logger::debug("4");
+                $data['pinCode'] = $data['coursePin'];
+                Logger::debug("5");
+            } catch (Throwable $e) {
+                Logger::error('Failed: ' . $e->getMessage());
+                return new ApiResponse(false, 'Invalid course data.', null, ['exception' => $e->getMessage()]);
+            }
 
-            $courseCreated = $this->courseRepository->createCourse(
-                $data['courseCode'],
-                $data['courseName'],
-                $lecturer?->id,
-                $data['coursePin']
-            );
+            try {
+                $course = new Course($data);
+                Logger::debug("6");
+            } catch (Throwable $e) {
+                Logger::error('Failed to instantiate Course: ' . $e->getMessage());
+                return new ApiResponse(false, 'Invalid course data.', null, ['exception' => $e->getMessage()]);
+            }
+            Logger::debug("7");
+
+
+            try {
+                Logger::debug('Attempting to create course...');
+                $courseCreated = $this->courseRepository->createCourse($course);
+                Logger::debug('createCourse() returned: ' . var_export($courseCreated, true));
+            } catch (Throwable $e) {
+                Logger::error('Exception during course creation: ' . $e->getMessage());
+                return new ApiResponse(false, 'Course creation failed.', null, ['exception' => $e->getMessage()]);
+            }
+
 
             Logger::debug('createCourse() returned: ' . var_export($courseCreated, true));
-
-            $courseCreated = $this->courseRepository->createCourse(
-                $data['courseCode'],
-                $data['courseName'],
-                $lecturer?->id,
-                $data['coursePin']
-            );
 
             if (!$courseCreated) {
                 Logger::error('Failed to create course for lecturer.');
@@ -134,6 +153,8 @@ class AuthService
         Logger::success('Registration successful for user: ' . $user->email);
 
         return new ApiResponse(true, 'Registration successful.', $userArray);
+
+
     }
 
     /**
