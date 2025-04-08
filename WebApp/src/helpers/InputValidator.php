@@ -219,4 +219,52 @@ class InputValidator
     {
         return (bool) filter_var($value, FILTER_VALIDATE_INT);
     }
+
+    /**
+     * Validate message input fields.
+     *
+     * @param array $input User-provided input data.
+     * @return array Returns an array with 'errors' and 'sanitized' data.
+     */
+    public static function validateMessage(array $input): array
+    {
+        $rules = self::getMessageRules();
+
+        $result = self::validateInputs($input, $rules);
+
+        // You can add additional validation if needed, e.g., checking content length
+        if (isset($result['sanitized']['content']) && strlen($result['sanitized']['content']) < 10) {
+            $result['errors']['content'][] = 'Message content must be at least 10 characters long.';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get validation rules for the message.
+     *
+     * @return array The validation rules for the message.
+     */
+    private static function getMessageRules(): array
+    {
+        return [
+            'studentId' => [
+                'required' => true,
+                'integer'  => true
+            ],
+            'courseId' => [
+                'required' => true,
+                'integer'  => true
+            ],
+            'anonymousId' => [
+                'required' => true,
+                'max'      => 100
+            ],
+            'content' => [
+                'required' => true,
+                'min'      => 10,
+                'max'      => 1000
+            ],
+        ];
+    }
 }

@@ -134,6 +134,8 @@ class AuthService
         Logger::success('Registration successful for user: ' . $user->email);
 
         return new ApiResponse(true, 'Registration successful.', $userArray);
+
+
     }
 
     /**
