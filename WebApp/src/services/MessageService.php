@@ -2,26 +2,17 @@
 
 namespace services;
 
-use DateMalformedStringException;
+//use DateMalformedStringException;
 use Exception;
-use finfo;
-use helpers\AuthHelper;
 use helpers\InputValidator;
-use helpers\Logger;
 use helpers\ApiResponse;
-use managers\JWTManager;
-use managers\SessionManager;
-use models\Comment;
 use models\Message;
-use repositories\UserRepository;
-use RuntimeException;
-use Random\RandomException;
+//use Random\RandomException;
 use repositories\MessageRepository;
 use repositories\LecturerRepository;
 use repositories\CommentRepository;
-use repositories\ReportRepository;
-use repositories\CourseRepository;
-use repositories\AnonymousIdRepository;
+//use repositories\CourseRepository;
+
 
 
 /** Class AuthService
@@ -34,9 +25,7 @@ class MessageService
 {
     private MessageRepository $messageRepository;
     private CommentRepository $commentRepository;
-    private ReportRepository $reportRepository;
-    private CourseRepository $courseRepository;
-    private AnonymousIdRepository $anonymousIdRepository;
+    //private CourseRepository $courseRepository;
     private LecturerRepository $lecturerRepository;
 
     /**
@@ -44,27 +33,19 @@ class MessageService
      *
      * @param MessageRepository $messageRepository
      * @param CommentRepository $commentRepository
-     * @param ReportRepository $reportRepository
-     * @param CourseRepository $courseRepository
-     * @param AnonymousIdRepository $anonymousIdRepository
+    // * @param CourseRepository $courseRepository
      * @param LecturerRepository $lecturerRepository
      */
     public function __construct(
         MessageRepository $messageRepository,
-
         CommentRepository $commentRepository,
-
-        ReportRepository $reportRepository,
-        CourseRepository $courseRepository,
-        AnonymousIdRepository $anonymousIdRepository,
+        //CourseRepository $courseRepository,
         LecturerRepository $lecturerRepository
     ) {
         $this->messageRepository = $messageRepository;
         $this->commentRepository = $commentRepository;
-        $this->reportRepository = $reportRepository;
         $this->lecturerRepository = $lecturerRepository;
-        $this->courseRepository = $courseRepository;
-        $this->anonymousIdRepository = $anonymousIdRepository;
+        //$this->courseRepository = $courseRepository;
     }
     /**
     /**
@@ -143,18 +124,17 @@ class MessageService
      *
      * @param int $courseId
      * @return ApiResponse
-     * @throws RandomException|DateMalformedStringException
      * @throws Exception
      */
-    public function getMessagesFromCourse(int $courseId): ApiResponse
+    public function getMessagesByCourse(int $courseId): ApiResponse
     {
         // Validate courseID
-        if (!InputValidator::isValidCourseId($courseId)) {
+        if (!InputValidator::isValidInteger($courseId)) {
             return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
         }
 
-        $messages = $this->messageRepository->getMessagesFromCourse($courseId);
-        if ($messages === false) {
+        $messages = $this->messageRepository->getMessagesByCourse($courseId);
+        if (!$messages) {
             return new ApiResponse(false, 'Failed to retrieve messages.', null, ['courseId' => $courseId]);
         }
 
@@ -169,7 +149,6 @@ class MessageService
      * @param int $messageId
      * @param string $reason
      * @return ApiResponse
-     * @throws RandomException|DateMalformedStringException
      * @throws Exception
      */
     public function reportMessage(int $messageId, string $reason): ApiResponse
@@ -191,13 +170,14 @@ class MessageService
         }
 
         // Create the report
-        $result = $this->reportRepository->reportMessage($messageId, $reason);
+        $result = $this->messageRepository->reportMessageById($messageId, $reason);
         if ($result) {
             return new ApiResponse(true, 'Message reported successfully.', ['messageId' => $messageId]);
         } else {
             return new ApiResponse(false, 'Failed to report message.', null, ['messageId' => $messageId]);
         }
     }
+
     /**
      * Sends a comment to a specific message.
      * Accepts POST requests with message ID and comment content.
@@ -207,7 +187,6 @@ class MessageService
      * @param string $guestName
      * @param string $content
      * @return ApiResponse
-     * @throws RandomException|DateMalformedStringException
      * @throws Exception
      */
     public function sendComment(int $messageId, string $guestName,string $content): ApiResponse
@@ -228,7 +207,7 @@ class MessageService
         if (!$message) {
             return new ApiResponse(false, 'Message not found.', null, ['messageId' => $messageId]);
         }
-        
+
         $result = $this->commentRepository->addComment($messageId, $guestName, $content);
         if ($result) {
             return new ApiResponse(true, 'Comment sent successfully.', ['commentId' => $messageId]);
@@ -245,46 +224,22 @@ class MessageService
      *
      * @param int $messageId
      * @return ApiResponse
-     * @throws RandomException|DateMalformedStringException
      * @throws Exception
      */
-    /*public function getCommentsForMessage(int $messageId): ApiResponse
+    /* not inn use at the moment:!
+    public function getCommentsByMessageId(int $messageId): ApiResponse
     {
-        // Validate courseID
+        // Validate messageId
         if (!InputValidator::isValidInteger($messageId)) {
             return new ApiResponse(false, 'Invalid message ID.', null, ['messageId' => $messageId]);
         }
 
         $comments = $this->commentRepository->getCommentsByMessageId($messageId);
-        if ($comments === false) {
+        if (!$comments) {
             return new ApiResponse(false, 'Failed to retrieve comments.', null, ['messageId' => $messageId]);
         }
 
         return new ApiResponse(true, 'Comments retrieved successfully.', $comments);
-    }*/
-
-    /// Retrieves all messages for a specific course.
-    /// Accepts GET requests with course ID as a parameter.
-    /// Responds with success status and message data.
-    ///
-    /// @param int $courseId
-    /// @return ApiResponse
-    /// @throws RandomException|DateMalformedStringException
-    /// @throws Exception
-    /*
-    public function getMessagesbyCourse(int $courseId): ApiResponse
-    {
-        // Validate courseID
-        if (!InputValidator::isValidCourseId($courseId)) {
-            return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
-        }
-
-        $messages = $this->messageRepository->getMessagesByCourse($courseId);
-        if ($messages === false) {
-            return new ApiResponse(false, 'Failed to retrieve messages.', null, ['courseId' => $courseId]);
-        }
-
-        return new ApiResponse(true, 'Messages retrieved successfully.', $messages);
     }*/
 
     /**
@@ -292,7 +247,6 @@ class MessageService
      * Used in LecturerController
      * @param string $messageId
      * @param string $reply
-     *
      * @return ApiResponse
      * @throws Exception
      */
