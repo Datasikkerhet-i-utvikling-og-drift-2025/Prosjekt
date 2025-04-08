@@ -16,9 +16,34 @@ class V1LecturerController
 
     }
 
-
-    public function getMessages()
+    /**
+     * @return void
+     *
+     * @throws JsonException
+     */
+    public function getMessages(): void
     {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken(); // (optional security)
+
+        try {
+            $input = ApiHelper::getJsonInput(); // Get parsed JSON as array
+
+            $courseId = $input['courseId'] ?? null; // <--- use $input you already fetched, not ApiHelper::getJsonInput() again
+
+            if (!$courseId) {
+                ApiHelper::sendError(400, 'Course ID is required.');
+            }
+
+            $response = $this->messageService->getMessagesByCourse((int)$courseId); // (int) casting is safer here
+
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+
+        } catch (JsonException $e) {
+            ApiHelper::sendError(400, 'Invalid JSON input.',  ['exception' => $e->getMessage()]);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
 
     }
 
@@ -37,7 +62,7 @@ class V1LecturerController
             $input = ApiHelper::getJsonInput();
             //validate that input has messageId and replyContent
             if (!isset($input['messageId']) || !isset($input['replyContent'])) {
-                ApiHelper::sendError(400, 'Missinng required fields: messageId or replyContent.',
+                ApiHelper::sendError(400, 'Missing required fields: messageId or replyContent.',
                     ['required' => ['messageId', 'replyContent'],
                         'received' => $input]);
             }
