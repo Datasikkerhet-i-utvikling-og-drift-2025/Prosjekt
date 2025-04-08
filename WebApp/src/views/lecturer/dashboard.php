@@ -16,6 +16,49 @@ $courses = [];
 $messages = [];
 $comments = [];
 $errorMessage = '';
+*/
+
+use managers\ApiManager;
+
+session_start();
+
+require_once __DIR__ . '/../../helpers/Logger.php';
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'lecturer') {
+    header('Location: /auth/login');
+    exit;
+}
+
+$lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
+$messages = [];
+$courses = [];
+$errorMessage = '';
+
+try {
+    $apiManager = new ApiManager();
+
+    // Example: Fetch courses first if needed (assuming you have such endpoint)
+    // $coursesResponse = $apiManager->get('/api/v1/lecturer/courses');
+    // $courses = $coursesResponse['data'] ?? [];
+
+    // Fetch messages for a course
+    if (isset($_GET['course_id'])) {
+        $courseId = (int)$_GET['course_id'];
+
+        $responseData = $apiManager->post('/api/v1/lecturer/messages', [
+            'courseId' => $courseId
+        ]);
+
+        if ($responseData['success']) {
+            $messages = $responseData['data']['messages'] ?? [];
+        } else {
+            $errorMessage = 'Failed to fetch messages.';
+        }
+    }
+} catch (Throwable $e) {
+    $errorMessage = 'Unexpected error: ' . $e->getMessage();
+}
+
 ?>
 
 <?php include __DIR__ . '/../partials/header.php'; ?>

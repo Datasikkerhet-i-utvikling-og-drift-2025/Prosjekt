@@ -48,7 +48,6 @@ class V1LecturerController
         } catch (Exception $e) {
             ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
-
     }
 
     /**
