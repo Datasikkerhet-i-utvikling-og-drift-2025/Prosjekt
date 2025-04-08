@@ -1,15 +1,18 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/DatabaseManager.php';
+require_once __DIR__ . '/../../managers/DatabaseManager.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 
+
+use managers\DatabaseManager;
 // Sanitize output
 function sanitize($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$pdo = (new service\DatabaseService())->pdo;
+$dbManager = new DatabaseManager();
+$pdo = $dbManager->connectToDb();
 $pin = $_POST['pin'] ?? null;
 $authorized = false;
 $course = null;
