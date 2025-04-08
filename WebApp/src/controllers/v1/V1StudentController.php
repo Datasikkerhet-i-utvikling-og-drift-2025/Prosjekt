@@ -58,28 +58,36 @@ class V1StudentController
     }
 
     /*
-    public function getMessagesByCourse()
-    {
-        ApiHelper::requirePost();
-        //ApiHelper::requireApiToken();
+    /**
+     * @return void
+     * @throws JsonException
+     */
+    /*
+ public function getMessagesByCourse(): void
+ {
+     ApiHelper::requirePost();
+     ApiHelper::requireApiToken(); // (optional security)
 
-        try {
-            $input = ApiHelper::getJsonInput();
-            $courseId = ApiHelper::getJsonInput()['courseId'] ?? null;
-            if (!$courseId) {
-                ApiHelper::sendError(400, 'course ID is required.');
-            }
+     try {
+         $input = ApiHelper::getJsonInput(); // Get parsed JSON as array
 
-            $response = $this->messageService->getMessagesByCourse($courseId);
+         $courseId = $input['courseId'] ?? null; // <--- use $input you already fetched, not ApiHelper::getJsonInput() again
 
-            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
-        } catch (JsonException $e) {
-            ApiHelper::sendError(400, 'Invalid JSON input.', ['exception' => $e->getMessage()]);
-        } catch (Exception $e) {
-            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
-        }
+         if (!$courseId) {
+             ApiHelper::sendError(400, 'Course ID is required.');
+         }
 
-    }*/
+         $response = $this->messageService->getMessagesByCourse((int)$courseId); // (int) casting is safer here
+
+         ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+
+     } catch (JsonException $e) {
+         ApiHelper::sendError(400, 'Invalid JSON input.',  ['exception' => $e->getMessage()]);
+     } catch (Exception $e) {
+         ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+     }
+
+ */
 
 
 }
