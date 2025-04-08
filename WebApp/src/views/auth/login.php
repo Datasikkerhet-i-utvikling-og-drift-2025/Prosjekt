@@ -1,4 +1,7 @@
 <?php
+
+use managers\ApiManager;
+
 session_start();
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'] ?? '';
@@ -11,6 +14,28 @@ if (isset($_SESSION['user'])) {
     } elseif ($role === 'admin') {
         header('Location: /admin/dashboard');
         exit;
+    }
+}
+
+try {
+    $apiManager = new ApiManager();
+} catch (Throwable $e) {
+    $_SESSION['errors'] = ['Cannot initialize ApiManager: ' . $e->getMessage()];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $responseData = $apiManager->post('/api/v1/auth/login', $_POST);
+
+        if ($responseData['success'] === true) {
+            $_SESSION['success'] = $responseData['data']['message'] ?? 'Login successful!';
+            header('Location: /');
+            exit;
+        } else {
+            $_SESSION['errors'] = $responseData['errors'] ?? ['An unexpected error occurred.'];
+        }
+    } catch (Throwable $e) {
+        $_SESSION['errors'] = ['Unexpected error: ' . $e->getMessage()];
     }
 }
 ?>
