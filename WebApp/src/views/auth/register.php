@@ -24,9 +24,6 @@ try {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        //var_dump($_POST);
-        //exit;
-
         $responseData = $apiManager->post('/api/v1/auth/register', $_POST);
 
         if ($responseData['success'] === true) {
