@@ -11,6 +11,7 @@ use helpers\Logger;
 use helpers\ApiResponse;
 use managers\JWTManager;
 use managers\SessionManager;
+use models\Comment;
 use models\Message;
 use repositories\UserRepository;
 use RuntimeException;
@@ -23,7 +24,7 @@ use repositories\CourseRepository;
 use repositories\AnonymousIdRepository;
 
 
-/** Class AuthService   
+/** Class AuthService
  * Handles authentication and message-related logic.
  * Compatible with both web and mobile clients.
  * Uses session manager for secure session lifecycle handling.
@@ -75,34 +76,34 @@ class MessageService
     public function createMessage(string $userMassage): ApiResponse
     {
 
-        // Validate the input data
-       $validatedMessage = InputValidator::sanitizeString($userMessage);
-       if (!empty($validatedMessage['errors'])) {
-           return new ApiResponse(false, 'Validation failed.', null, $message['errors']);
-       }
-
-       $data = $validatedMessage['sanitized'];
-
-        if ($validatedMessage['success']) {
-            $message = new Message();
-            $message->courseId = $validatedMessage['data']['courseId'];
-            $message->studentId = $validatedMessage['data']['studentId'];
-            $message->anonymousId = $validatedMessage['data']['anonymousId'];
-            $message->content = $validatedMessage['data']['content'];
-
-            $result = $this->messageRepository->createMessage($message);
-            if ($result) {
-                ApiHelper::sendApiResponse(201, ['success' => true, 'messageId' => $result]);
-            } else {
-                ApiHelper::sendApiResponse(500, ['success' => false, 'error' => 'Failed to create message.']);
-            }
-        } else {
-            ApiHelper::sendApiResponse(400, ['success' => false, 'error' => 'Validation failed.', 'details' => $validatedData['errors']]);
-        }
-
-        return new ApiResponse(true, 'Message successfully created.', $message);
+    // Validate the input data
+    $validatedMessage = InputValidator::sanitizeString($userMessage);
+    if (!empty($validatedMessage['errors'])) {
+    return new ApiResponse(false, 'Validation failed.', null, $message['errors']);
     }
-    */
+
+    $data = $validatedMessage['sanitized'];
+
+    if ($validatedMessage['success']) {
+    $message = new Message();
+    $message->courseId = $validatedMessage['data']['courseId'];
+    $message->studentId = $validatedMessage['data']['studentId'];
+    $message->anonymousId = $validatedMessage['data']['anonymousId'];
+    $message->content = $validatedMessage['data']['content'];
+
+    $result = $this->messageRepository->createMessage($message);
+    if ($result) {
+    ApiHelper::sendApiResponse(201, ['success' => true, 'messageId' => $result]);
+    } else {
+    ApiHelper::sendApiResponse(500, ['success' => false, 'error' => 'Failed to create message.']);
+    }
+    } else {
+    ApiHelper::sendApiResponse(400, ['success' => false, 'error' => 'Validation failed.', 'details' => $validatedData['errors']]);
+    }
+
+    return new ApiResponse(true, 'Message successfully created.', $message);
+    }
+     */
 
     /**
      * Sends a message to a specific course.
@@ -133,18 +134,18 @@ class MessageService
         return new ApiResponse(true, 'Message sent successfully.', $message);
 
     }
-        
-    
+
+
     /**
-    * Retrieves messages from a specificCourse.
-    * Accepts POST requests with CourseID as a parameter.
-    * Responds with success status and message data.
-    *
-    * @param int $courseId
-    * @return ApiResponse
-    * @throws RandomException|DateMalformedStringException
-    * @throws Exception
-    */
+     * Retrieves messages from a specificCourse.
+     * Accepts POST requests with CourseID as a parameter.
+     * Responds with success status and message data.
+     *
+     * @param int $courseId
+     * @return ApiResponse
+     * @throws RandomException|DateMalformedStringException
+     * @throws Exception
+     */
     public function getMessagesFromCourse(int $courseId): ApiResponse
     {
         // Validate courseID
@@ -203,15 +204,17 @@ class MessageService
      * Responds with success status and comment ID.
      *
      * @param int $messageId
+     * @param string $guestName
      * @param string $content
      * @return ApiResponse
      * @throws RandomException|DateMalformedStringException
      * @throws Exception
      */
-    public function sendComment(int $messageId, string $content): ApiResponse
+    public function sendComment(int $messageId, string $guestName,string $content): ApiResponse
     {
         // Sanitize and validate input
         $content = InputValidator::sanitizeString($content);
+        $guestName = InputValidator::sanitizeString($guestName);
         if (!InputValidator::isNotEmpty($content)) {
             return new ApiResponse(false, 'Comment content cannot be empty.', null, ['messageId' => $messageId]);
         }
@@ -221,21 +224,16 @@ class MessageService
         }
 
         // Check if the message exists
-        $message = $this->messageRepository->getMessageById($messageId);
+        $message = $this->commentRepository->addComment($messageId, $guestName, $content);
         if (!$message) {
             return new ApiResponse(false, 'Message not found.', null, ['messageId' => $messageId]);
         }
-
-        // Create the comment
-        $comment = new Comment();
-        $comment->messageId = $messageId;
-        $comment->content = $content;
-
-        $result = $this->commentRepository->createComment($comment);
+        
+        $result = $this->commentRepository->addComment($messageId, $guestName, $content);
         if ($result) {
-            return new ApiResponse(true, 'Comment sent successfully.', ['commentId' => $result]);
+            return new ApiResponse(true, 'Comment sent successfully.', ['commentId' => $messageId]);
         } else {
-            return new ApiResponse(false, 'Failed to send comment.', null, ['messageId' => $messageId]);
+            return new ApiResponse(false, 'Failed to send comment.',null, ['messageId' => $messageId]);
         }
     }
 
@@ -250,7 +248,7 @@ class MessageService
      * @throws RandomException|DateMalformedStringException
      * @throws Exception
      */
-    public function getCommentsForMessage(int $messageId): ApiResponse
+    /*public function getCommentsForMessage(int $messageId): ApiResponse
     {
         // Validate courseID
         if (!InputValidator::isValidInteger($messageId)) {
@@ -263,7 +261,7 @@ class MessageService
         }
 
         return new ApiResponse(true, 'Comments retrieved successfully.', $comments);
-    }
+    }*/
 
     /// Retrieves all messages for a specific course.
     /// Accepts GET requests with course ID as a parameter.
@@ -273,6 +271,7 @@ class MessageService
     /// @return ApiResponse
     /// @throws RandomException|DateMalformedStringException
     /// @throws Exception
+    /*
     public function getMessagesbyCourse(int $courseId): ApiResponse
     {
         // Validate courseID
@@ -286,7 +285,7 @@ class MessageService
         }
 
         return new ApiResponse(true, 'Messages retrieved successfully.', $messages);
-    }
+    }*/
 
     /**
      * reply to a student's message
@@ -322,4 +321,3 @@ class MessageService
         return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId]);
     }
 }
-   
