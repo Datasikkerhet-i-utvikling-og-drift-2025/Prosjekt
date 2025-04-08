@@ -23,9 +23,13 @@ use helpers\Logger;
 use managers\DatabaseManager;
 use managers\JWTManager;
 use managers\SessionManager;
+use repositories\CommentRepository;
 use repositories\CourseRepository;
+use repositories\LecturerRepository;
+use repositories\MessageRepository;
 use repositories\UserRepository;
 use services\AuthService;
+use services\MessageService;
 
 // Log application startup
 Logger::info('Initializing application...');
@@ -43,16 +47,19 @@ try {
     // Initialize repository classes
     $userRepository = new UserRepository($db);
     $courseRepository = new CourseRepository($db);
+    $messageRepository = new MessageRepository($db);
+    $lecturerRepository = new LecturerRepository($db);
+    $commentRepository = new CommentRepository($db);
 
 
     // Initialize service classes
     $authService = new AuthService($userRepository, $courseRepository, $jwtManager, $sessionManager);
-
+    $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
 
     // Create controller instances
     $authController = new V1AuthController($authService, $sessionManager);
-    //$studentController = new StudentController($pdo);
-    //$lecturerController = new LecturerController($pdo);
+    //$studentController = new StudentController($messageService);
+    $lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);
     //$guestController = new GuestController($pdo);
 
@@ -83,12 +90,12 @@ try {
         // Student routes
         //['GET', '/api/student/courses', [$studentController, 'getCourses']],
         //['GET', '/api/student/messages', [$studentController, 'getMyMessages']],
-        //['POST', '/api/student/message/send', [$studentController, 'sendMessage']],
+        //['POST', '/api/v1/student/message/send', [$studentController, 'sendMessage']],
 
         // Lecturer routes
         //['GET', '/api/lecturer/courses', [$lecturerController, 'getCourses']],
-        //['GET', '/api/lecturer/messages', [$lecturerController, 'getMessagesForCourse']],
-        //['POST', '/api/lecturer/message/reply', [$lecturerController, 'replyToMessage']],
+        ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
+        ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
         //['POST', '/api/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
 
         // Admin routes

@@ -1,4 +1,5 @@
 <?php
+/*
 session_start();
 require_once __DIR__ . '/../../helpers/Logger.php';
 // Check if the user is logged in and has the correct role
@@ -16,8 +17,6 @@ $messages = [];
 $errorMessage = '';
 require_once __DIR__ . '/../../config/DatabaseManager.php';
 try {
-   
-   
 
     $db = new service\DatabaseService();
     $pdo = $db->pdo;
@@ -50,6 +49,8 @@ try {
     //Fetch guest comments
     $stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
     $comments = $stmtComments->fetchAll();
+*/
+
 
 ?>
 
