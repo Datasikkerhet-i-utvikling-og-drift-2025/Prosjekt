@@ -72,7 +72,7 @@ class V1AuthController
         ApiHelper::requirePost();
 
         try {
-            $input = ApiHelper::getJsonInput();
+            $input = ApiHelper::getInput();
             $response = $this->authService->login($input);
 
             if ($response->success) {

@@ -91,19 +91,14 @@ class AuthService
         }
 
         Logger::success('User saved to database: ' . $user->email);
-// TODO fix this shit
+
         Logger::debug($user->role->value);
         if ($user->role->value === 'lecturer') {
             Logger::info('User is lecturer, creating course.');
-            Logger::debug("1");
             try {
-                Logger::debug("2");
                 $lecturer = $this->userRepository->getUserByEmail($data['email']);
-                Logger::debug("3");
                 $data['lecturerId'] = $lecturer->id ?? null;
-                Logger::debug("4");
                 $data['pinCode'] = $data['coursePin'];
-                Logger::debug("5");
             } catch (Throwable $e) {
                 Logger::error('Failed: ' . $e->getMessage());
                 return new ApiResponse(false, 'Invalid course data.', null, ['exception' => $e->getMessage()]);
@@ -111,12 +106,10 @@ class AuthService
 
             try {
                 $course = new Course($data);
-                Logger::debug("6");
             } catch (Throwable $e) {
                 Logger::error('Failed to instantiate Course: ' . $e->getMessage());
                 return new ApiResponse(false, 'Invalid course data.', null, ['exception' => $e->getMessage()]);
             }
-            Logger::debug("7");
 
 
             try {
@@ -127,9 +120,6 @@ class AuthService
                 Logger::error('Exception during course creation: ' . $e->getMessage());
                 return new ApiResponse(false, 'Course creation failed.', null, ['exception' => $e->getMessage()]);
             }
-
-
-            Logger::debug('createCourse() returned: ' . var_export($courseCreated, true));
 
             if (!$courseCreated) {
                 Logger::error('Failed to create course for lecturer.');
@@ -153,8 +143,6 @@ class AuthService
         Logger::success('Registration successful for user: ' . $user->email);
 
         return new ApiResponse(true, 'Registration successful.', $userArray);
-
-
     }
 
     /**

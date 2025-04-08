@@ -14,44 +14,8 @@ $lecturerName = $_SESSION['user']['name'] ?? 'Lecturer';
 // Fetch courses and messages from the database
 $courses = [];
 $messages = [];
+$comments = [];
 $errorMessage = '';
-require_once __DIR__ . '/../../config/DatabaseManager.php';
-try {
-
-    $db = new service\DatabaseService();
-    $pdo = $db->pdo;
-
-    $lecturerId = $_SESSION['user']['id'];
-
-    // Fetch courses assigned to the lecturer
-    $stmtCourses = $pdo->prepare("
-         SELECT id, code, name, pin_code
-         FROM courses 
-         WHERE lecturer_id = :lecturer_id
-    ");
-    $stmtCourses->execute([':lecturer_id' => $lecturerId]);
-    $courses = $stmtCourses->fetchAll();
-
-    // Fetch messages sent to the lecturer's courses
-    $stmtMessages = $pdo->prepare("
-        SELECT m.id, m.content, c.name AS course_name 
-        FROM messages m
-        JOIN courses c ON m.course_id = c.id
-        WHERE c.lecturer_id = :lecturer_id
-        ORDER BY m.created_at DESC
-    ");
-    $stmtMessages->execute([':lecturer_id' => $lecturerId]);
-    $messages = $stmtMessages->fetchAll();
-} catch (Exception $e) {
-    $errorMessage = 'Failed to load courses and messages. Please try again later.';
-    Logger::error('Error fetching lecturer dashboard data: ' . $e->getMessage());
-}
-    //Fetch guest comments
-    $stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
-    $comments = $stmtComments->fetchAll();
-*/
-
-
 ?>
 
 <?php include __DIR__ . '/../partials/header.php'; ?>
