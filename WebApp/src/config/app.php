@@ -1,11 +1,17 @@
 <?php
-
 namespace config;
+
+use helpers\ApiHelper;
+
+if (isset($logger)) {
+    ApiHelper::setLogger($logger);
+}
 
 return [
     // Application Settings
     'app_name' => 'Feedback System',
     'base_url' => 'http://localhost:8080', // Change to your domain in production
+    'APP_BASE_URL' => $_ENV['URL'] ?? 'http://localhost',
     //'base_url' => 'http://http://158.39.188.204/steg1/',
     'environment' => 'development', // Options: 'development', 'production'
     //'environment' => 'production', // Options: 'development', 'production'
