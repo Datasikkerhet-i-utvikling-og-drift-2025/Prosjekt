@@ -4,6 +4,7 @@ namespace controllers\v1;
 
 use helpers\ApiHelper;
 use helpers\ApiResponse;
+use helpers\InputValidator;
 use managers\SessionManager;
 use services\StudentService;
 use JsonException;
@@ -58,6 +59,31 @@ class V1StudentController
         } catch (Exception $e) {
            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * @return void
+     * @throws JsonException
+     */
+    public function getMessagesByStudent(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken();
+
+        try {
+            $studentId = $_POST['studentId'] ?? null;
+
+            if (!$studentId) {
+                ApiHelper::sendError(400, 'StudentId is required.', ['exception' => 'studentId']);
+            }
+
+           $response = $this->studentService->getMessagesByStudent($studentId);
+
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+
 
     }
 

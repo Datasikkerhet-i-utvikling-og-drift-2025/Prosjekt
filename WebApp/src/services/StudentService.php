@@ -5,6 +5,7 @@ namespace services;
 use DateMalformedStringException;
 use Exception;
 use Helpers\ApiResponse;
+use JsonException;
 use models\Message;
 use repositories\StudentRepository;
 use helpers\InputValidator;
@@ -73,6 +74,28 @@ class StudentService
         }
 
         return new ApiResponse(true, 'Message sent sucessfully!', $message);
+    }
+
+    /**
+     * @param string $studentId
+     * @return ApiResponse
+     * @throws JsonException
+     */
+
+    public function getMessagesByStudent(string $studentId): ApiResponse
+    {
+        $studentId = InputValidator::sanitizeString($studentId);
+        if (!$studentId = InputValidator::isValidInteger($studentId)){
+            return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
+        }
+
+        $messages = $this->studentRepository->getMessagesByStudent($studentId);
+        if (!$messages) {
+            return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
+        }
+
+        return new ApiResponse(true, 'Messages found!', $messages);
+
     }
 
 }
