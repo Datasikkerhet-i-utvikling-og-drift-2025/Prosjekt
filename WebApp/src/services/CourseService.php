@@ -60,11 +60,11 @@ class CourseService
             return new ApiResponse(false, 'Course id is empty??? well fuck me...', null, ['courseId' => $pinCode]);
         }
         //getCourseByPin er nokk ikke laget enda
-        $input = $this->courseRepository->getCourseByPin($pinCode);
+        $input = $this->courseRepository->getCourseByPinCode($pinCode);
         if (!$input) {
             return new ApiResponse(false, 'Course not found', null, ['courseId' => $pinCode]);
         }
-        return new ApiResponse(true, 'Course id retieved successfully', null, ['courseId' => $pinCode]);
+        return new ApiResponse(true, 'Course pin retrieved successfully', null, ['courseId' => $pinCode]);
     }
 
 
