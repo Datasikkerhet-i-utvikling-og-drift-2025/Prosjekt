@@ -27,17 +27,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $responseData = $apiManager->post('/api/v1/auth/login', $_POST);
 
-        if ($responseData['success'] === true) {
-            $_SESSION['success'] = $responseData['data']['message'] ?? 'Login successful!';
-            header('Location: /');
+        if ($responseData['success'] === true && isset($responseData['data']['data'])) {
+            $_SESSION['user'] = $responseData['data']['data'];
+
+            $role = $_SESSION['user']['role'] ?? '';
+
+            if ($role === 'student') {
+                header('Location: /student/dashboard');
+            } elseif ($role === 'lecturer') {
+                header('Location: /lecturer/dashboard');
+            } elseif ($role === 'admin') {
+                header('Location: /admin/dashboard');
+            } else {
+                header('Location: /');
+            }
             exit;
+
         } else {
-            $_SESSION['errors'] = $responseData['errors'] ?? ['An unexpected error occurred.'];
+            $_SESSION['errors'] = $responseData['data']['errors'] ?? ['Invalid login credentials.'];
         }
+
     } catch (Throwable $e) {
         $_SESSION['errors'] = ['Unexpected error: ' . $e->getMessage()];
     }
 }
+
 ?>
 
 <?php include __DIR__ . '/../partials/header.php'; ?>
@@ -67,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <!-- Login Form -->
-    <form action="/api/v1/auth/login" method="POST" class="form">
+    <form action="" method="POST" class="form">
         <div class="form-group">
             <label for="email">Email Address</label>
             <input

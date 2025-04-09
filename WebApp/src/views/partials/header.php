@@ -47,7 +47,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <li><a href="/profile">My Profile</a></li>
                     <?php endif; ?>
 
-                    <li><a href="/auth/logout" class="logout-link">Logout</a></li>
+                    <li><a href="/api/v1/auth/logout" class="logout-link">Logout</a></li>
                 <?php else: ?>
                     <li><a href="/">Login</a></li>
                     <li><a href="/register">Register</a></li>
