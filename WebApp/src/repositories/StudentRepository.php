@@ -79,7 +79,6 @@ class StudentRepository
         return $this->db->fetchAll("Fetching messages for student ID: $studentId");
     }
 
-
     /**
      * Retrieves a specific message along with its reply.
      *

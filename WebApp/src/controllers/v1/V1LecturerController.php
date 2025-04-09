@@ -3,6 +3,7 @@
 namespace controllers\v1;
 
 use helpers\ApiHelper;
+use managers\SessionManager;
 use services\MessageService;
 use JsonException;
 use Exception;
@@ -10,6 +11,9 @@ use Exception;
 class V1LecturerController
 {
     private MessageService $messageService;
+    public function __construct(MessageService $messageService){
+        $this->messageService = $messageService;
+    }
 
     public function registerSubject()
     {
@@ -44,11 +48,10 @@ class V1LecturerController
         } catch (Exception $e) {
             ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
-
     }
 
     /**
-     * Uses from Message-> LecturerRepository -> MessageService -> LecturerRepository -> Controller
+     * Uses from Message model-> LecturerRepository -> MessageService -> Controller
      * @return void
      * @throws JsonException
      */
