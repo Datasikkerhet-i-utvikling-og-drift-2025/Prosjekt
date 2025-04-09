@@ -98,4 +98,29 @@ class StudentService
 
     }
 
+    //not complete
+    /**
+     * @param string $messageId
+     * @param string $studentId
+     * @return ApiResponse
+     * @throws JsonException
+     */
+    public function getMessagesWithReply(string $messageId, string $studentId): ApiResponse
+    {
+        $messageId = InputValidator::sanitizeString($messageId);
+        $studentId = InputValidator::sanitizeString($studentId);
+        if (!$messageId = InputValidator::isValidInteger($messageId)){
+            return new ApiResponse(false, 'Message id is invalid!', null, ['messageId' => $messageId]);
+        }
+        if (!$studentId = InputValidator::isValidInteger($studentId)){
+            return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
+        }
+
+        $messages = $this->studentRepository->getMessageWithReply($messageId, $studentId);
+        if (!$messages) {
+            return new ApiResponse(false, 'Message id not found', null, ['messageId' => $messageId]);
+        }
+        return new ApiResponse(true, 'Messages found!', $messages);
+    }
+
 }
