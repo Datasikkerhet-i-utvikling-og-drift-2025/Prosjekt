@@ -83,8 +83,23 @@ class V1StudentController
         } catch (JsonException $e) {
             ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
+    }
 
+    /**
+     * @return void
+     * @throws JsonException
+     */
+    public function getAvailableCourses(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken();
 
+        try {
+            $response = $this->studentService->getAvailableCourses();
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
     }
 
     /*

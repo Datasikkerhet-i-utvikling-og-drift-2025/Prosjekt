@@ -76,6 +76,7 @@ class StudentService
         return new ApiResponse(true, 'Message sent sucessfully!', $message);
     }
 
+    //Variable will allways be true on line 93...
     /**
      * @param string $studentId
      * @return ApiResponse
@@ -90,7 +91,7 @@ class StudentService
         }
 
         $messages = $this->studentRepository->getMessagesByStudent($studentId);
-        if (!$messages) {
+        if (empty($messages)) {
             return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
         }
 
@@ -117,10 +118,25 @@ class StudentService
         }
 
         $messages = $this->studentRepository->getMessageWithReply($messageId, $studentId);
-        if (!$messages) {
+
+        if (empty($messages)) {
             return new ApiResponse(false, 'Message id not found', null, ['messageId' => $messageId]);
         }
         return new ApiResponse(true, 'Messages found!', $messages);
     }
+
+    /**
+     * @return ApiResponse
+     * @throws JsonException
+     */
+    public function getAvailableCourses(): ApiResponse
+    {
+        $courses = $this->studentRepository->getAvailableCourses();
+        if (empty($courses)) {
+            return new ApiResponse(false, 'No available courses at the moment!', null, ['courses' => $courses]);
+        }
+        return new ApiResponse(true, 'Available courses found!', $courses);
+    }
+
 
 }
