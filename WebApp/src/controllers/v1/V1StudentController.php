@@ -5,24 +5,24 @@ namespace controllers\v1;
 use helpers\ApiHelper;
 use helpers\ApiResponse;
 use managers\SessionManager;
-use services\MessageService;
+use services\StudentService;
 use JsonException;
 use Exception;
 
 class V1StudentController
 {
-    private MessageService $messageService;
+    private StudentService $studentService;
 
     /**
      *V1StudentController constructor.
      *
-     *@param MessageService $messageService
+     *@param StudentService $studentService
      *
      */
 
-    public function __construct(MessageService $messageService)
+    public function __construct(StudentService $studentService)
     {
-       $this->messageService = $messageService;
+       $this->studentService = $studentService;
     }
 
     //controller function for student users to interact with the system.
@@ -38,15 +38,19 @@ class V1StudentController
         ApiHelper::requireApiToken();
 
         try {
-           $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+           $postData = ApiHelper::getJsonInput();
 
-           if ($contentType === "application/json") {
-               $input = ApiHelper::getJsonInput();
-           } else {
-               $input = $_POST;
+           $studentId = $postData['studentId'] ?? null;
+           $courseId = $postData['courseId'] ?? null;
+           $isAnonymous = $postData['anonymousId'] ?? false;
+           $content = $postData['content'] ?? null;
+
+           $anonymousId = null;
+           if ($isAnonymous) {
+               $anonymousId = $postData['anonymousId'] ?? null;
            }
 
-            $response = $this->messageService->sendMessage($input);
+           $response = $this->studentService->sendMessage($studentId, $courseId, $anonymousId, $content);
 
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {
