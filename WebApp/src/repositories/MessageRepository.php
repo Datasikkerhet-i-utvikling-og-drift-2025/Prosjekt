@@ -22,6 +22,7 @@ class MessageRepository
     }
 
 
+    //brukt av SendMessage() i MessageService()
     /**
      * Creates a new message in the database.
      *

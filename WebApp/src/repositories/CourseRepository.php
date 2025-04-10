@@ -73,6 +73,30 @@ class CourseRepository
         return $data ? new Course($data) : null;
     }
 
+    /**
+     * Retrieves a course by its pinCode for guests.
+     *
+     * @param int $pinCode The pinCode of the course.
+     *
+     * @return Course|null Returns a Course object if found, otherwise null.
+     */
+    public function getCourseByPinCode(int $pinCode): ?Course
+    {
+        if (!InputValidator::isValidInteger($pinCode)) {
+            Logger::error("Invalid course pin: $pinCode");
+            return null;
+        }
+
+        $sql = "SELECT id, code, name, pin_code, lecturer_id FROM courses WHERE pin_code = :pin_code";
+        $stmt = $this->db->prepareStmt($sql);
+        //$this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
+
+        $logger = "Fetching course by pinCode: " . $pinCode;
+        $data = $this->db->fetchSingle($stmt, $logger);
+
+        return $data ? new Course($data) : null;
+    }
+
 
     /**
      * Retrieves all courses from the database.

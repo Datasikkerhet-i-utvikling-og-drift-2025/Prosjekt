@@ -4,25 +4,26 @@ namespace controllers\v1;
 
 use helpers\ApiHelper;
 use helpers\ApiResponse;
+use helpers\InputValidator;
 use managers\SessionManager;
-use services\MessageService;
+use services\StudentService;
 use JsonException;
 use Exception;
 
 class V1StudentController
 {
-    private MessageService $messageService;
+    private StudentService $studentService;
 
     /**
      *V1StudentController constructor.
      *
-     *@param MessageService $messageService
+     *@param StudentService $studentService
      *
      */
 
-    public function __construct(MessageService $messageService)
+    public function __construct(StudentService $studentService)
     {
-       $this->messageService = $messageService;
+       $this->studentService = $studentService;
     }
 
     //controller function for student users to interact with the system.
@@ -38,15 +39,19 @@ class V1StudentController
         ApiHelper::requireApiToken();
 
         try {
-           $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+           $postData = ApiHelper::getJsonInput();
 
-           if ($contentType === "application/json") {
-               $input = ApiHelper::getJsonInput();
-           } else {
-               $input = $_POST;
+           $studentId = $postData['studentId'] ?? null;
+           $courseId = $postData['courseId'] ?? null;
+           $isAnonymous = $postData['anonymousId'] ?? false;
+           $content = $postData['content'] ?? null;
+
+           $anonymousId = null;
+           if ($isAnonymous) {
+               $anonymousId = $postData['anonymousId'] ?? null;
            }
 
-            $response = $this->messageService->sendMessage($input);
+           $response = $this->studentService->sendMessage($studentId, $courseId, $anonymousId, $content);
 
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {
@@ -54,7 +59,47 @@ class V1StudentController
         } catch (Exception $e) {
            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
         }
+    }
 
+    /**
+     * @return void
+     * @throws JsonException
+     */
+    public function getMessagesByStudent(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken();
+
+        try {
+            $studentId = $_POST['studentId'] ?? null;
+
+            if (!$studentId) {
+                ApiHelper::sendError(400, 'StudentId is required.', ['exception' => 'studentId']);
+            }
+
+           $response = $this->studentService->getMessagesByStudent($studentId);
+
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * @return void
+     * @throws JsonException
+     */
+    public function getAvailableCourses(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken();
+
+        try {
+            $response = $this->studentService->getAvailableCourses();
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
     }
 
     /*
