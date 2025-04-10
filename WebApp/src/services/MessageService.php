@@ -274,4 +274,28 @@ class MessageService
 
         return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId]);
     }
+
+    public function getLecturerInfo(int $lecturerId): ApiResponse
+{
+    // Validate lecturerId
+    if (!InputValidator::isValidInteger($lecturerId)) {
+        return new ApiResponse(false, 'Invalid lecturer ID.', null, ['lecturerId' => $lecturerId]);
+    }
+
+    try {
+        // Fetch lecturer details from the repository
+        $lecturer = $this->lecturerRepository->fetchLecturerById($lecturerId);
+
+        if ($lecturer) {
+            return new ApiResponse(true, 'Lecturer retrieved successfully.', $lecturer);
+        } else {
+            return new ApiResponse(false, 'Lecturer not found.', null, ['lecturerId' => $lecturerId]);
+        }
+    } catch (Exception $e) {
+        // Handle unexpected errors
+        return new ApiResponse(false, 'An error occurred while retrieving the lecturer.', null, ['error' => $e->getMessage()]);
+    }
+}
+
+
 }

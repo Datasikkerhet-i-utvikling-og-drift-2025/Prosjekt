@@ -6,6 +6,7 @@ use helpers\ApiHelper;
 use helpers\ApiResponse;
 use managers\SessionManager;
 use services\MessageService;
+use services\GuestService;
 use JsonException;
 use Exception;
 
@@ -18,17 +19,20 @@ class V1GuestController
 {
     private MessageService $messageService;
     private SessionManager $sessionManager;
+    private GuestService $guestService;
 
     /**
      * V1GuestController constructor.
      *
      * @param MessageService $messageService
      * @param SessionManager $sessionManager
+     * @param GuestService $guestService
      */
-    public function __construct(MessageService $messageService, SessionManager $sessionManager)
+    public function __construct(MessageService $messageService, SessionManager $sessionManager, GuestService $guestService)
     {
         $this->messageService = $messageService;
         $this->sessionManager = $sessionManager;
+        $this->guestService = $guestService;
     }
     /**
      * Retrieves messages from a specific course.
@@ -38,6 +42,43 @@ class V1GuestController
      * @return void
      * @throws JsonException
      */
+
+     public function authorizePin(): void
+    {
+        ApiHelper::requirePost();
+
+        try {
+            $pin = $_POST['pin'] ?? null;
+
+            if (!$pin) {
+                ApiHelper::sendError(400, 'PIN is required.');
+                return; // Stop here if there's an error
+            }
+
+            $course = $this->guestService->authorizeCourseByPin($pin);
+
+            if ($course) {
+                // Authorization successful
+                //$response = new ApiResponse(true, 'Authorization successful.', ['course' => $course]);
+                //ApiHelper::sendApiResponse(200, $response);
+
+                // If it's a web page request and not just an API call, you might redirect here:
+                $_SESSION['authorized_courses'][$course['id']] = true;
+                header('Location: /guests/dashboard?course_id=' . $course['id']);
+                exit;
+            } else {
+                // Invalid PIN
+                ApiHelper::sendError(403, 'Invalid PIN.');
+                return; // Stop here if there's an error
+            }
+
+        } catch (JsonException $e) {
+            ApiHelper::sendError(400, 'Invalid JSON.', ['exception' => $e->getMessage()]);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Server error.', ['exception' => $e->getMessage()]);
+        }
+    }
+
     
     public function getMessagesByCourse()
     {

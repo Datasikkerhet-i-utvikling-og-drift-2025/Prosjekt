@@ -4,6 +4,7 @@ namespace controllers\v1;
 
 use helpers\ApiHelper;
 use services\MessageService;
+
 use JsonException;
 use Exception;
 
@@ -83,5 +84,38 @@ class V1LecturerController
             ApiHelper::sendError(500, 'Internal server error.', ['error' => $e->getMessage()]  );
         }
     }
+    public function getLecturerDetails(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken();
+
+        try {
+            $input = ApiHelper::getJsonInput();
+
+            if (!isset($input['lecturerId'])) {
+                ApiHelper::sendError(400, 'Missing required field: lecturerId.');
+            }
+
+            $lecturerId = (int)$input['lecturerId'];
+            $response = $this->messageService->getLecturerById($lecturerId);
+
+            if ($response->success) {
+                ApiHelper::sendApiResponse(200, $response);
+            } else {
+                ApiHelper::sendApiResponse(404, $response);
+            }
+
+        } catch (JsonException $e) {
+            ApiHelper::sendError(400, 'Invalid JSON input.', ['error' => $e->getMessage()]);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['error' => $e->getMessage()]);
+        }
+
+    }
+
+
+
+
+
 
 }

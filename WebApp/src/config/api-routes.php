@@ -25,7 +25,12 @@ use managers\JWTManager;
 use managers\SessionManager;
 use repositories\CourseRepository;
 use repositories\UserRepository;
+use repositories\commentRepository;
+use repositories\LecturerRepository;
+use repositories\MessageRepository;
 use services\AuthService;
+use services\GuestService;
+use services\MessageService;
 
 // Log application startup
 Logger::info('Initializing application...');
@@ -43,18 +48,25 @@ try {
     // Initialize repository classes
     $userRepository = new UserRepository($db);
     $courseRepository = new CourseRepository($db);
+    $commentRepository = new CommentRepository($db);
+    $lecturerRepository = new LecturerRepository($db);
+    $messageRepository = new MessageRepository($db);
+
 
 
     // Initialize service classes
     $authService = new AuthService($userRepository, $courseRepository, $jwtManager, $sessionManager);
+    $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
 
 
     // Create controller instances
     $authController = new V1AuthController($authService, $sessionManager);
+
     //$studentController = new StudentController($pdo);
     //$lecturerController = new LecturerController($pdo);
     //$adminController = new AdminController($db);
-    //$guestController = new GuestController($pdo);
+    $guestService = new GuestService($courseRepository);
+    $guestController = new V1GuestController($messageService, $sessionManager, $guestService);
 
     Logger::info('Controllers initialized successfully.');
 } catch (Exception $e) {
@@ -103,6 +115,8 @@ try {
         //['GET', '/api/guest/messages', [$guestController, 'getMessages']],
         //['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
         //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
+        ['POST', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
+
     ];
 
     Logger::info('Routes initialized successfully.');

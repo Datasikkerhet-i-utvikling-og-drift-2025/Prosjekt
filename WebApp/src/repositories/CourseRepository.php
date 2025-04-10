@@ -7,6 +7,8 @@ use helpers\Logger;
 use managers\DatabaseManager;
 use models\Course;
 
+use PDO;
+
 /**
  * Repository class for handling course-related database operations.
  */
@@ -156,5 +158,31 @@ class CourseRepository
 
         $logger = "Deleting course ID: " . $courseId;
         return $this->db->executeTransaction($stmt, $logger);
+    }
+    public function findCourseByPin(string $pin): ?array
+    {
+        // Validate the pin
+        if (!InputValidator::isNotEmpty($pin)) {
+            Logger::error("Invalid pin: Pin cannot be empty.");
+            return null;
+        }
+
+        $sql = "SELECT id, code, name, pin_code, lecturer_id FROM courses WHERE pin_code = :pin_code";
+
+        // Prepare the statement
+        $stmtPrepared = $this->db->prepareStmt($sql, function ($stmt) use ($pin) {
+            $stmt->bindValue(':pin_code', $pin, PDO::PARAM_STR);
+        });
+
+        if (!$stmtPrepared) {
+            Logger::error("Failed to prepare statement for finding course by pin.");
+            return null;
+        }
+
+        // Fetch the course
+        $loggerMessage = "Fetching course by pin: $pin";
+        $course = $this->db->fetchSingle($loggerMessage);
+
+        return $course ?: null;
     }
 }
