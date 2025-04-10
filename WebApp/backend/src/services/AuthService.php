@@ -2,16 +2,14 @@
 
 namespace services;
 
-use AllowDynamicProperties;
 use DateMalformedStringException;
 use Exception;
 use finfo;
 use helpers\AuthHelper;
 use helpers\InputValidator;
 use helpers\ApiResponse;
-use helpers\Logger;
+use helpers\GelfLogger;
 use managers\JWTManager;
-//use managers\SessionManager;
 use models\Course;
 use repositories\UserRepository;
 use repositories\CourseRepository;
@@ -24,14 +22,13 @@ use Throwable;
  * Class AuthService
  * Handles authentication and registration logic.
  * Compatible with both web and mobile clients.
- * Uses session manager for secure session lifecycle handling.
  */
 class AuthService
 {
     private UserRepository $userRepository;
     private CourseRepository $courseRepository;
     private JWTManager $jwtManager;
-    //private SessionManager $sessionManager;
+    private GelfLogger $logger;
 
     /**
      * AuthService constructor.
@@ -39,14 +36,13 @@ class AuthService
      * @param UserRepository $userRepository
      * @param CourseRepository $courseRepository
      * @param JWTManager $jwtManager
-     * @param SessionManager $sessionManager
      */
     public function __construct(UserRepository $userRepository, CourseRepository $courseRepository, JWTManager $jwtManager)
     {
         $this->userRepository = $userRepository;
         $this->courseRepository = $courseRepository;
         $this->jwtManager = $jwtManager;
-        //$this->sessionManager = $sessionManager;
+        $this->logger = new GelfLogger();
     }
 
     /**
@@ -54,79 +50,59 @@ class AuthService
      *
      * @param array $userData
      * @return ApiResponse
-     * @throws RandomException|DateMalformedStringException
-     * @throws Exception
+     * @throws RandomException|DateMalformedStringException|Exception
      */
     public function register(array $userData): ApiResponse
     {
-        Logger::info('Register method called with input: ' . json_encode($userData, JSON_THROW_ON_ERROR));
+        $this->logger->info('Register method called', ['payload' => $userData]);
 
         $validation = InputValidator::validateRegistration($userData);
-        Logger::debug('Validation result: ' . json_encode($validation, JSON_THROW_ON_ERROR));
+        $this->logger->debug('Validation result', $validation);
 
         if (!empty($validation['errors'])) {
-            Logger::warning('Validation failed.' . json_encode($validation['errors'], JSON_THROW_ON_ERROR));
+            $this->logger->warning('Validation failed', ['errors' => $validation['errors']]);
             return new ApiResponse(false, 'Validation failed.', null, $validation['errors']);
         }
 
         $data = $validation['sanitized'];
 
         if ($this->userRepository->getUserByEmail($data['email'])) {
-            Logger::warning('Email already registered: ' . $data['email']);
+            $this->logger->warning('Email already registered', ['email' => $data['email']]);
             return new ApiResponse(false, 'Email already registered.');
         }
 
-        Logger::info('Email is not in use, proceeding to hash password.');
+        $this->logger->info('Hashing password and processing image upload...');
         $data['password'] = AuthHelper::hashPassword($data['password']);
         $data['imagePath'] = $this->handleProfilePictureUpload();
-        Logger::info('Profile picture uploaded to: ' . $data['imagePath']);
 
         $user = UserFactory::createUser($data);
-        Logger::debug('User object created: ' . json_encode($user->toArray(), JSON_THROW_ON_ERROR));
+        $this->logger->debug('User object created', ['user' => $user->toArray()]);
 
-        $success = $this->userRepository->createUser($user);
-        if (!$success) {
-            Logger::error('Failed to save user to database.');
+        if (!$this->userRepository->createUser($user)) {
+            $this->logger->error('Failed to save user to database.');
             return new ApiResponse(false, 'Registration failed.');
         }
 
-        Logger::success('User saved to database: ' . $user->email);
+        $this->logger->info('User saved to database', ['email' => $user->email]);
 
-        Logger::debug($user->role->value);
         if ($user->role->value === 'lecturer') {
-            Logger::info('User is lecturer, creating course.');
+            $this->logger->info('Creating course for lecturer...');
             try {
                 $lecturer = $this->userRepository->getUserByEmail($data['email']);
                 $data['lecturerId'] = $lecturer->id ?? null;
                 $data['pinCode'] = $data['coursePin'];
-            } catch (Throwable $e) {
-                Logger::error('Failed: ' . $e->getMessage());
-                return new ApiResponse(false, 'Invalid course data.', null, ['exception' => $e->getMessage()]);
-            }
-
-            try {
                 $course = new Course($data);
-            } catch (Throwable $e) {
-                Logger::error('Failed to instantiate Course: ' . $e->getMessage());
-                return new ApiResponse(false, 'Invalid course data.', null, ['exception' => $e->getMessage()]);
-            }
 
+                if (!$this->courseRepository->createCourse($course)) {
+                    $this->logger->error('Failed to create course.');
+                    return new ApiResponse(false, 'Registration succeeded, but course creation failed.');
+                }
 
-            try {
-                Logger::debug('Attempting to create course...');
-                $courseCreated = $this->courseRepository->createCourse($course);
-                Logger::debug('createCourse() returned: ' . var_export($courseCreated, true));
+                $this->logger->info('Course created successfully.', ['courseCode' => $data['courseCode']]);
             } catch (Throwable $e) {
-                Logger::error('Exception during course creation: ' . $e->getMessage());
+                $this->logger->error('Exception during course creation.', ['exception' => $e->getMessage()]);
                 return new ApiResponse(false, 'Course creation failed.', null, ['exception' => $e->getMessage()]);
             }
-
-            if (!$courseCreated) {
-                Logger::error('Failed to create course for lecturer.');
-                return new ApiResponse(false, 'Registration succeeded, but course creation failed.');
-            }
-
-            Logger::success('Course created for lecturer: ' . $data['courseCode']);
         }
 
         $token = $this->jwtManager->generateToken([
@@ -138,10 +114,7 @@ class AuthService
         $userArray = $user->toArray();
         $userArray['token'] = $token;
 
-        //$this->sessionManager->storeUser($userArray, $token);
-
-        Logger::success('Registration successful for user: ' . $user->email);
-
+        $this->logger->info('Registration successful', ['user' => $userArray]);
         return new ApiResponse(true, 'Registration successful.', $userArray);
     }
 
@@ -150,22 +123,21 @@ class AuthService
      *
      * @param array $credentials
      * @return ApiResponse
-     * @throws DateMalformedStringException
-     * @throws Exception
+     * @throws DateMalformedStringException|Exception
      */
     public function login(array $credentials): ApiResponse
     {
+        $this->logger->info('Login attempt', ['email' => $credentials['email'] ?? null]);
+
         if (empty($credentials['email']) || empty($credentials['password'])) {
             return new ApiResponse(false, 'Email and password required.');
         }
 
         $user = $this->userRepository->getUserByEmail($credentials['email']);
         if (!$user || !AuthHelper::verifyPassword($credentials['password'], $user->password)) {
-            //$this->sessionManager->incrementFailedLogin();
+            $this->logger->warning('Invalid login credentials', ['email' => $credentials['email']]);
             return new ApiResponse(false, 'Invalid credentials.');
         }
-
-
 
         $token = $this->jwtManager->generateToken([
             'id' => $user->id,
@@ -176,7 +148,7 @@ class AuthService
         $userArray = $user->toArray();
         $userArray['token'] = $token;
 
-        //$this->sessionManager->storeUser($userArray, $token);
+        $this->logger->info('Login successful', ['user' => $userArray]);
 
         return new ApiResponse(true, 'Login successful.', $userArray);
     }
@@ -209,7 +181,7 @@ class AuthService
         }
 
         $ext = $mimeType === 'image/png' ? 'png' : 'jpg';
-        $fileName = bin2hex(random_bytes(16)) . 'services' . $ext;
+        $fileName = bin2hex(random_bytes(16)) . '.' . $ext;
         $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
 
         if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {

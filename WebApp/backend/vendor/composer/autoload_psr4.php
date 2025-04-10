@@ -6,6 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
+    'Prosjekt\\WebApp\\' => array($baseDir . '/src'),
+    'ParagonIE\\ConstantTime\\' => array($vendorDir . '/paragonie/constant_time_encoding/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
-    'App\\' => array($baseDir . '/src'),
+    'Gelf\\' => array($vendorDir . '/graylog2/gelf-php/src/Gelf'),
 );

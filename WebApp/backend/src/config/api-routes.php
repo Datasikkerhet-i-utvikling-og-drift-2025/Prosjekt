@@ -22,7 +22,6 @@ use helpers\AccessControlManager;
 use helpers\Logger;
 use managers\DatabaseManager;
 use managers\JWTManager;
-use managers\SessionManager;
 use repositories\CommentRepository;
 use repositories\CourseRepository;
 use repositories\LecturerRepository;
@@ -41,7 +40,7 @@ try {
 
     //$accessControlManager = new AccessControlManager();
     $jwtManager = new JWTManager();
-    $sessionManager = new SessionManager();
+    //$sessionManager = new SessionManager();
 
 
     // Initialize repository classes
@@ -53,11 +52,11 @@ try {
 
 
     // Initialize service classes
-    $authService = new AuthService($userRepository, $courseRepository, $jwtManager, $sessionManager);
+    $authService = new AuthService($userRepository, $courseRepository, $jwtManager);
     $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
 
     // Create controller instances
-    $authController = new V1AuthController($authService, $sessionManager);
+    $authController = new V1AuthController($authService);
     //$studentController = new StudentController($messageService);
     $lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);

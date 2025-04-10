@@ -17,18 +17,15 @@ use Exception;
 class V1GuestController
 {
     private MessageService $messageService;
-    private SessionManager $sessionManager;
-
     /**
      * V1GuestController constructor.
      *
      * @param MessageService $messageService
      * @param SessionManager $sessionManager
      */
-    public function __construct(MessageService $messageService, SessionManager $sessionManager)
+    public function __construct(MessageService $messageService)
     {
         $this->messageService = $messageService;
-        $this->sessionManager = $sessionManager;
     }
     /**
      * Retrieves messages from a specific course.

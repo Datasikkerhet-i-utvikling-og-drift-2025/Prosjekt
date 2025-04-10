@@ -6,7 +6,6 @@ use JetBrains\PhpStorm\NoReturn;
 use services\AuthService;
 use helpers\ApiHelper;
 use helpers\ApiResponse;
-use managers\SessionManager;
 use JsonException;
 use Exception;
 
@@ -18,7 +17,6 @@ use Exception;
 class V1AuthController
 {
     private AuthService $authService;
-    private SessionManager $sessionManager;
 
     /**
      * V1AuthController constructor.
@@ -26,10 +24,9 @@ class V1AuthController
      * @param AuthService $authService
      * @param SessionManager $sessionManager
      */
-    public function __construct(AuthService $authService, SessionManager $sessionManager)
+    public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
-        $this->sessionManager = $sessionManager;
     }
 
     /**
@@ -49,10 +46,6 @@ class V1AuthController
             $input = ApiHelper::getInput();
 
             $response = $this->authService->register($input);
-
-            if ($response->success) {
-                $this->sessionManager->storeUser($response->data, $response->data['token'] ?? null);
-            }
 
             ApiHelper::sendApiResponse($response->success ? 201 : 400, $response);
         } catch (Exception $e) {
@@ -75,9 +68,6 @@ class V1AuthController
             $input = ApiHelper::getInput();
             $response = $this->authService->login($input);
 
-            if ($response->success) {
-                $this->sessionManager->storeUser($response->data, $response->data['token'] ?? null);
-            }
 
             ApiHelper::sendApiResponse($response->success ? 200 : 401, $response);
         } catch (JsonException|Exception $e) {
@@ -93,7 +83,7 @@ class V1AuthController
      */
     #[NoReturn] public function logout(): void
     {
-        $this->sessionManager->destroy();
+        //$this->sessionManager->destroy();
         ApiHelper::sendApiResponse(200, new ApiResponse(true, 'Successfully logged out.'));
     }
 }

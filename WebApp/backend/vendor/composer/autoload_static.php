@@ -9,22 +9,37 @@ class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
     public static $prefixLengthsPsr4 = array (
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
+            'Prosjekt\\WebApp\\' => 16,
+            'ParagonIE\\ConstantTime\\' => 23,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'A' => 
+        'G' => 
         array (
-            'App\\' => 4,
+            'Gelf\\' => 5,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/src',
+        ),
+        'Prosjekt\\WebApp\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
+        'ParagonIE\\ConstantTime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
+        ),
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'App\\' => 
+        'Gelf\\' => 
         array (
-            0 => __DIR__ . '/../Prosjekt' . '/src',
+            0 => __DIR__ . '/..' . '/graylog2/gelf-php/src/Gelf',
         ),
     );
 

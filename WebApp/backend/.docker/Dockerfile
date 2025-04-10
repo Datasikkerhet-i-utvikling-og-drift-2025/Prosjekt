@@ -19,9 +19,9 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
 # Sett arbeidskatalog
 WORKDIR /var/www/html
 
-# Kopier composer-filer og installer avhengigheter
+# Kopier composer-filer og installer alle avhengigheter
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader
+RUN composer update --no-dev --optimize-autoloader
 
 # Kopier app-kode
 COPY ./src ./src
@@ -31,11 +31,11 @@ COPY ./api.php ./api.php
 # Kopier .htaccess fra backend
 COPY ./.htaccess ./.htaccess
 
-# Eksponer HTTP-port
-EXPOSE 80
-
 # Sørg for at logs-mappen finnes
 RUN mkdir -p /var/www/html/logs
+
+# Eksponer HTTP-port
+EXPOSE 80
 
 # Kjør Apache i foreground
 CMD ["apache2-foreground"]
