@@ -38,7 +38,6 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_PORT=${SMTP_PORT}
-      - SMTP_PORT=${SMTP_PORT}
       - JWT_SECRET=${JWT_SECRET}
       - API_TOKEN=${API_TOKEN}
       - URL=${URL}
@@ -47,6 +46,11 @@ services:
       - .env
     volumes:
       - ./WebApp/backend:/var/www/html
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build:
@@ -128,6 +132,18 @@ services:
     networks:
       - project_network
     restart: always
+
+  graylog-init:
+    image: curlimages/curl:latest
+    container_name: graylog-init
+    networks:
+      - project_network
+    depends_on:
+      - graylog
+    volumes:
+      - ./graylog-init/graylog-init.sh:/graylog-init.sh
+    entrypoint: ["/bin/sh", "/graylog-init.sh"]
+
 
 networks:
   project_network:

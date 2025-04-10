@@ -21,7 +21,8 @@ WORKDIR /var/www/html
 
 # Kopier composer-filer og installer alle avhengigheter
 COPY composer.json composer.lock ./
-RUN composer update --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader
+#RUN composer update --no-dev --optimize-autoloader
 
 # Kopier app-kode
 COPY ./src ./src

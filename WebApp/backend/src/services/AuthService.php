@@ -8,7 +8,7 @@ use finfo;
 use helpers\AuthHelper;
 use helpers\InputValidator;
 use helpers\ApiResponse;
-use helpers\GelfLogger;
+use helpers\GrayLogger;
 use managers\JWTManager;
 use models\Course;
 use repositories\UserRepository;
@@ -28,7 +28,7 @@ class AuthService
     private UserRepository $userRepository;
     private CourseRepository $courseRepository;
     private JWTManager $jwtManager;
-    private GelfLogger $logger;
+    private GrayLogger $logger;
 
     /**
      * AuthService constructor.
@@ -42,7 +42,7 @@ class AuthService
         $this->userRepository = $userRepository;
         $this->courseRepository = $courseRepository;
         $this->jwtManager = $jwtManager;
-        $this->logger = new GelfLogger();
+        $this->logger = GrayLogger::getInstance();
     }
 
     /**
