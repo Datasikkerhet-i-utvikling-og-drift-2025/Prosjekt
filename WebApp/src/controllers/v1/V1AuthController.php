@@ -43,10 +43,11 @@ class V1AuthController
     public function register(): void
     {
         ApiHelper::requirePost();
-        //ApiHelper::requireApiToken();
+        ApiHelper::requireApiToken();
 
         try {
-            $input = $_POST;
+            $input = ApiHelper::getInput();
+
             $response = $this->authService->register($input);
 
             if ($response->success) {
@@ -71,7 +72,7 @@ class V1AuthController
         ApiHelper::requirePost();
 
         try {
-            $input = ApiHelper::getJsonInput();
+            $input = ApiHelper::getInput();
             $response = $this->authService->login($input);
 
             if ($response->success) {

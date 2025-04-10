@@ -23,6 +23,7 @@ use helpers\Logger;
 use managers\DatabaseManager;
 use managers\JWTManager;
 use managers\SessionManager;
+use repositories\CourseRepository;
 use repositories\UserRepository;
 use services\AuthService;
 
@@ -41,10 +42,11 @@ try {
 
     // Initialize repository classes
     $userRepository = new UserRepository($db);
+    $courseRepository = new CourseRepository($db);
 
 
     // Initialize service classes
-    $authService = new AuthService($userRepository, $jwtManager, $sessionManager);
+    $authService = new AuthService($userRepository, $courseRepository, $jwtManager, $sessionManager);
 
 
     // Create controller instances

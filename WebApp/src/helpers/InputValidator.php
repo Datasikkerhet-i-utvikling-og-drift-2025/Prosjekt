@@ -13,44 +13,18 @@ class InputValidator
     public static function validateRegistration(array $input): array
     {
         $rules = self::getRegistrationRules($input['role'] ?? '');
-        $errors = [];
-        $sanitized = [];
 
-        foreach ($rules as $field => $ruleset) {
-            $value = $input[$field] ?? '';
+        $result = self::validateInputs($input, $rules);
 
-            // Special case for email: Validate first, don't sanitize it like a normal string
-            if ($field === 'email') {
-                if (!self::isValidEmail($value)) {
-                    $errors[$field][] = 'Invalid email format.';
-                } else {
-                    $sanitized[$field] = $value; // Store the actual email, not a boolean
-                }
-                continue;
-            }
-
-            // For other fields, sanitize normally
-            $sanitized[$field] = self::sanitizeString($value);
-
-            foreach ($ruleset as $rule => $ruleValue) {
-                $validationMethod = 'validate' . ucfirst($rule);
-                if (method_exists(self::class, $validationMethod)) {
-                    $validationResult = self::$validationMethod($sanitized[$field], $ruleValue);
-                    if ($validationResult !== true) {
-                        $errors[$field][] = $validationResult;
-                    }
-                }
-            }
+        if (
+            isset($result['sanitized']['password'], $result['sanitized']['repeatPassword']) &&
+            $result['sanitized']['password'] !== $result['sanitized']['repeatPassword']
+        ) {
+            $result['errors']['password'][] = "Passwords do not match.";
         }
 
-        // Ensure passwords match
-        if ($sanitized['password'] !== ($sanitized['repeatPassword'] ?? '')) {
-            $errors['password'][] = "Passwords do not match.";
-        }
-
-        return ['errors' => $errors, 'sanitized' => $sanitized];
+        return $result;
     }
-
 
     /**
      * Get validation rules for different user roles.
@@ -61,128 +35,76 @@ class InputValidator
     private static function getRegistrationRules(string $role): array
     {
         $commonRules = [
-            'firstName' => ['required' => true, 'min' => 3, 'max' => 50],
-            'lastName' => ['required' => true, 'min' => 3, 'max' => 50],
-            'name' => ['required' => true, 'min' => 3, 'max' => 100],
-            'email' => ['required' => true, 'email' => true],
-            'password' => ['required' => true, 'min' => 8],
-            'repeatPassword' => ['required' => true],
-            'role' => ['required' => true],
+            'firstName' => [
+                'required' => true,
+                'min'      => 3,
+                'max'      => 50
+            ],
+            'lastName' => [
+                'required' => true,
+                'min'      => 3,
+                'max'      => 50
+            ],
+            'email' => [
+                'required' => true,
+                'email'    => true
+            ],
+            'password' => [
+                'required' => true,
+                'regex'    => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'
+            ],
+            'repeatPassword' => [
+                'required' => true
+            ],
+            'role' => [
+                'required' => true
+            ],
         ];
 
         if ($role === 'student') {
-            return array_merge($commonRules, [
-                'studyProgram' => ['required' => true, 'max' => 100],
-                'enrollmentYear' => ['required' => true, 'integer' => true],
-            ]);
-        }
-
-        if ($role === 'lecturer') {
-            return array_merge($commonRules, [
-                'courseCode' => ['required' => true, 'max' => 10],
-                'courseName' => ['required' => true, 'max' => 100],
-                'coursePin' => ['required' => true, 'regex' => '/^\d{4}$/'],
-            ]);
+            $commonRules['studyProgram'] = [
+                'required' => true,
+                'max'      => 100
+            ];
+            $commonRules['enrollmentYear'] = [
+                'required' => true,
+                'integer'  => true
+            ];
+        } elseif ($role === 'lecturer') {
+            $commonRules['courseCode'] = [
+                'required' => true,
+                'max'      => 10
+            ];
+            $commonRules['courseName'] = [
+                'required' => true,
+                'max'      => 100
+            ];
+            $commonRules['coursePin'] = [
+                'required' => true,
+                'regex'    => '/^\d{4}$/'
+            ];
         }
 
         return $commonRules;
     }
 
     /**
-     * Sanitize input value to remove harmful characters.
+     * Validate and sanitize an array of inputs using a structured set of rules.
      *
-     * @param string $value The input value.
-     * @return string The sanitized string.
-     */
-    public static function sanitizeString(string $value): string
-    {
-        return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
-    }
-
-    /**
-     * Check if a field is not empty.
-     *
-     * @param mixed $value The value to check.
-     * @return bool True if not empty, false otherwise.
-     */
-    public static function isNotEmpty(mixed $value): bool
-    {
-        return isset($value) && trim($value) !== '';
-    }
-
-    /**
-     * Validate email format.
-     *
-     * @param string $email The email address.
-     * @return bool True if valid, false otherwise.
-     */
-    public static function isValidEmail(string $email): bool
-    {
-        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-    }
-
-    /**
-     * Validate string length (min and max).
-     *
-     * @param string $value The string to validate.
-     * @param int $min Minimum length.
-     * @param int $max Maximum length.
-     * @return bool True if valid, false otherwise.
-     */
-    public static function isValidLength(string $value, int $min, int $max): bool
-    {
-        $length = strlen(trim($value));
-        return $length >= $min && $length <= $max;
-    }
-
-    /**
-     * Validate integer within a range.
-     *
-     * @param mixed $value The value to check.
-     * @param int|null $min Minimum value.
-     * @param int|null $max Maximum value.
-     * @return bool True if valid, false otherwise.
-     */
-    public static function isValidInteger($value, ?int $min = null, ?int $max = null): bool
-    {
-        if (!filter_var($value, FILTER_VALIDATE_INT)) {
-            return false;
-        }
-
-        if (($min !== null && $value < $min) || ($max !== null && $value > $max)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Validate password strength.
-     *
-     * @param string $password The password to validate.
-     * @return bool True if valid, false otherwise.
-     */
-    public static function isValidPassword(string $password): bool
-    {
-        return preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/', $password);
-    }
-
-    /**
-     * Validate and sanitize an array of inputs.
-     *
-     * @param array $inputs The input data.
-     * @param array $rules The validation rules.
-     * @return array Returns an array with 'errors' and 'sanitized' data.
+     * @param array $inputs The input data (e.g. $_POST).
+     * @param array $rules  The validation rules.
+     * @return array        Returns an array with 'errors' and 'sanitized' data.
      */
     public static function validateInputs(array $inputs, array $rules): array
     {
-        Logger::info("Validating inputs: " . var_export($inputs, true));
-
-        $errors = [];
+        $errors    = [];
         $sanitized = [];
 
         foreach ($rules as $field => $ruleSet) {
             $value = $inputs[$field] ?? '';
+
+            // We'll sanitize every field (except if it's file upload).
+            $value = self::sanitizeString($value);
 
             foreach ($ruleSet as $rule => $ruleValue) {
                 switch ($rule) {
@@ -210,18 +132,6 @@ class InputValidator
                         }
                         break;
 
-                    case 'password':
-                        if ($ruleValue && !self::isValidPassword($value)) {
-                            $errors[$field][] = 'Password must contain at least 8 characters, including an uppercase letter, a lowercase letter, a digit, and a special character.';
-                        }
-                        break;
-
-                    case 'sanitize':
-                        if ($ruleValue) {
-                            $value = self::sanitizeString($value);
-                        }
-                        break;
-
                     case 'integer':
                         if ($ruleValue && !self::isValidInteger($value)) {
                             $errors[$field][] = 'Must be a valid integer.';
@@ -230,9 +140,14 @@ class InputValidator
 
                     case 'regex':
                         if ($ruleValue && !preg_match($ruleValue, $value)) {
-                            $errors[$field][] = 'Invalid format.';
+                            if ($field === 'password') {
+                                $errors[$field][] = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.';
+                            } else {
+                                $errors[$field][] = 'Invalid format.';
+                            }
                         }
                         break;
+
                 }
             }
 
@@ -241,6 +156,115 @@ class InputValidator
             }
         }
 
-        return ['errors' => $errors, 'sanitized' => $sanitized];
+        return [
+            'errors'    => $errors,
+            'sanitized' => $sanitized
+        ];
+    }
+
+    /**
+     * Sanitize input value by trimming and encoding special chars.
+     *
+     * @param string $value The input value
+     * @return string Sanitized string
+     */
+    public static function sanitizeString(string $value): string
+    {
+        return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * Check if a string is not empty (after trim).
+     *
+     * @param string $value The value to check
+     * @return bool True if not empty
+     */
+    public static function isNotEmpty(string $value): bool
+    {
+        return $value !== '';
+    }
+
+    /**
+     * Validate email format.
+     *
+     * @param string $email The email address.
+     * @return bool True if valid
+     */
+    public static function isValidEmail(string $email): bool
+    {
+        return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
+    }
+
+    /**
+     * Validate string length (min, max).
+     *
+     * @param string $value The string to validate
+     * @param int $min Minimum length
+     * @param int $max Maximum length
+     * @return bool True if valid
+     */
+    public static function isValidLength(string $value, int $min, int $max): bool
+    {
+        $length = strlen($value);
+        return ($length >= $min && $length <= $max);
+    }
+
+    /**
+     * Validate that a string is an integer. Optional min/max checks can be done in your code if needed.
+     *
+     * @param string $value The value to check
+     * @return bool True if valid
+     */
+    public static function isValidInteger(string $value): bool
+    {
+        return (bool) filter_var($value, FILTER_VALIDATE_INT);
+    }
+
+    /**
+     * Validate message input fields.
+     *
+     * @param array $input User-provided input data.
+     * @return array Returns an array with 'errors' and 'sanitized' data.
+     */
+    public static function validateMessage(array $input): array
+    {
+        $rules = self::getMessageRules();
+
+        $result = self::validateInputs($input, $rules);
+
+        // You can add additional validation if needed, e.g., checking content length
+        if (isset($result['sanitized']['content']) && strlen($result['sanitized']['content']) < 10) {
+            $result['errors']['content'][] = 'Message content must be at least 10 characters long.';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get validation rules for the message.
+     *
+     * @return array The validation rules for the message.
+     */
+    private static function getMessageRules(): array
+    {
+        return [
+            'studentId' => [
+                'required' => true,
+                'integer'  => true
+            ],
+            'courseId' => [
+                'required' => true,
+                'integer'  => true
+            ],
+            'anonymousId' => [
+                'required' => true,
+                'max'      => 100
+            ],
+            'content' => [
+                'required' => true,
+                'min'      => 10,
+                'max'      => 1000
+            ],
+        ];
     }
 }

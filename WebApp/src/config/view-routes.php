@@ -50,9 +50,9 @@ return [
     '/admin/reports'         => __DIR__ . '/../views/admin/reports.php',
 
     // Guest Views
-    '/guest/view-messages'   => __DIR__ . '/../views/guest/view-messages.php',
-    '/guest/report-message'  => __DIR__ . '/../views/guest/report-message.php',
-    '/guest/dashboard'       => __DIR__ . '/../views/guest/dashboard.php',
+    '/guests/view-messages'   => __DIR__ . '/../views/guests/view-messages.php',
+    '/guests/report-message'  => __DIR__ . '/../views/guests/report-message.php',
+    '/guests/dashboard'       => __DIR__ . '/../views/guests/dashboard.php',
 
     // Profile Page
     '/profile' => __DIR__ . '/../views/profile/index.php',

@@ -68,8 +68,8 @@ class LecturerRepository
 
 
     /**
-     * Replies to a student's message.
-     *
+     * Replies to a student's message .
+     * Used in MessageService
      * @param string $messageId The ID of the message being replied to.
      * @param string $replyContent The reply content.
      *

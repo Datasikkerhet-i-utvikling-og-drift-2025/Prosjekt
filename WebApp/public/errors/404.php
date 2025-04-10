@@ -256,7 +256,7 @@ http_response_code(404);
 <!-- Alltid synlig 404-melding -->
 <div id="always-visible-404" style="text-align: center; padding: 1rem;">
     <h1>404 - Page Not Found</h1>
-    <p>If you get stuck, <a href="<?=APP_BASE_URL?>">return to homepage</a></p>
+    <p>If you get stuck, <a href="/">return to homepage</a></p>
 </div>
 
 
@@ -299,7 +299,7 @@ http_response_code(404);
     <div id="loggedin" class="hidden">
         <h2>RobCo Terminal Access Granted</h2>
         <p>Date: <span id="todays-date"></span></p>
-        <p>Time to head home to actually try to hack this website, <a href="<?=APP_BASE_URL?>">return to homepage</a></p>
+        <p>Time to head home to actually try to hack this website, <a href="/">return to homepage</a></p>
     </div>
 
 </div>
@@ -797,7 +797,7 @@ http_response_code(404);
 
                 // Create the return link dynamically
                 let homeLink = document.createElement("p");
-                homeLink.innerHTML = `Time to head home to actually try to hack this website, <a href="<?=APP_BASE_URL?>">return to homepage</a>`;
+                homeLink.innerHTML = `Time to head home to actually try to hack this website, <a href="/">return to homepage</a>`;
                 homeLink.style.marginTop = "20px"; // Optional spacing
                 homeLink.style.textAlign = "center"; // Center it
 

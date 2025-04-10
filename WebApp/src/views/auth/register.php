@@ -16,21 +16,27 @@ if (isset($_SESSION['user'])) {
     }
 }
 
-$apiToken = getenv('API_TOKEN');
-$apiManager = new ApiManager($apiToken);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $responseData = $apiManager->post('/api/v1/auth/register', $_POST);
-
-    if ($responseData['success']) {
-        $_SESSION['success'] = $responseData['message'];
-        header('Location: /');
-        exit;
-    } else {
-        $_SESSION['errors'] = $responseData['errors'] ?? ['An unexpected error occurred.'];
-    }
+try {
+    $apiManager = new ApiManager();
+} catch (Throwable $e) {
+    $_SESSION['errors'] = ['Cannot initialize ApiManager: ' . $e->getMessage()];
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $responseData = $apiManager->post('/api/v1/auth/register', $_POST);
+
+        if ($responseData['success'] === true) {
+            $_SESSION['success'] = $responseData['data']['message'] ?? 'Registration successful!';
+            header('Location: /');
+            exit;
+        } else {
+            $_SESSION['errors'] = $responseData['errors'] ?? ['An unexpected error occurred.'];
+        }
+    } catch (Throwable $e) {
+        $_SESSION['errors'] = ['Unexpected error: ' . $e->getMessage()];
+    }
+}
 
 require_once __DIR__ . '/../partials/header.php';
 ?>
@@ -59,12 +65,12 @@ require_once __DIR__ . '/../partials/header.php';
     <form action="" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="firstName">First Name</label>
-            <input type="text" id="firstName" name="firstName" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            <input type="text" id="firstName" name="firstName" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['firstName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </div>
 
         <div class="form-group">
             <label for="last_name">Last Name</label>
-            <input type="text" id="lastName" name="lastName" placeholder="Nätt" value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            <input type="text" id="lastName" name="lastName" placeholder="Nätt" value="<?= htmlspecialchars($_POST['lastName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </div>
 
         <div class="form-group">
@@ -99,7 +105,7 @@ require_once __DIR__ . '/../partials/header.php';
 
             <div class="form-group">
                 <label for="enrollmentYear">Cohort Year</label>
-                <input type="number" id="enrollmentYear" name="enrollmentYear" placeholder="2025" value="<?= htmlspecialchars($_POST['cohort_year'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <input type="number" id="enrollmentYear" name="enrollmentYear" placeholder="2025" value="<?= htmlspecialchars($_POST['enrollmentYear'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
         </div>
         <div id="lecturer-fields" style="display: <?= ($_POST['role'] ?? '') === 'lecturer' ? 'block' : 'none' ?>;">
@@ -107,26 +113,26 @@ require_once __DIR__ . '/../partials/header.php';
         <label for="profilePicture">Profile Picture</label>
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
     </div>
-    
+
     <div class="form-group">
         <label for="course_code">Course Code</label>
         <input type="text" id="courseCode" name="courseCode"
-               placeholder="ITF12345" 
+               placeholder="ITF12345"
                value="<?= htmlspecialchars($_POST['courseCode'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
         <label for="course_name">Course Name</label>
         <input type="text" id="courseName" name="courseName"
-               placeholder="Datasikkerhet i utvikling og drift" 
+               placeholder="Datasikkerhet i utvikling og drift"
                value="<?= htmlspecialchars($_POST['courseName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
         <label for="coursePin">Course PIN</label>
         <input type="text" id="coursePin" name="coursePin"
-               placeholder="1337" 
-               pattern="[0-9]{4}" 
+               placeholder="1337"
+               pattern="[0-9]{4}"
                title="Please enter a 4-digit PIN code"
                value="<?= htmlspecialchars($_POST['coursePin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
@@ -145,7 +151,7 @@ require_once __DIR__ . '/../partials/header.php';
         const role = this.value;
         document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
         document.getElementById('lecturer-fields').style.display = role === 'lecturer' ? 'block' : 'none';
-        
+
         const studentFields = document.querySelectorAll('#student-fields input');
         const lecturerFields = document.querySelectorAll('#lecturer-fields input');
 

@@ -101,9 +101,12 @@ class Logger
         self::rotateLogFile();
 
         $date = date('Y-m-d H:i:s'); // Current timestamp
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        $file = $backtrace[0]['file'] ?? 'unknown';
-        $line = $backtrace[0]['line'] ?? 'unknown';
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        $caller = $backtrace[2] ?? $backtrace[1] ?? $backtrace[0];
+
+        $file = $caller['file'] ?? 'unknown';
+        $line = $caller['line'] ?? 'unknown';
+
 
         $logEntry = "[$date] [$level] $message [in $file:$line]" . PHP_EOL;
 

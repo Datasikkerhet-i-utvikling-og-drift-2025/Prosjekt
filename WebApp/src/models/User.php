@@ -125,7 +125,6 @@ abstract class User
         }
     }
 
-
     /**
      * Constructs a new User instance.
      *
