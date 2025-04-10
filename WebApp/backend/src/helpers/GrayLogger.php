@@ -1,10 +1,10 @@
 <?php
-
 namespace helpers;
-
+require_once __DIR__ . '/../../vendor/autoload.php';
 use Gelf\Message;
 use Gelf\Publisher;
 use Gelf\Transport\UdpTransport;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -27,9 +27,9 @@ class GrayLogger
     /**
      * GELF message publisher.
      *
-     * @var Publisher
+     * @var Publisher|null
      */
-    private Publisher $publisher;
+    private ?Publisher $publisher = null;
 
     /**
      * GrayLogger constructor.
@@ -44,7 +44,7 @@ class GrayLogger
             $transport = new UdpTransport($host, $port);
             $this->publisher = new Publisher($transport);
         } catch (Throwable $e) {
-            error_log("[GrayLogger] Transport initialization failed: " . $e->getMessage());
+            $this->fallbackLog("[GrayLogger] Transport initialization failed: " . $e->getMessage());
         }
     }
 
@@ -59,7 +59,7 @@ class GrayLogger
     }
 
     /**
-     * Sends a log message to Graylog.
+     * Sends a log message to Graylog or fallback to file.
      *
      * @param string $shortMessage Short summary of the log event.
      * @param array $context Additional key-value metadata.
@@ -69,11 +69,15 @@ class GrayLogger
     public function log(string $shortMessage, array $context = [], string $level = 'info'): void
     {
         try {
+            if ($this->publisher === null) {
+                throw new RuntimeException("Graylog publisher is not initialized.");
+            }
+
             $message = new Message();
             $message->setShortMessage($shortMessage);
             $message->setLevel($this->mapLogLevel($level));
             $message->setTimestamp(microtime(true));
-            $message->setFacility('SecureFeedbackApp');
+            $message->setFacility('Feedback System');
             $message->setHost('backend');
 
             foreach ($context as $key => $value) {
@@ -86,7 +90,11 @@ class GrayLogger
 
             $this->publisher->publish($message);
         } catch (Throwable $e) {
-            error_log("[GrayLogger] Logging failed: " . $e->getMessage());
+            $this->fallbackLog("[GrayLogger] Logging failed: " . $e->getMessage(), [
+                'shortMessage' => $shortMessage,
+                'context' => $context,
+                'level' => $level
+            ]);
         }
     }
 
@@ -114,7 +122,7 @@ class GrayLogger
     /**
      * Retrieves the file and line where the log call originated.
      *
-     * @return array{file: string, line: int} Associative array with file and line number.
+     * @return array{file: string, line: int}
      */
     private function getCallerInfo(): array
     {
@@ -130,6 +138,23 @@ class GrayLogger
         }
 
         return ['file' => 'unknown', 'line' => 0];
+    }
+
+    /**
+     * Writes log message to fallback file.
+     *
+     * @param string $error Error message
+     * @param array|null $data Optional log data
+     * @return void
+     */
+    private function fallbackLog(string $error, ?array $data = null): void
+    {
+        $log = [
+            'timestamp' => date('c'),
+            'error' => $error,
+            'data' => $data
+        ];
+        file_put_contents('/var/www/html/logs/log-fallback.log', json_encode($log, JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND);
     }
 
     /**
