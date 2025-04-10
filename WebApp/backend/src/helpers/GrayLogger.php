@@ -5,36 +5,35 @@ namespace helpers;
 use Gelf\Message;
 use Gelf\Publisher;
 use Gelf\Transport\UdpTransport;
-use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Throwable;
 
 /**
- * Class GraylogLogger
+ * Class GrayLogger
  *
- * Håndterer logging til Graylog via UDP GELF.
- * Trygg og enkel måte å sende structured logs fra PHP til Graylog-tjener.
+ * Handles structured logging to Graylog using UDP GELF transport.
+ * Provides a singleton logger instance with severity-level methods.
  *
- * @package App\Helpers
+ * @package helpers
  */
 class GrayLogger
 {
     /**
-     * Singleton-instans
+     * Singleton instance of the logger.
      *
      * @var GrayLogger|null
      */
-    private static ?GrayLogger $instance = null;
+    private static ?self $instance = null;
 
     /**
-     * Graylog publisher
+     * GELF message publisher.
      *
      * @var Publisher
      */
     private Publisher $publisher;
 
     /**
-     * GraylogLogger constructor.
-     * Oppretter transport og publisher for GELF.
+     * GrayLogger constructor.
+     * Initializes the GELF transport and publisher.
      *
      * @param string $host Graylog host (default: graylog)
      * @param int $port GELF UDP port (default: 12201)
@@ -42,32 +41,29 @@ class GrayLogger
     private function __construct(string $host = 'graylog', int $port = 12201)
     {
         try {
-            $transport = new IgnoreErrorTransportWrapper(new UdpTransport($host, $port));
+            $transport = new UdpTransport($host, $port);
             $this->publisher = new Publisher($transport);
         } catch (Throwable $e) {
-            error_log("Graylog transport init feilet: " . $e->getMessage());
+            error_log("[GrayLogger] Transport initialization failed: " . $e->getMessage());
         }
     }
 
     /**
-     * Returnerer singleton-instansen av loggeren.
+     * Returns the singleton instance of the logger.
      *
      * @return GrayLogger
      */
     public static function getInstance(): self
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+        return self::$instance ??= new self();
     }
 
     /**
-     * Logger en melding til Graylog.
+     * Sends a log message to Graylog.
      *
-     * @param string $shortMessage En kort beskrivelse av hendelsen.
-     * @param array $context Ekstra metadata (key => value).
-     * @param string $level Loggnivå (info, error, debug, warning, etc).
+     * @param string $shortMessage Short summary of the log event.
+     * @param array $context Additional key-value metadata.
+     * @param string $level Log severity level (e.g. info, error, debug).
      * @return void
      */
     public function log(string $shortMessage, array $context = [], string $level = 'info'): void
@@ -76,30 +72,29 @@ class GrayLogger
             $message = new Message();
             $message->setShortMessage($shortMessage);
             $message->setLevel($this->mapLogLevel($level));
-            $message->setTimestamp(time());
-            $message->setHost(gethostname());
+            $message->setTimestamp(microtime(true));
+            $message->setFacility('SecureFeedbackApp');
+            $message->setHost('backend');
 
-            // Legg til metadata
             foreach ($context as $key => $value) {
                 $message->setAdditional($key, $value);
             }
 
-            // Legg til info om hvor i koden loggen kom fra
             $caller = $this->getCallerInfo();
             $message->setAdditional('file', $caller['file']);
             $message->setAdditional('line', $caller['line']);
 
             $this->publisher->publish($message);
         } catch (Throwable $e) {
-            error_log("Graylog-logging feilet: " . $e->getMessage());
+            error_log("[GrayLogger] Logging failed: " . $e->getMessage());
         }
     }
 
     /**
-     * Mapper tekstnivå til syslog-nivå.
+     * Maps a textual log level to its syslog integer equivalent.
      *
-     * @param string $level
-     * @return int
+     * @param string $level Log level name.
+     * @return int Syslog level constant.
      */
     private function mapLogLevel(string $level): int
     {
@@ -117,41 +112,71 @@ class GrayLogger
     }
 
     /**
-     * Returnerer filnavn og linje fra der loggen ble kalt.
+     * Retrieves the file and line where the log call originated.
      *
-     * @return array{file: string, line: int}
+     * @return array{file: string, line: int} Associative array with file and line number.
      */
     private function getCallerInfo(): array
     {
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        if (isset($backtrace[2])) {
-            return [
-                'file' => $backtrace[2]['file'] ?? 'unknown',
-                'line' => $backtrace[2]['line'] ?? 0,
-            ];
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+        foreach ($trace as $frame) {
+            if (isset($frame['file']) && !str_contains($frame['file'], 'GrayLogger.php')) {
+                return [
+                    'file' => basename($frame['file']),
+                    'line' => $frame['line'] ?? 0,
+                ];
+            }
         }
+
         return ['file' => 'unknown', 'line' => 0];
     }
 
-
+    /**
+     * Logs an informational message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
     public function info(string $message, array $context = []): void
     {
         $this->log($message, $context, 'info');
     }
 
+    /**
+     * Logs a debug-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
     public function debug(string $message, array $context = []): void
     {
         $this->log($message, $context, 'debug');
     }
 
+    /**
+     * Logs a warning-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
     public function warning(string $message, array $context = []): void
     {
         $this->log($message, $context, 'warning');
     }
 
+    /**
+     * Logs an error-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
     public function error(string $message, array $context = []): void
     {
         $this->log($message, $context, 'error');
     }
-
 }

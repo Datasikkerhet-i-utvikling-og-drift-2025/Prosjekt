@@ -133,18 +133,6 @@ services:
       - project_network
     restart: always
 
-  graylog-init:
-    image: curlimages/curl:latest
-    container_name: graylog-init
-    networks:
-      - project_network
-    depends_on:
-      - graylog
-    volumes:
-      - ./graylog-init/graylog-init.sh:/graylog-init.sh
-    entrypoint: ["/bin/sh", "/graylog-init.sh"]
-
-
 networks:
   project_network:
     driver: bridge
