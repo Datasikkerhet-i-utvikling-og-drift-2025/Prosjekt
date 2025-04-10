@@ -9,21 +9,27 @@ use JsonException;
 use models\Message;
 use repositories\StudentRepository;
 use helpers\InputValidator;
+use helpers\GrayLogger;
 
 
 class StudentService
 {
     private StudentRepository $studentRepository;
     private InputValidator $inputValidator;
+    private GrayLogger $logger;
+
 
     /**
      * @param StudentRepository $studentRepository
-     * @param InputValidator $inputvalidator
+     * @param InputValidator $inputValidator
      */
     public function __construct(
-        StudentRepository $studentRepository
+        StudentRepository $studentRepository,
+        InputValidator $inputValidator
     ){
         $this->studentRepository = $studentRepository;
+        $this->inputValidator = $inputValidator;
+        $this->logger = GrayLogger::getInstance();
     }
 
     /**
@@ -39,6 +45,7 @@ class StudentService
      */
     public function sendMessage(string $studentId, string $courseId, ?string $anonymousId, string $content): ApiResponse
     {
+        $this->logger->info('Students sendMessage function initiated. Params in use: ', ['studentId' => $studentId, 'courseId' => $courseId, 'anonymousId' => $anonymousId]);
         //sanitize and validate input
         $studentId = InputValidator::isValidInteger($studentId);
         $courseId = InputValidator::isValidInteger($courseId);
@@ -46,14 +53,22 @@ class StudentService
         $content = InputValidator::sanitizeString($content);
 
         if(!InputValidator::isNotEmpty($content)) {
+            $this->logger->warning('did not contain any content, or is?', ['content' => $content]);
             return new ApiResponse(false, 'Message cannot be empty! Herro? liek whut');
         }
         if(!InputValidator::isNotEmpty($studentId)) {
+            $this->logger->warning('did not contain any studentId, or is?', ['studentId' => $studentId]);
             return new ApiResponse(false, 'This for student function only >:I ');
         }
         if(!InputValidator::isNotEmpty($courseId)) {
+            $this->logger->warning('did not contain any courseId, or is?', ['courseId' => $courseId]);
             return new ApiResponse(false, 'Nah man, where dah course be, yeh written mon, ba boa dem.');
         }
+        /*
+         * ser at jeg benytter meg av flere metoder for den samme tingen :/ kanskje ikke det smarteste med dobble meldinger...
+        $this->logger->info('Params being validated and put in input array, oh, shit magie!',
+            ['studentId' => $studentId, 'courseId' => $courseId, 'anonymousId' => $anonymousId, 'content' => $content]);
+
         $input = $this->inputValidator->validateMessage( [
             'studentId' => $studentId,
             'courseId' => $courseId,
@@ -61,19 +76,28 @@ class StudentService
             'content' => $content
         ]);
 
+        $this->logger->info('input has been sanitized and being put in data',
+            ['studentId' => $studentId, 'courseId' => $courseId, 'anonymousId' => $anonymousId, 'content' => $content]);
+
         $data = $input['sanitized'];
+
+
         if (!$input) {
+            $this->logger->debug('well shit, inputs now empty');
             return new ApiResponse(false, 'Message cannot be empty!');
         }
+
+        $this->logger->info('new message initialized.', ['data' => $data]);
         $message = new Message($data);
+        */
 
         $success = $this->studentRepository->sendMessage($studentId, $courseId, $anonymousId, $content);
 
-        if (!$success) {
+        if (!empty($success)) {
             return new ApiResponse(false, 'Message cannot be empty!');
         }
-
-        return new ApiResponse(true, 'Message sent sucessfully!', $message);
+        $this->logger->info('Now, we can devour the gods, togethaaa! -> Some God-Devouring Serpent.');
+        return new ApiResponse(true, 'Message sent successfully!', $success);
     }
 
     //Variable will allways be true on line 93...
@@ -85,16 +109,21 @@ class StudentService
 
     public function getMessagesByStudent(string $studentId): ApiResponse
     {
+        $this->logger->info('getMessagesByStudent function initiated. Params in use: ', ['studentId' => $studentId]);
         $studentId = InputValidator::sanitizeString($studentId);
+        $this->logger->info('Sanitized: ' . $studentId);
+        //hmm allways true when reached?
         if (!$studentId = InputValidator::isValidInteger($studentId)){
+            $this->logger->warning('did not contain any studentId, or is?', ['studentId' => $studentId]);
             return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
         }
+
 
         $messages = $this->studentRepository->getMessagesByStudent($studentId);
         if (empty($messages)) {
             return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
         }
-
+        $this->logger->info('Success', ['studentId' => $studentId, 'messages' => $messages]);
         return new ApiResponse(true, 'Messages found!', $messages);
 
     }
