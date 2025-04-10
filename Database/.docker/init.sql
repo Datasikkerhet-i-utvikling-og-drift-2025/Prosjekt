@@ -63,16 +63,16 @@ CREATE TABLE reports (
                          FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
-CREATE USER 'student'@'mysql' [IDENTIFIED BY 'studentPass' ]
+CREATE USER 'student'@'mysql' IDENTIFIED BY 'studentPass';
 
-CREATE USER 'lecturer'@'mysql' [IDENTIFIED BY 'lecturerPass' ]
+CREATE USER 'lecturer'@'mysql' IDENTIFIED BY 'lecturerPass';
 
-CREATE USER 'guest'@'mysql' [IDENTIFIED BY 'guestPass' ]
+CREATE USER 'guest'@'mysql' IDENTIFIED BY 'guestPass';
 
-CREATE USER 'admin'@'mysql' [IDENTIFIED BY 'adminPass' ]
+CREATE USER 'admin'@'mysql' IDENTIFIED BY 'adminPass';
 
 
-delimiter // ;
+delimiter //
 
 -- AdminRepository
 
@@ -393,5 +393,5 @@ BEGIN
         reset_token_created_at = NULL
     WHERE id = userId;
 END //
-delimiter ; //
+delimiter;
 
