@@ -19,7 +19,7 @@ use controllers\v1\V1LecturerController;
 use controllers\v1\V1StudentController;
 use Exception;
 use helpers\AccessControlManager;
-use helpers\Logger;
+use helpers\GrayLogger;
 use managers\DatabaseManager;
 use managers\JWTManager;
 use models\Student;
@@ -30,8 +30,11 @@ use repositories\UserRepository;
 use services\AuthService;
 use services\MessageService;
 
+$logger = GrayLogger::getInstance();
+
+
 // Log application startup
-Logger::info('Initializing application...');
+$this->logger::info('Initializing application...');
 
 try {
     // Initialize manager classes
@@ -53,7 +56,7 @@ try {
 
 
     // Initialize repository classes
-    $userRepository = new UserRepository($adminDb);
+    $userRepository = new UserRepository($userDb);
     $lecturerRepository = new LecturerRepository($lecturerDb);
     $guestRepository = new GuestRepository($guestDb);
     $studentRepository = new StudentRepository($studentDb);
@@ -70,9 +73,9 @@ try {
     //$adminController = new AdminController($db);
     //$guestController = new GuestController($pdo);
 
-    Logger::info('Controllers initialized successfully.');
+    $this->logger::info('Controllers initialized successfully.');
 } catch (Exception $e) {
-    Logger::error('Error initializing components: ' . $e->getMessage());
+    $this->logger::error('Error initializing components: ' . $e->getMessage());
     http_response_code(500);
     die('Internal server error. Check logs for details.');
 }
@@ -119,9 +122,9 @@ try {
         //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
     ];
 
-    Logger::info('Routes initialized successfully.');
+    $this->logger::info('Routes initialized successfully.');
 } catch (Exception $e) {
-    Logger::error('Error initializing routes: ' . $e->getMessage());
+    $this->logger::error('Error initializing routes: ' . $e->getMessage());
     http_response_code(500);
     die('Internal server error while initializing routes.');
 }
@@ -137,7 +140,7 @@ $routes[] = ['GET', '/debug/routes', function () use ($routes) {
             'action' => is_array($route[2]) ? $route[2][1] : null,
         ];
     }, $routes), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-    Logger::info('Debug route accessed.');
+    $this->logger::info('Debug route accessed.');
     exit;
 }];
 
@@ -145,11 +148,11 @@ $routes[] = ['GET', '/debug/routes', function () use ($routes) {
 $logFile = __DIR__ . '/../../logs/routes.log';
 try {
     file_put_contents($logFile, json_encode($routes, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-    Logger::info('Routes logged successfully to ' . $logFile);
+    $this->logger::info('Routes logged successfully to ' . $logFile);
 } catch (Exception $e) {
-    Logger::error('Failed to write routes log: ' . $e->getMessage());
+    $this->logger::error('Failed to write routes log: ' . $e->getMessage());
 }
 
 // Return routes to the main entry point
-Logger::info('Application initialized successfully.');
+$this->logger::info('Application initialized successfully.');
 return $routes;

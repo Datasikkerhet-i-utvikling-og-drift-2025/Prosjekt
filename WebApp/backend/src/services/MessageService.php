@@ -37,7 +37,6 @@ class MessageService
      * @param CommentRepository $commentRepository
     // * @param CourseRepository $courseRepository
      * @param LecturerRepository $lecturerRepository
-     * @param GrayLogger $logger
      */
     public function __construct(
         MessageRepository $messageRepository,

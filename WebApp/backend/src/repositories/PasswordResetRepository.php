@@ -134,4 +134,5 @@ class PasswordResetRepository
             error_log("Database Error (deleteTokensForUser): " . $e->getMessage());
             return false;
         }
-    } }
+    }
+}
