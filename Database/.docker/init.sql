@@ -72,7 +72,7 @@ CREATE USER 'guest'@'mysql' [IDENTIFIED BY 'guestPass' ]
 CREATE USER 'admin'@'mysql' [IDENTIFIED BY 'adminPass' ]
 
 
-DELIMITER // ;
+delimiter // ;
 
 -- AdminRepository
 
