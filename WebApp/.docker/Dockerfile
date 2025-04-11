@@ -25,6 +25,9 @@ WORKDIR /var/www/html
 # Kopier composer-filer FØRST for caching
 COPY composer.json composer.lock ./
 
+# Kjør composer update for å hente alle dependencies inkludert gelf-php
+RUN composer update --no-dev --optimize-autoloader
+
 # Installer avhengigheter
 RUN composer install --no-dev --optimize-autoloader
 
