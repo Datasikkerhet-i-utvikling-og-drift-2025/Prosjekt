@@ -43,8 +43,7 @@ class MessageService
         MessageRepository $messageRepository,
         CommentRepository $commentRepository,
         //CourseRepository $courseRepository,
-        LecturerRepository $lecturerRepository,
-        GrayLogger $logger
+        LecturerRepository $lecturerRepository
     ) {
         $this->messageRepository = $messageRepository;
         $this->commentRepository = $commentRepository;

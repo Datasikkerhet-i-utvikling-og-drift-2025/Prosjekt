@@ -2,6 +2,7 @@
 
 namespace managers;
 
+use CURLFile;
 use JsonException;
 use RuntimeException;
 use Throwable;
@@ -139,7 +140,7 @@ class ApiManager
 
             if (!empty($data) && $method !== 'GET') {
                 if ($hasFile) {
-                    $data['profilePicture'] = new \CURLFile(
+                    $data['profilePicture'] = new CURLFile(
                         $_FILES['profilePicture']['tmp_name'],
                         $_FILES['profilePicture']['type'],
                         $_FILES['profilePicture']['name']

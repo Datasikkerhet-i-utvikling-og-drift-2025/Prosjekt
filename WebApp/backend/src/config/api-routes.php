@@ -27,9 +27,9 @@ use repositories\CourseRepository;
 use repositories\LecturerRepository;
 use repositories\MessageRepository;
 use repositories\UserRepository;
-use repositories\commentRepository;
-use repositories\LecturerRepository;
-use repositories\MessageRepository;
+//use repositories\commentRepository;
+//use repositories\LecturerRepository;
+//use repositories\MessageRepository;
 use services\AuthService;
 use services\GuestService;
 use services\MessageService;
@@ -66,7 +66,7 @@ try {
     $lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);
     $guestService = new GuestService($courseRepository);
-    $guestController = new V1GuestController($messageService, $sessionManager, $guestService);
+    //$guestController = new V1GuestController($messageService, $sessionManager, $guestService);
 
     Logger::info('Controllers initialized successfully.');
 } catch (Exception $e) {
@@ -115,7 +115,7 @@ try {
         //['GET', '/api/guest/messages', [$guestController, 'getMessages']],
         //['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
         //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
-        ['POST', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
+        //['POST', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
 
     ];
 
