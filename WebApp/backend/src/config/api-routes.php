@@ -89,8 +89,8 @@ try {
         //['POST', '/api/auth/login', [$authController, 'login']],
         //['GET', '/api/auth/logout', [$authController, 'logout']],
         //['POST', '/api/auth/change-password', [$authController, 'changePassword']],
-        //['POST', '/api/auth/password-reset/request', [$authController, 'requestPasswordReset']],
-        //['POST', '/api/auth/password-reset', [$authController, 'resetPassword']],
+        ['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
+        ['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
 
         // Student routes
         //['GET', '/api/student/courses', [$studentController, 'getCourses']],
