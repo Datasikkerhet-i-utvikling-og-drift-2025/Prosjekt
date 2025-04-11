@@ -12,7 +12,7 @@ use models\Lecturer;
 /**
  * Repository class for handling comment-related database operations.
  */
-class CommentRepository
+class GuestRepository
 {
     private DatabaseManager $db;
 
