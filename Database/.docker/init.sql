@@ -230,14 +230,14 @@ BEGIN
     WHERE m.student_id = studentId;
 END //
 
-CREATE PROCEDURE getMessageById(IN messageId INT)
-BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-           c.code AS course_code, c.name AS course_name
-    FROM messages m
-    JOIN courses c ON m.course_id = c.id
-    WHERE m.id = messageId;
-END //
+#CREATE PROCEDURE getMessageById(IN messageId INT)
+#BEGIN
+#    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
+#           c.code AS course_code, c.name AS course_name
+#    FROM messages m
+#    JOIN courses c ON m.course_id = c.id
+#    WHERE m.id = messageId;
+#END //
 
 CREATE PROCEDURE updateMessageReply(IN messageId INT, IN replyContent TEXT)
 BEGIN
@@ -250,10 +250,10 @@ BEGIN
     # FIXME legg til report message
 END //
 
-CREATE PROCEDURE deleteMessageById(IN messageId INT)
-BEGIN
-    DELETE FROM messages WHERE id = messageId;
-END //
+#CREATE PROCEDURE deleteMessageById(IN messageId INT)
+#BEGIN
+#    DELETE FROM messages WHERE id = messageId;
+#END //
 
 CREATE PROCEDURE getPublicMessages()
 BEGIN
@@ -274,15 +274,15 @@ BEGIN
     VALUES (studentId, courseId, anonymousId, contentText, NOW());
 END //
 
-CREATE PROCEDURE getMessagesByStudent(IN studentId VARCHAR(255))
-BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-           c.code AS course_code, c.name AS course_name
-    FROM messages m
-    JOIN courses c ON m.course_id = c.id
-    WHERE m.student_id = studentId
-    ORDER BY m.created_at DESC;
-END //
+#CREATE PROCEDURE getMessagesByStudent(IN studentId VARCHAR(255))
+#BEGIN
+#    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
+#           c.code AS course_code, c.name AS course_name
+#    FROM messages m
+#    JOIN courses c ON m.course_id = c.id
+#    WHERE m.student_id = studentId
+#    ORDER BY m.created_at DESC;
+#END //
 
 CREATE PROCEDURE getMessageWithReply(IN messageId VARCHAR(255), IN studentId VARCHAR(255))
 BEGIN
@@ -349,10 +349,10 @@ BEGIN
     WHERE id = userId;
 END //
 
-CREATE PROCEDURE deleteUserById(IN userId VARCHAR(255))
-BEGIN
-    DELETE FROM users WHERE id = userId;
-END //
+#CREATE PROCEDURE deleteUserById(IN userId VARCHAR(255))
+#BEGIN
+#    DELETE FROM users WHERE id = userId;
+#END //
 
 CREATE PROCEDURE deleteUserByEmail(IN userEmail VARCHAR(255))
 BEGIN
