@@ -252,4 +252,18 @@ class UserRepository
 
         return $this->db->executeTransaction("Updating password and clearing reset token for user ID: $userId");
     }
+
+    public function updatePassword(int $userId, string $hashedPassword): bool
+    {
+        $sql = "UPDATE users SET password = :password WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':password', $hashedPassword, PDO::PARAM_STR);
+            $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+            return $stmt->execute(); // Returnerer true hvis spørringen kjørte ok
+        } catch (PDOException $e) {
+            error_log("Database Error (updatePassword): " . $e->getMessage());
+            return false;
+        }
+    }
 }

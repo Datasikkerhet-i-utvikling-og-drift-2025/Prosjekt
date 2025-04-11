@@ -1,5 +1,5 @@
 <?php
-
+//FIXME Slett denne etterhvert.
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
