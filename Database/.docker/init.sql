@@ -83,7 +83,7 @@ END //
 
 CREATE PROCEDURE getLecturerById(IN lecturerId INT)
 BEGIN
-    SELECT name, image_path FROM users WHERE id = lecturerId AND role = 'lecturer';
+    SELECT full_name, image_path FROM users WHERE id = lecturerId AND role = 'lecturer';
 END //
 
 CREATE PROCEDURE getCourseByPinCode(IN pinCode INT)
@@ -250,7 +250,7 @@ BEGIN
     WHERE id = userId;
 END //
 
---For Lecturer and Guest--
+# --For Lecturer and Guest--
 
 CREATE PROCEDURE reportMessage(IN messageId VARCHAR(255), IN reason TEXT)
 BEGIN
