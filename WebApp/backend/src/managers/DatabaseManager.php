@@ -12,17 +12,38 @@ class DatabaseManager
 {
     private string $host;
     private string $dbName;
+
     private string $username;
     private string $password;
+    
     private ?PDO $pdo = null;
     private ?PDOStatement $stmt = null; // Stores the last prepared statement
 
-    public function __construct()
+    public function __construct(string $role)
     {
         $this->host = $_ENV['DB_HOST'];
         $this->dbName = $_ENV['DB_NAME'];
-        $this->username = $_ENV['DB_USER'];
-        $this->password = $_ENV['DB_PASS'];
+
+        switch($role) {
+            case 'user':
+                $this->username = $_ENV['DB_USER_USER'];
+                $this->password = $_ENV['DB_USER_PASS'];
+                break;
+            case 'lecturer':
+                $this->username = $_ENV['DB_LECTURER_USER'];
+                $this->password = $_ENV['DB_LECTURER_PASS'];
+                break;
+            case 'student':
+                $this->username = $_ENV['DB_STUDENT_USER'];
+                $this->password = $_ENV['DB_STUDENT_PASS'];
+                break;
+            case 'guest':
+                $this->username = $_ENV['DB_GUEST_USER'];
+                $this->password = $_ENV['DB_GUEST_PASS'];
+                break;
+            default:
+                throw new \InvalidArgumentException("Invalid role: $role");
+        }
     }
 
     /**

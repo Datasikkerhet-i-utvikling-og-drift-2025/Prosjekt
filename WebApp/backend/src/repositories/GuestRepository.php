@@ -12,7 +12,7 @@ use models\Lecturer;
 /**
  * Repository class for handling comment-related database operations.
  */
-class CommentRepository
+class GuestRepository
 {
     private DatabaseManager $db;
 
@@ -47,15 +47,14 @@ class CommentRepository
             return false;
         }
 
-        $sql = "INSERT INTO comments (message_id, guest_name, content, created_at)
-                VALUES (:message_id, :guest_name, :content, NOW())";
+        $sql = "CALL addComment(:message_id, :guest_name, :content)";
 
         $stmt = $this->db->prepareStmt($sql);
-        //$this->db->bindArrayToSqlStmt(
-        //    $stmt,
-        //    [':message_id', ':guest_name', ':content'],
-        //    [(int)$messageId, InputValidator::sanitizeString($guestName), InputValidator::sanitizeString($content)]
-        //);
+        $this->db->bindArrayToSqlStmt(
+            $stmt,
+            [':message_id', ':guest_name', ':content'],
+            [(int)$messageId, InputValidator::sanitizeString($guestName), InputValidator::sanitizeString($content)]
+        );
 
         $logger = "Adding comment to message ID: $messageId";
         return $this->db->executeTransaction($stmt, $logger);
@@ -75,10 +74,7 @@ class CommentRepository
             return [];
         }
 
-        $sql = "SELECT id, message_id, guest_name, content, created_at 
-                FROM comments 
-                WHERE message_id = :message_id 
-                ORDER BY created_at ASC";
+        $sql = "CALL getCommentsByMessageId(:message_id)";
 
         $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':message_id', (int)$messageId);
@@ -108,27 +104,33 @@ class CommentRepository
             return false;
         }
 
-        $sql = "UPDATE messages SET is_reported = 1 WHERE id = :messageId";
+        $sql = "CALL reportMessage(:messageId, :reason)";
         $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':messageId', $messageId);
+        $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':reason'], [$messageId, InputValidator::sanitizeString($reason)]);
 
         $loggerMessage = "Reporting message ID: $messageId";
         return $this->db->executeTransaction($stmt, $loggerMessage);
     }
 
-    public function getLecturerById (int $lecturerId): ?Lecturer
+    public function getLecturerById(int $lecturerId): ?Lecturer
     {
         if (!InputValidator::isValidInteger($lecturerId)) {
             Logger::error("Invalid lecturer ID: $lecturerId");
             return null;
         }
 
-        $sql = "SELECT name, image_path FROM users WHERE id = :lecturer_id" AND " role = 'lecturer'";
+        $sql = "CALL getLecturerById(:lecturerId)";
         $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':lecturerId', (int)$lecturerId);
+        $this->db->bindSingleValueToSqlStmt($stmt, ':lecturerId', $lecturerId);
 
         $loggerMessage = "Fetching lecturer ID: $lecturerId";
-        return $this->db->fetchSingle($stmt, $loggerMessage);
+        $lecturerData = $this->db->fetchSingle($stmt, $loggerMessage);
+
+        if ($lecturerData) {
+            return new Lecturer($lecturerData);
+        }
+
+        return null;
     }
 
     /**
@@ -145,9 +147,9 @@ class CommentRepository
             return null;
         }
 
-        $sql = "SELECT id, code, name, pin_code, lecturer_id FROM courses WHERE pin_code = :pin_code";
+        $sql = "CALL getCourseByPinCode(:pinCode)";
         $stmt = $this->db->prepareStmt($sql);
-        //$this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
+        $this->db->bindSingleValueToSqlStmt($stmt, ':pinCode', $pinCode);
 
         $logger = "Fetching course by pinCode: " . $pinCode;
         $data = $this->db->fetchSingle($stmt, $logger);
@@ -163,8 +165,7 @@ class CommentRepository
      */
     public function getMessagesByCourse(int $courseId): array
     {
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, m.anonymous_id
-                FROM messages m WHERE m.course_id = :courseId";
+        $sql = "CALL getMessagesForCourse(:courseId)";
 
         $stmt = $this->db->prepareStmt($sql);
         $this->db->bindSingleValueToSqlStmt($stmt, ':courseId', $courseId);
