@@ -126,9 +126,10 @@ class MessageService
 
     }
 
-
+/* Moved to lecturerService
     /**
      * Retrieves messages from a specificCourse.
+     * Used in LecturerController.
      * Accepts POST requests with CourseID as a parameter.
      * Responds with success status and message data.
      *
@@ -136,7 +137,8 @@ class MessageService
      * @return ApiResponse
      * @throws Exception
      */
-    public function getMessagesByCourse(int $courseId): ApiResponse
+    /*
+    public function getMessagesForCourse(int $courseId): ApiResponse
     {
         $this->logger->info('Get Messages by Course ID', ['courseId' => $courseId]);
         // Validate courseID
@@ -145,7 +147,7 @@ class MessageService
             return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
         }
 
-        $messages = $this->messageRepository->getMessagesByCourse($courseId);
+        $messages = $this->lecturerRepository->getMessagesForCourse($courseId);
         if (!$messages) {
             $this->logger->error('failed to get messages', ['courseId' => $courseId]);
             return new ApiResponse(false, 'Failed to retrieve messages.', null, ['courseId' => $courseId]);
@@ -154,7 +156,7 @@ class MessageService
         $this->logger->info('Messages retrieved successfully', ['messages' => $messages]);
         return new ApiResponse(true, 'Messages retrieved successfully.', $messages);
     }
-
+*/
     /**
      * Reports a message.
      * Accepts POST requests with message ID and report reason.
@@ -238,7 +240,7 @@ class MessageService
         }
     }
 
-
+/*
     /**
      * Retrieves comments for a specific message.
      * Accepts GET requests with message ID as a parameter.
@@ -263,16 +265,16 @@ class MessageService
 
         return new ApiResponse(true, 'Comments retrieved successfully.', $comments);
     }*/
-
-    /**
-     * reply to a student's message
+/*
+    /** Moved to LecturerService
+     * Used in LecturerController to reply to a student's message
      * Used in LecturerController
      * @param string $messageId
      * @param string $reply
      * @return ApiResponse
      * @throws Exception
      */
-
+/*
     public function replyToMessage(string $messageId, string $reply): ApiResponse
     {
         $this->logger->info('attempting to send a lecturer reply', ['messageId' => $messageId, 'reply' => $reply]);
@@ -305,28 +307,7 @@ class MessageService
 
         $this->logger->info('Reply successfully sent, oh mama!', ['messageId' => $messageId, 'reply' => $reply]);
         return new ApiResponse(true, 'Reply sent successfully.', ['messageId' => $messageId]);
-    }
-
-    public function getLecturerInfo(int $lecturerId): ApiResponse
-{
-    // Validate lecturerId
-    if (!InputValidator::isValidInteger($lecturerId)) {
-        return new ApiResponse(false, 'Invalid lecturer ID.', null, ['lecturerId' => $lecturerId]);
-    }
-
-    try {
-        // Fetch lecturer details from the repository
-        $lecturer = $this->lecturerRepository->fetchLecturerById($lecturerId);
-
-        if ($lecturer) {
-            return new ApiResponse(true, 'Lecturer retrieved successfully.', $lecturer);
-        } else {
-            return new ApiResponse(false, 'Lecturer not found.', null, ['lecturerId' => $lecturerId]);
-        }
-    } catch (Exception $e) {
-        // Handle unexpected errors
-        return new ApiResponse(false, 'An error occurred while retrieving the lecturer.', null, ['error' => $e->getMessage()]);
-    }
+    }*/
 }
 
 

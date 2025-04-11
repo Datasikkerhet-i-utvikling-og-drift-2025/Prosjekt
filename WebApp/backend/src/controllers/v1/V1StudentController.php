@@ -85,6 +85,30 @@ class V1StudentController
         }
     }
 
+    public function getMessageWithReply(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiToken();
+
+        try {
+            $messageId = $_POST['messageId'] ?? null;
+            $studentId = $_POST['studentId'] ?? null;
+            if (!$messageId) {
+                ApiHelper::sendError(400, 'MessageId is required.', ['exception' => 'messageId']);
+            }
+            if (!$studentId) {
+                ApiHelper::sendError(400, 'StudentId is required.', ['exception' => 'studentId']);
+            }
+
+            $response = $this->studentService->getMessagesWithReply($studentId, $messageId);
+
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+
+    }
+
     /**
      * @return void
      * @throws JsonException
