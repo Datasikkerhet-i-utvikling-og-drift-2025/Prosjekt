@@ -63,6 +63,8 @@ CREATE TABLE reports (
                          FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
+
+
 delimiter //
 
 -- GuestRepository
@@ -267,45 +269,44 @@ END //
 
 delimiter ;
 
+-- Admin får full tilgang
+CREATE USER 'admin'@'%' IDENTIFIED BY 'adminPass';
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;
 
-CREATE USER 'admin'@'mysql' IDENTIFIED BY 'adminPass';
-GRANT ALL PRIVILEGES
-ON database.*
-TO 'admin'@'mysql'
-IDENTIFIED BY 'adminPass'
-WITH GRANT OPTION;
+-- Student-bruker med tilgang til utvalgte prosedyrer
+CREATE USER 'student'@'%' IDENTIFIED BY 'studentPass';
+GRANT EXECUTE ON PROCEDURE `database`.`sendMessage` TO 'student'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getMessageWithReply` TO 'student'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getAvailableCourses` TO 'student'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getMessagesByStudent` TO 'student'@'%';
 
+-- Lecturer-bruker
+CREATE USER 'lecturer'@'%' IDENTIFIED BY 'lecturerPass';
+GRANT EXECUTE ON PROCEDURE `database`.`createCourse` TO 'lecturer'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getCourses` TO 'lecturer'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`replyToMessage` TO 'lecturer'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getMessageById` TO 'lecturer'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`reportMessage` TO 'lecturer'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getMessagesForCourse` TO 'lecturer'@'%';
 
-CREATE USER 'student'@'mysql' IDENTIFIED BY 'studentPass';
-GRANT EXECUTE ON PROCEDURE sendMessage TO 'student'@'mysql';
-GRANT EXECUTE ON PROCEDURE getMessageWithReply TO 'student'@'mysql';
-GRANT EXECUTE ON PROCEDURE getAvailableCourses TO 'student'@'mysql';
-GRANT EXECUTE ON PROCEDURE getMessagesByStudent TO 'student'@'mysql';
+-- Guest-bruker
+CREATE USER 'guest'@'%' IDENTIFIED BY 'guestPass';
+GRANT EXECUTE ON PROCEDURE `database`.`addComment` TO 'guest'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getCommentsByMessageId` TO 'guest'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getLecturerById` TO 'guest'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getCourseByPinCode` TO 'guest'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`reportMessage` TO 'guest'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getMessagesForCourse` TO 'guest'@'%';
 
-CREATE USER 'lecturer'@'mysql' IDENTIFIED BY 'lecturerPass';
-GRANT EXECUTE ON PROCEDURE createCourse TO 'lecturer'@'mysql';
-GRANT EXECUTE ON PROCEDURE getCourses TO 'lecturer'@'mysql';
-GRANT EXECUTE ON PROCEDURE replyToMessage TO 'lecturer'@'mysql';
-GRANT EXECUTE ON PROCEDURE getMessageById TO 'lecturer'@'mysql';
-GRANT EXECUTE ON PROCEDURE reportMessage TO 'lecturer'@'mysql';
-GRANT EXECUTE ON PROCEDURE getMessagesForCourse TO 'lecturer'@'mysql';
-
-CREATE USER 'guest'@'mysql' IDENTIFIED BY 'guestPass';
-GRANT EXECUTE ON PROCEDURE addComment TO 'guest'@'mysql';
-GRANT EXECUTE ON PROCEDURE getCommentsByMessageId TO 'guest'@'mysql';
-GRANT EXECUTE ON PROCEDURE getLecturerById TO 'guest'@'mysql';
-GRANT EXECUTE ON PROCEDURE getCourseByPinCode TO 'guest'@'mysql';
-GRANT EXECUTE ON PROCEDURE reportMessage TO 'guest'@'mysql';
-GRANT EXECUTE ON PROCEDURE getMessagesForCourse TO 'guest'@'mysql';
-
-CREATE USER 'user'@'mysql' IDENTIFIED BY 'userPass';
-GRANT EXECUTE ON PROCEDURE createUser TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE getUserByEmail TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE updateUser TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE deleteUserById TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE deleteUserByEmail TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE getUserById TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE getAllUsers TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE savePasswordResetToken TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE getUserByResetToken TO 'user'@'mysql';
-GRANT EXECUTE ON PROCEDURE updatePasswordAndClearToken TO 'user'@'mysql';
+-- Intern systembruker
+CREATE USER 'user'@'%' IDENTIFIED BY 'userPass';
+GRANT EXECUTE ON PROCEDURE `database`.`createUser` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getUserByEmail` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`updateUser` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`deleteUserById` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`deleteUserByEmail` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getUserById` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getAllUsers` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`savePasswordResetToken` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`getUserByResetToken` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `database`.`updatePasswordAndClearToken` TO 'user'@'%';
