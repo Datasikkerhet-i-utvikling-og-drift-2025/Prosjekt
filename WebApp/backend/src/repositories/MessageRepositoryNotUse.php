@@ -45,25 +45,6 @@ class MessageRepository
 
 
     /**
-     * Retrieves all messages for a specific course.
-     *
-     * @param int $courseId The ID of the course.
-     * @return array Returns an array of messages.
-     */
-    public function getMessagesByCourse(int $courseId): array
-    {
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, m.anonymous_id
-                FROM messages m WHERE m.course_id = :courseId";
-
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':courseId', $courseId);
-
-        $loggerMessage = "Fetching messages for course ID: $courseId";
-        return $this->db->fetchAll($stmt, $loggerMessage);
-    }
-
-
-    /**
      * Retrieves all messages sent by a specific student.
      *
      * @param int $studentId The ID of the student.
@@ -126,29 +107,6 @@ class MessageRepository
         $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':replyContent'], [$messageId, InputValidator::sanitizeString($replyContent)]);
 
         $loggerMessage = "Updating reply for message ID: $messageId";
-        return $this->db->executeTransaction($stmt, $loggerMessage);
-    }
-
-
-    /**
-     * Reports a message as inappropriate.
-     *
-     * @param int $messageId The ID of the message.
-     * @param string $reason The reason for reporting.
-     * @return bool Returns true if the message was successfully reported, false otherwise.
-     */
-    public function reportMessageById(int $messageId, string $reason): bool
-    {
-        if (!InputValidator::isNotEmpty($reason)) {
-            Logger::error("Report reason is empty for message ID $messageId");
-            return false;
-        }
-
-        $sql = "UPDATE messages SET is_reported = 1 WHERE id = :messageId";
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':messageId', $messageId);
-
-        $loggerMessage = "Reporting message ID: $messageId";
         return $this->db->executeTransaction($stmt, $loggerMessage);
     }
 
