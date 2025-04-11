@@ -8,7 +8,12 @@ out
 gen
 
 /WebApp/logs/
-/public/uploads/
-!/WebApp/public/uploads/
-/WebApp/public/uploads/
+/WebApp/backend/logs/
+/backend/logs/
+/WebApp/frontend/logs/
+/frontend/logs/
+/public/uploads
+!/WebApp/frontend/public/uploads/
+/WebApp/frontend/public/uploads/
+/WebApp/backend/public/uploads/
 /WebApp/vendor/

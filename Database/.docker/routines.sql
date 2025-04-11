@@ -1,68 +1,3 @@
--- Users Table
-CREATE TABLE users (
-                       id INT AUTO_INCREMENT PRIMARY KEY,
-                       first_name VARCHAR(100) NOT NULL,
-                       last_name VARCHAR(100) NOT NULL,
-                       full_name VARCHAR(100) NOT NULL,
-                       email VARCHAR(100) UNIQUE NOT NULL,
-                       password VARCHAR(255) NOT NULL,
-                       role ENUM('student', 'lecturer', 'admin') NOT NULL,
-                       study_program VARCHAR(100),
-                       enrollment_year INT NULL,
-                       image_path VARCHAR(255),
-                       reset_token VARCHAR(255), -- Added for storing reset tokens
-                       reset_token_created_at TIMESTAMP NULL, -- Added for tracking token creation time
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Courses Table
-CREATE TABLE courses (
-                         id INT AUTO_INCREMENT PRIMARY KEY,
-                         code VARCHAR(10) UNIQUE NOT NULL,
-                         name VARCHAR(100) NOT NULL,
-                         lecturer_id INT NOT NULL,
-                         pin_code CHAR(4) NOT NULL,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         FOREIGN KEY (lecturer_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- Messages Table
-CREATE TABLE messages (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          course_id INT NOT NULL,
-                          student_id INT NOT NULL,
-                          anonymous_id CHAR(36) NOT NULL,
-                          content TEXT NOT NULL,
-                          reply TEXT,
-                          is_reported BOOLEAN DEFAULT FALSE,
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-                          FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- Comments Table
-CREATE TABLE comments (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          message_id INT NOT NULL,
-                          guest_name VARCHAR(100) NOT NULL,
-                          content TEXT NOT NULL,
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
-);
-
--- Reports Table
-CREATE TABLE reports (
-                         id INT AUTO_INCREMENT PRIMARY KEY,
-                         message_id INT NOT NULL,
-                         reported_by INT,
-                         report_reason TEXT,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
-                         FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
-);
-
 CREATE USER 'student'@'mysql' [IDENTIFIED BY 'studentPass' ]
 
 CREATE USER 'lecturer'@'mysql' [IDENTIFIED BY 'lecturerPass' ]
@@ -72,7 +7,7 @@ CREATE USER 'guest'@'mysql' [IDENTIFIED BY 'guestPass' ]
 CREATE USER 'admin'@'mysql' [IDENTIFIED BY 'adminPass' ]
 
 
-DELIMITER // ;
+delimiter // ;
 
 -- AdminRepository
 
@@ -95,8 +30,8 @@ CREATE PROCEDURE getAllReportedMessages()
 BEGIN
     SELECT m.id AS message_id, m.content, r.report_reason, u.first_name AS reported_by, m.created_at
     FROM messages m
-    LEFT JOIN reports r ON m.id = r.message_id
-    LEFT JOIN users u ON r.reported_by = u.id;
+             LEFT JOIN reports r ON m.id = r.message_id
+             LEFT JOIN users u ON r.reported_by = u.id;
 END //
 
 CREATE PROCEDURE getAllUsersByRole(IN userRole VARCHAR(255))
@@ -108,7 +43,7 @@ CREATE PROCEDURE findMessageSender(IN messageId VARCHAR(255))
 BEGIN
     SELECT m.id AS message_id, m.content, u.id AS sender_id, u.first_name, u.email, u.study_program, u.enrollment_year
     FROM messages m
-    JOIN users u ON m.student_id = u.id
+             JOIN users u ON m.student_id = u.id
     WHERE m.id = messageId;
 END //
 
@@ -123,15 +58,15 @@ END //
 
 CREATE PROCEDURE getCommentsByMessageId(IN messageId INT)
 BEGIN
-    SELECT id, message_id, guest_name, content, created_at 
-    FROM comments 
-    WHERE message_id = messageId 
+    SELECT id, message_id, guest_name, content, created_at
+    FROM comments
+    WHERE message_id = messageId
     ORDER BY created_at ASC;
 END //
 
 CREATE PROCEDURE deleteComment(IN commentId INT)
 BEGIN
-    DELETE FROM comments 
+    DELETE FROM comments
     WHERE id = commentId;
 END //
 
@@ -175,8 +110,8 @@ END //
 
 CREATE PROCEDURE getCourses(IN lecturerId VARCHAR(255))
 BEGIN
-    SELECT id, code, name, pin_code, created_at 
-    FROM courses 
+    SELECT id, code, name, pin_code, created_at
+    FROM courses
     WHERE lecturer_id = lecturerId;
 END //
 
@@ -189,8 +124,8 @@ END //
 
 CREATE PROCEDURE replyToMessage(IN messageId VARCHAR(255), IN replyContent TEXT)
 BEGIN
-    UPDATE messages 
-    SET reply = replyContent, updated_at = NOW() 
+    UPDATE messages
+    SET reply = replyContent, updated_at = NOW()
     WHERE id = messageId;
 END //
 
@@ -224,19 +159,19 @@ END //
 
 CREATE PROCEDURE getMessagesByStudent(IN studentId INT)
 BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
+    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
            c.code AS course_code, c.name AS course_name
     FROM messages m
-    JOIN courses c ON m.course_id = c.id
+             JOIN courses c ON m.course_id = c.id
     WHERE m.student_id = studentId;
 END //
 
 CREATE PROCEDURE getMessageById(IN messageId INT)
 BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
+    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
            c.code AS course_code, c.name AS course_name
     FROM messages m
-    JOIN courses c ON m.course_id = c.id
+             JOIN courses c ON m.course_id = c.id
     WHERE m.id = messageId;
 END //
 
@@ -276,26 +211,26 @@ END //
 
 CREATE PROCEDURE getMessagesByStudent(IN studentId VARCHAR(255))
 BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
+    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
            c.code AS course_code, c.name AS course_name
     FROM messages m
-    JOIN courses c ON m.course_id = c.id
+             JOIN courses c ON m.course_id = c.id
     WHERE m.student_id = studentId
     ORDER BY m.created_at DESC;
 END //
 
 CREATE PROCEDURE getMessageWithReply(IN messageId VARCHAR(255), IN studentId VARCHAR(255))
 BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
+    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
            c.code AS course_code, c.name AS course_name
     FROM messages m
-    JOIN courses c ON m.course_id = c.id
+             JOIN courses c ON m.course_id = c.id
     WHERE m.id = messageId AND m.student_id = studentId;
 END //
 
 CREATE PROCEDURE getAvailableCourses()
 BEGIN
-    SELECT id, code, name 
+    SELECT id, code, name
     FROM courses;
 END //
 
@@ -394,4 +329,3 @@ BEGIN
     WHERE id = userId;
 END //
 delimiter ; //
-
