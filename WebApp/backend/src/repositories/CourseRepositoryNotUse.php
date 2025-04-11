@@ -26,30 +26,6 @@ class CourseRepository
 
 
     /**
-     * Creates a new course in the database.
-     *
-     * @param string $code Unique course code.
-     * @param string $name Name of the course.
-     * @param int $lecturerId ID of the lecturer responsible for the course.
-     * @param string $pinCode 4-digit access code for the course.
-     *
-     * @return bool Returns true if the course was created successfully, false otherwise.
-     */
-    public function createCourse(Course $course): bool
-    {
-        $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
-                VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
-
-        $stmt = $this->db->prepareStmt(
-            $sql,
-            fn($stmt) => $course->bindCourseDataForDbStmt($stmt)
-        );
-
-        return $this->db->executeTransaction("Saving user data in database");
-    }
-
-
-    /**
      * Retrieves a course by its ID.
      *
      * @param int $courseId The ID of the course.
@@ -68,30 +44,6 @@ class CourseRepository
         //$this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
 
         $logger = "Fetching course by ID: " . $courseId;
-        $data = $this->db->fetchSingle($stmt, $logger);
-
-        return $data ? new Course($data) : null;
-    }
-
-    /**
-     * Retrieves a course by its pinCode for guests.
-     *
-     * @param int $pinCode The pinCode of the course.
-     *
-     * @return Course|null Returns a Course object if found, otherwise null.
-     */
-    public function getCourseByPinCode(int $pinCode): ?Course
-    {
-        if (!InputValidator::isValidInteger($pinCode)) {
-            Logger::error("Invalid course pin: $pinCode");
-            return null;
-        }
-
-        $sql = "SELECT id, code, name, pin_code, lecturer_id FROM courses WHERE pin_code = :pin_code";
-        $stmt = $this->db->prepareStmt($sql);
-        //$this->db->bindSingleValueToSqlStmt($stmt, ":id", $courseId);
-
-        $logger = "Fetching course by pinCode: " . $pinCode;
         $data = $this->db->fetchSingle($stmt, $logger);
 
         return $data ? new Course($data) : null;
