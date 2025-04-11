@@ -22,16 +22,12 @@ use helpers\AccessControlManager;
 use helpers\Logger;
 use managers\DatabaseManager;
 use managers\JWTManager;
-use repositories\CommentRepository;
-use repositories\CourseRepository;
+use models\Student;
+use repositories\GuestRepository;
 use repositories\LecturerRepository;
-use repositories\MessageRepository;
+use repositories\StudentRepository;
 use repositories\UserRepository;
-//use repositories\commentRepository;
-//use repositories\LecturerRepository;
-//use repositories\MessageRepository;
 use services\AuthService;
-use services\GuestService;
 use services\MessageService;
 
 // Log application startup
@@ -39,8 +35,17 @@ Logger::info('Initializing application...');
 
 try {
     // Initialize manager classes
-    $db = new DatabaseManager();
-    $pdo = $db->connectToDb();
+    $userDb = new DatabaseManager("user");
+    $pdo = $userDb->connectToDb();
+
+    $lecturerDb = new DatabaseManager("lecturer");
+    $pdo = $lecturerDb->connectToDb();
+
+    $studentDb = new DatabaseManager("student");
+    $pdo = $studentDb->connectToDb();
+
+    $guestDb = new DatabaseManager("guest");
+    $pdo = $guestDb->connectToDb();
 
     //$accessControlManager = new AccessControlManager();
     $jwtManager = new JWTManager();
@@ -48,12 +53,10 @@ try {
 
 
     // Initialize repository classes
-    $userRepository = new UserRepository($db);
-    $courseRepository = new CourseRepository($db);
-    $messageRepository = new MessageRepository($db);
-    $lecturerRepository = new LecturerRepository($db);
-    $commentRepository = new CommentRepository($db);
-
+    $userRepository = new UserRepository($adminDb);
+    $lecturerRepository = new LecturerRepository($lecturerDb);
+    $guestRepository = new GuestRepository($guestDb);
+    $studentRepository = new StudentRepository($studentDb);
 
 
     // Initialize service classes
@@ -65,8 +68,7 @@ try {
     //$studentController = new StudentController($messageService);
     $lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);
-    $guestService = new GuestService($courseRepository);
-    //$guestController = new V1GuestController($messageService, $sessionManager, $guestService);
+    //$guestController = new GuestController($pdo);
 
     Logger::info('Controllers initialized successfully.');
 } catch (Exception $e) {
@@ -115,8 +117,6 @@ try {
         //['GET', '/api/guest/messages', [$guestController, 'getMessages']],
         //['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
         //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
-        //['POST', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
-
     ];
 
     Logger::info('Routes initialized successfully.');

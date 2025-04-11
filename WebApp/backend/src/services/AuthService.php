@@ -13,8 +13,9 @@ use managers\JWTManager;
 use models\Course;
 use repositories\PasswordResetRepository;
 use repositories\UserRepository;
-use repositories\CourseRepository;
+use repositories\LecturerRepository;
 use factories\UserFactory;
+use models\Lecturer;
 use RuntimeException;
 use Random\RandomException;
 use Throwable;
@@ -29,7 +30,7 @@ use DateTime;
 class AuthService
 {
     private UserRepository $userRepository;
-    private CourseRepository $courseRepository;
+    private LecturerRepository $lecturerRepository;
     private JWTManager $jwtManager;
 
     private MailerService $mailerService;
@@ -45,10 +46,10 @@ class AuthService
      * @param CourseRepository $courseRepository
      * @param JWTManager $jwtManager
      */
-    public function __construct(UserRepository $userRepository, CourseRepository $courseRepository, JWTManager $jwtManager, MailerService $mailerService, PasswordResetRepository $passwordResetRepository, array $config)
+    public function __construct(UserRepository $userRepository, LecturerRepository $lecturerRepository, JWTManager $jwtManager)
     {
         $this->userRepository = $userRepository;
-        $this->courseRepository = $courseRepository;
+        $this->lecturerRepository = $lecturerRepository;
         $this->jwtManager = $jwtManager;
         $this->logger = GrayLogger::getInstance();
         $this->mailerService = $mailerService;
@@ -104,7 +105,7 @@ class AuthService
                 $data['pinCode'] = $data['coursePin'];
                 $course = new Course($data);
 
-                if (!$this->courseRepository->createCourse($course)) {
+                if (!$this->lecturerRepository->createCourse($course)) {
                     $this->logger->error('Failed to create course.');
                     return new ApiResponse(false, 'Registration succeeded, but course creation failed.');
                 }
