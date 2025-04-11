@@ -51,11 +51,11 @@ class CommentRepository
                 VALUES (:message_id, :guest_name, :content, NOW())";
 
         $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt(
-            $stmt,
-            [':message_id', ':guest_name', ':content'],
-            [(int)$messageId, InputValidator::sanitizeString($guestName), InputValidator::sanitizeString($content)]
-        );
+        //$this->db->bindArrayToSqlStmt(
+        //    $stmt,
+        //    [':message_id', ':guest_name', ':content'],
+        //    [(int)$messageId, InputValidator::sanitizeString($guestName), InputValidator::sanitizeString($content)]
+        //);
 
         $logger = "Adding comment to message ID: $messageId";
         return $this->db->executeTransaction($stmt, $logger);

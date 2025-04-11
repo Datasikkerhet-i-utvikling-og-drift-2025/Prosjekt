@@ -115,10 +115,10 @@ END //
 
 -- CommentRepository
 
-CREATE PROCEDURE addComment(IN messageId INT, IN guestName VARCHAR(100), IN content TEXT)
+CREATE PROCEDURE addComment(IN messageId INT, IN guestName VARCHAR(100), IN contentText TEXT)
 BEGIN
     INSERT INTO comments (message_id, guest_name, content, created_at)
-    VALUES (messageId, guestName, content, NOW());
+    VALUES (messageId, guestName, contentText, NOW());
 END //
 
 CREATE PROCEDURE getCommentsByMessageId(IN messageId INT)
@@ -126,7 +126,7 @@ BEGIN
     SELECT id, message_id, guest_name, content, created_at 
     FROM comments 
     WHERE message_id = messageId 
-    ORDER BY created_at ASC;
+    ORDER BY created_at;
 END //
 
 CREATE PROCEDURE deleteComment(IN commentId INT)
@@ -160,8 +160,7 @@ BEGIN
     SET code = courseCode,
         name = courseName,
         lecturer_id = lecturerId,
-        pin_code = pinCode,
-        updated_at = NOW()
+        pin_code = pinCode
     WHERE id = courseId;
 END //
 
@@ -210,10 +209,10 @@ END //
 
 -- MessageRepository
 
-CREATE PROCEDURE createMessage(IN studentId INT, IN courseId INT, IN anonymousId CHAR(36), IN content TEXT)
+CREATE PROCEDURE createMessage(IN studentId INT, IN courseId INT, IN anonymousId CHAR(36), IN contentText TEXT)
 BEGIN
     INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at, is_reported)
-    VALUES (studentId, courseId, anonymousId, content, NOW(), 0);
+    VALUES (studentId, courseId, anonymousId, contentText, NOW(), 0);
 END //
 
 CREATE PROCEDURE getMessagesByCourse(IN courseId INT)
@@ -231,58 +230,59 @@ BEGIN
     WHERE m.student_id = studentId;
 END //
 
-CREATE PROCEDURE getMessageById(IN messageId INT)
-BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-           c.code AS course_code, c.name AS course_name
-    FROM messages m
-    JOIN courses c ON m.course_id = c.id
-    WHERE m.id = messageId;
-END //
+#CREATE PROCEDURE getMessageById(IN messageId INT)
+#BEGIN
+#    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
+#           c.code AS course_code, c.name AS course_name
+#    FROM messages m
+#    JOIN courses c ON m.course_id = c.id
+#    WHERE m.id = messageId;
+#END //
 
 CREATE PROCEDURE updateMessageReply(IN messageId INT, IN replyContent TEXT)
 BEGIN
     UPDATE messages SET reply = replyContent, updated_at = NOW() WHERE id = messageId;
 END //
 
-CREATE PROCEDURE reportMessageById(IN messageId INT, IN reason TEXT)
+CREATE PROCEDURE reportMessageById(IN messageId INT)
 BEGIN
     UPDATE messages SET is_reported = 1 WHERE id = messageId;
+    # FIXME legg til report message
 END //
 
-CREATE PROCEDURE deleteMessageById(IN messageId INT)
-BEGIN
-    DELETE FROM messages WHERE id = messageId;
-END //
+#CREATE PROCEDURE deleteMessageById(IN messageId INT)
+#BEGIN
+#    DELETE FROM messages WHERE id = messageId;
+#END //
 
 CREATE PROCEDURE getPublicMessages()
 BEGIN
     SELECT id AS message_id, content, created_at FROM messages;
 END //
 
-CREATE PROCEDURE updateMessage(IN message_id INT, IN content TEXT)
+CREATE PROCEDURE updateMessage(IN message_id INT, IN contentText TEXT)
 BEGIN
-    UPDATE messages SET content = content, updated_at = NOW() WHERE id = message_id;
+    UPDATE messages SET content = contentText, updated_at = NOW() WHERE id = message_id;
 END //
 
 
 -- StudentRepository
 
-CREATE PROCEDURE sendMessage(IN studentId VARCHAR(255), IN courseId VARCHAR(255), IN anonymousId VARCHAR(255), IN content TEXT)
+CREATE PROCEDURE sendMessage(IN studentId VARCHAR(255), IN courseId VARCHAR(255), IN anonymousId VARCHAR(255), IN contentText TEXT)
 BEGIN
     INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at)
-    VALUES (studentId, courseId, anonymousId, content, NOW());
+    VALUES (studentId, courseId, anonymousId, contentText, NOW());
 END //
 
-CREATE PROCEDURE getMessagesByStudent(IN studentId VARCHAR(255))
-BEGIN
-    SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-           c.code AS course_code, c.name AS course_name
-    FROM messages m
-    JOIN courses c ON m.course_id = c.id
-    WHERE m.student_id = studentId
-    ORDER BY m.created_at DESC;
-END //
+#CREATE PROCEDURE getMessagesByStudent(IN studentId VARCHAR(255))
+#BEGIN
+#    SELECT m.id AS message_id, m.content, m.reply, m.created_at,
+#           c.code AS course_code, c.name AS course_name
+#    FROM messages m
+#    JOIN courses c ON m.course_id = c.id
+#    WHERE m.student_id = studentId
+#    ORDER BY m.created_at DESC;
+#END //
 
 CREATE PROCEDURE getMessageWithReply(IN messageId VARCHAR(255), IN studentId VARCHAR(255))
 BEGIN
@@ -305,16 +305,16 @@ CREATE PROCEDURE createUser(
     IN firstName VARCHAR(100),
     IN lastName VARCHAR(100),
     IN fullName VARCHAR(100),
-    IN email VARCHAR(100),
-    IN password VARCHAR(255),
-    IN role ENUM('student', 'lecturer', 'admin'),
+    IN emailValue VARCHAR(100),
+    IN passwordValue VARCHAR(255),
+    IN roleValue ENUM('student', 'lecturer', 'admin'),
     IN studyProgram VARCHAR(100),
     IN enrollmentYear INT,
     IN imagePath VARCHAR(255)
 )
 BEGIN
     INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at)
-    VALUES (firstName, lastName, fullName, email, password, role, studyProgram, enrollmentYear, imagePath, NOW(), NOW());
+    VALUES (firstName, lastName, fullName, emailValue, passwordValue, roleValue, studyProgram, enrollmentYear, imagePath, NOW(), NOW());
 END //
 
 CREATE PROCEDURE getUserByEmail(IN userEmail VARCHAR(255))
@@ -327,9 +327,9 @@ CREATE PROCEDURE updateUser(
     IN firstName VARCHAR(100),
     IN lastName VARCHAR(100),
     IN fullName VARCHAR(100),
-    IN email VARCHAR(100),
-    IN password VARCHAR(255),
-    IN role ENUM('student', 'lecturer', 'admin'),
+    IN emailValue VARCHAR(100),
+    IN passwordValue VARCHAR(255),
+    IN roleValue ENUM('student', 'lecturer', 'admin'),
     IN studyProgram VARCHAR(100),
     IN enrollmentYear INT,
     IN imagePath VARCHAR(255)
@@ -339,9 +339,9 @@ BEGIN
     SET first_name = firstName,
         last_name = lastName,
         full_name = fullName,
-        email = email,
-        password = password,
-        role = role,
+        email = emailValue,
+        password = passwordValue,
+        role = roleValue,
         study_program = studyProgram,
         enrollment_year = enrollmentYear,
         image_path = imagePath,
@@ -349,10 +349,10 @@ BEGIN
     WHERE id = userId;
 END //
 
-CREATE PROCEDURE deleteUserById(IN userId VARCHAR(255))
-BEGIN
-    DELETE FROM users WHERE id = userId;
-END //
+#CREATE PROCEDURE deleteUserById(IN userId VARCHAR(255))
+#BEGIN
+#    DELETE FROM users WHERE id = userId;
+#END //
 
 CREATE PROCEDURE deleteUserByEmail(IN userEmail VARCHAR(255))
 BEGIN
@@ -393,5 +393,5 @@ BEGIN
         reset_token_created_at = NULL
     WHERE id = userId;
 END //
-delimiter;
+delimiter ;
 

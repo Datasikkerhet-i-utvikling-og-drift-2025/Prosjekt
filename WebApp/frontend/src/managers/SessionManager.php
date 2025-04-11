@@ -2,8 +2,6 @@
 
 namespace managers;
 
-use helpers\Logger;
-
 /**
  * Class SessionManager
  * Handles secure session management including fingerprinting,
@@ -40,7 +38,6 @@ class SessionManager
                 'samesite' => 'Strict',
             ]);
             session_start();
-            Logger::info("Secure session started.");
         }
     }
 
@@ -53,7 +50,6 @@ class SessionManager
         $currentFingerprint = $this->generateFingerprint();
 
         if (isset($_SESSION['fingerprint']) && $_SESSION['fingerprint'] !== $currentFingerprint) {
-            Logger::warning("Session fingerprint mismatch. Destroying session.");
             $this->destroy();
             return;
         }
@@ -63,18 +59,15 @@ class SessionManager
             $_SESSION['last_activity'] = time();
             $_SESSION['fingerprint'] = $currentFingerprint;
             $_SESSION['failed_attempts'] = 0;
-            Logger::info("New session initialized.");
             return;
         }
 
         if (time() - $_SESSION['created'] > $this->absoluteLifetime) {
-            Logger::info("Session expired (absolute lifetime).");
             $this->destroy();
             return;
         }
 
         if (time() - $_SESSION['last_activity'] > $this->idleTimeout) {
-            Logger::info("Session expired (inactivity).");
             $this->destroy();
             return;
         }
@@ -133,7 +126,6 @@ class SessionManager
         if ($token) {
             $_SESSION['token'] = $token;
         }
-        Logger::info("User stored in session.");
     }
 
     /**
@@ -169,7 +161,6 @@ class SessionManager
             $params = session_get_cookie_params();
             setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
         }
-        Logger::info("Session destroyed.");
     }
 
     /**
@@ -178,7 +169,6 @@ class SessionManager
     public function incrementFailedLogin(): void
     {
         $_SESSION['failed_attempts'] = ($_SESSION['failed_attempts'] ?? 0) + 1;
-        Logger::warning("Failed login attempt #{$_SESSION['failed_attempts']}");
     }
 
     /**

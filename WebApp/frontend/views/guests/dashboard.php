@@ -13,34 +13,21 @@ function sanitize($value) {
 
 $dbManager = new DatabaseManager();
 $pdo = $dbManager->connectToDb();
-$pin = $_POST['pin'] ?? null;
-$authorized = false;
-$course = null;
 
-// Handle PIN submission
-if ($pin) {
-    $stmt = $pdo->prepare("SELECT id, code, name, pin_code, lecturer_id FROM courses WHERE pin_code = :pin_code");
-    $stmt->execute([':pin_code' => $pin]);
-    $course = $stmt->fetch();
-
-    if ($course) {
-        $_SESSION['authorized_courses'][$course['id']] = true;
-    }
-}
-
-if ($course && !empty($_SESSION['authorized_courses'][$course['id']])) {
-    $authorized = true;
-}
+$courseId = $_GET['course_id'] ?? null;
+$authorized = $courseId !== null && isset($_SESSION['authorized_courses']) && isset($_SESSION['authorized_courses'][$courseId]);
 
 if (!$authorized) {
-    echo "<form method='POST'>
-            <label>Enter PIN to view course messages:</label>
-            <input type='text' name='pin' required>
-            <button type='submit'>Submit</button>
-          </form>";
+    echo "<form method='POST' action='/api/v1/guest/authorize'>
+        <label>Enter PIN to view course messages:</label>
+        <input type='text' name='pin' required>
+        <input type='hidden' name='courseId' value='" . htmlspecialchars($courseId ?? '') . "'>
+        <button type='submit'>Submit</button>
+      </form>";
     include __DIR__ . '/../partials/footer.php';
     exit;
 }
+
 
 // Fetch lecturer details
 $stmt = $pdo->prepare("SELECT name, image_path FROM users WHERE id = :lecturer_id AND role = 'lecturer'");
