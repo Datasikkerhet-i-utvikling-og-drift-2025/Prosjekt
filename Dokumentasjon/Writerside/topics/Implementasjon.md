@@ -64,8 +64,8 @@ Vi bruker docker for å teste nettsiden.
 ### Det som ble levert
 [Repo av det som ble levert](https://github.com/Datasikkerhet-i-utvikling-og-drift-2025/Prosjekt)
 
-Vi hadde i utgangspunktet en del sikkerhets tiltak på plass allerede i steg 1, vi hadde blandt annet prepared staements på plass, litt input validering og sanitering av data. 
-Dette var egentlig nok til at ingen av gruppene greide å hacke tjenesten vår. Vi hadde også en enkel variant av logg funskjonalitet som srev loggene til en .log fil. Samt PHPMailer for å sende reset link til å bytte passord.
+Vi hadde i utgangspunktet en del sikkerhets tiltak på plass allerede i steg 1, vi hadde blandt annet prepared statements på plass, litt input validering og sanitering av data. 
+Dette var egentlig nok til at ingen av gruppene greide å hacke tjenesten vår. Vi hadde også en enkel variant av logg funskjonalitet som skrev loggene til en .log fil. Samt PHPMailer for å sende reset link til å bytte passord.
 
 Så det vi endte med å levere er egentlig steg 1 med https og ekstra sikkerhets headere fra serveren.
 
@@ -73,14 +73,14 @@ Så det vi endte med å levere er egentlig steg 1 med https og ekstra sikkerhets
 [Repo med alt vi har prøvd men ikke rakk å bli ferdig med](https://github.com/Datasikkerhet-i-utvikling-og-drift-2025/Prosjekt/tree/refactor/WebApp)
 
 Vi var litt for ambisiøse når det kom til steg 2, vi kastet hele backenden og laget den helt fra scratch. Vi bet over mer enn det vi klarte å tygge og kom ikke helt i mål til fristen.
-Vi kom veldig langt og har fått til veldig mye, men var såpass funksjonalitet som ikke var helt 100% ferdig at vi så oss nødt til å levere steg 1 på nytt, men med oppdaterte server instillinger.
+Vi kom veldig langt og har fått til veldig mye, men var såpass med funksjonalitet som ikke var helt 100% ferdig at vi så oss nødt til å levere steg 1 på nytt, men med oppdaterte server instillinger.
 
 * Vi har implementer graylog og brukt den til å logge det som skjer i backenden
 * Vi har laget forbedrede versjoner av input validering og sanitering.
 * Vi har laget rutiner for alle de forskjellige spørringene til databasen.
 * Vi har begrenset hvilke bruker roller som kan utføre spesifikke spørringer.
-* Vi har lagt til en sikkrere sesjonshåndtering 
-  * Den begrenser antall innlogginsforsøk 
+* Vi har lagt til en sikrere sesjonshåndtering 
+  * Den begrenser antall innlogginsforsøk til 3 forsøk
   * Sesjonen utløper etter 30 dager
   * Har funksjonalitet for fingerprinting
 * API-et krever en api nøkkel
