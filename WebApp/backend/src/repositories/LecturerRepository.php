@@ -36,17 +36,30 @@ class LecturerRepository
      */
     public function createCourse(Course $course): bool
     {
+            Logger::debug('Hello to earth!');
         $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
                 VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
-
-        $stmt = $this->db->prepareStmt(
-            $sql,
-            fn($stmt) => $course->bindCourseDataForDbStmt($stmt)
-        );
-
-        return $this->db->executeTransaction("Saving user data in database");
+    
+        try {
+            Logger::debug('Preparing SQL for course creation for WHAAAAAT', );
+            
+            $stmt = $this->db->prepareStmt(
+                $sql,
+                fn($stmt) => $course->bindCourseDataForDbStmt($stmt)
+            );
+    
+            $result = $this->db->executeTransaction("Saving course data in database");
+    
+            if (!$result) {
+                Logger::error('Failed to execute course creation transaction');
+            }
+    
+            return $result;
+        } catch (Exception $e) {
+            Logger::error('Exception during course creation', ['exception' => $e->getMessage()]);
+            return false;
+        }
     }
-
 
     /**
      * Retrieves all courses taught by a lecturer.
