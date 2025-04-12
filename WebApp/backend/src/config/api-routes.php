@@ -63,8 +63,7 @@ try {
 
 
     // Initialize service classes
-    $authService = new AuthService($userRepository, $courseRepository, $jwtManager);
-    $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository, $logger);
+    $authService = new AuthService($userRepository, $lecturerRepository, $jwtManager);
 
     // Create controller instances
     $authController = new V1AuthController($authService);

@@ -43,6 +43,7 @@ class AuthService
      * AuthService constructor.
      *
      * @param UserRepository $userRepository
+     * @param LecturerRepository $lecturerRepository
      * @param JWTManager $jwtManager
      */
     public function __construct(UserRepository $userRepository, LecturerRepository $lecturerRepository, JWTManager $jwtManager)
