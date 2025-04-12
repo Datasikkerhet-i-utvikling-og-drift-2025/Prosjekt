@@ -53,14 +53,10 @@ class V1GuestController
 
             $course = $this->guestService->getCourseByPin($pin);
 
-            if ($course) {
-                // Authorization successful
-                //$response = new ApiResponse(true, 'Authorization successful.', ['course' => $course]);
-                //ApiHelper::sendApiResponse(200, $response);
-
-                // If it's a web page request and not just an API call, you might redirect here:
-                $_SESSION['authorized_courses'][$course['id']] = true;
-                header('Location: /guests/dashboard?course_id=' . $course['id']);
+            if ($course->success == true) {
+                //Authorization successful
+                $response = new ApiResponse(true, 'Authorization successful.', ['course' => $course]);
+                ApiHelper::sendApiResponse(200, $response);
                 exit;
             } else {
                 // Invalid PIN
