@@ -43,20 +43,24 @@ if (isset($_SESSION['errors'])) {
 
 if ($authorized) {
     // Fetch course details if authorized
-    try try {
+     try {
         $apiManager = new ApiManager();
         $responseData = $apiManager->get('/api/v1/guest/authorize', ['pin' => $pin, 'course_id' => $courseId]);
 
         if ($responseData['success'] === true) {
             // Store the course_id in session after authorization
-            $_SESSION['authorized_courses'][$responseData['data']['course_id']] = true;
             
             // Fetch additional course details here (assuming your API provides this)
             $courseId = $responseData['data']['course_id'];
-            $courseDetails = $apiManager->get('/api/v1/courses/' . $courseId);  // Assuming an endpoint that provides course info
+            $courseDetails = $apiManager->get('/api/v1/lecturer/courses/' . $courseId);  // Added the correct endpoint format
 
             // Store course details in session or pass them to the frontend
             $_SESSION['course_details'] = $courseDetails['data'];  // Store in session if you want to keep it for later
+
+            $lecturer = $apiManager->get('/api/v1/guest/getLecturer' . $courseDetails['data']['lecturer_id']);
+            $messages = $apiManager->get('/api/v1/guest/messages' . $courseId);
+            $comments = $apiManager->get('/api/v1/guest/viewComment' . $messages['data']['id']);
+
 
             // Redirect to dashboard with course_id in the URL
             header('Location: /guests/dashboard?course_id=' . $courseId);
@@ -83,7 +87,7 @@ if ($authorized) {
     <!-- Course details displayed after successful PIN -->
    <div class="container">
     <h1>Course Messages</h1>
-    <p><strong>Course:</strong> <?= sanitize($course['code']) ?> - <?= sanitize($course['name']) ?></p>
+    <p><strong>Course:</strong> <?= sanitize($courseDetails['code']) ?> - <?= sanitize($courseDetails['name']) ?></p>
     <p><strong>Lecturer:</strong> <?= sanitize($lecturer['name'] ?? 'Unknown') ?></p>
     <img src="<?= sanitize($lecturer['image_path'] ?? 'uploads/profile_pictures/hiof.jpg') ?>" alt="Lecturer Image" width="100" height="100">
 

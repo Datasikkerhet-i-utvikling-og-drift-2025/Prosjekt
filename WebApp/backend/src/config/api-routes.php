@@ -94,6 +94,9 @@ try {
         ['GET', '/api/v1/auth/logout', [$authController, 'logout']],
         ['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
         ['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
+        ['GET', '/api/v1/auth/getUserID', [$authController, 'getUserById']],
+        
+        
 
         // Student routes
         ['GET', '/api/v1/student/courses', [$studentController, 'getAvailableCourses']],
@@ -103,6 +106,7 @@ try {
 
         // Lecturer routes
         ['GET', '/api/v1/lecturer/courses', [$lecturerController, 'getCourse']],
+       
         ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
         ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
         ['GET', '/api/v1/lecturer/messageById', [$lecturerController, 'getMessageById']],
@@ -118,8 +122,12 @@ try {
         // Guest routes
         ['GET', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
         ['GET', '/api/v1/guest/messages', [$guestController, 'getMessagesByCourse']],
+        ['GET', '/api/v1/lecturer/getLecturer', [$guestController, 'getLecturerById']],
+
         ['POST', '/api/v1/guest/messages/report', [$guestController, 'reportMessage']],
         ['POST', '/api/v1/guest/messages/comment', [$guestController, 'sendComment']],
+        ['GET', '/api/v1/messages/viewComment', [$guestController, 'getCommentsByMessageId']],
+        
     ];
 
     //$logger->info('Routes initialized successfully.');

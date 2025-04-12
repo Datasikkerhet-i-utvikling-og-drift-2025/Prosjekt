@@ -142,4 +142,38 @@ class GuestService
             return new ApiResponse(false, 'Failed to report message.', null, ['messageId' => $messageId]);
         }
     }
+
+    public function getLecturerById(int $lecturerId): ApiResponse
+    {
+        $this->logger->info('Get lecturer by ID method called', ['lecturerId' => $lecturerId]);
+        // Sanitize and validate input
+        if (!InputValidator::isValidInteger($lecturerId)) {
+            return new ApiResponse(false, 'Invalid lecturer ID.', null, ['lecturerId' => $lecturerId]);
+        }
+
+        // Retrieve lecturer from the repository
+        $lecturer = $this->guestRepository->getLecturerById($lecturerId);
+        if ($lecturer) {
+            return new ApiResponse(true, 'Lecturer retrieved successfully.', $lecturer, ['lecturerId' => $lecturerId]);
+        } else {
+            return new ApiResponse(false, 'No lecturer found with this ID.', null, ['lecturerId' => $lecturerId]);
+        }
+    }
+
+    public function getCommentsByMessageId(int $messageId): ApiResponse
+    {
+        $this->logger->info('Get comments by message ID method called', ['messageId' => $messageId]);
+        // Sanitize and validate input
+        if (!InputValidator::isValidInteger($messageId)) {
+            return new ApiResponse(false, 'Invalid message ID.', null, ['messageId' => $messageId]);
+        }
+
+        // Retrieve comments from the repository
+        $comments = $this->guestRepository->getCommentsByMessageId($messageId);
+        if ($comments) {
+            return new ApiResponse(true, 'Comments retrieved successfully.', $comments, ['messageId' => $messageId]);
+        } else {
+            return new ApiResponse(false, 'No comments found for this message.', null, ['messageId' => $messageId]);
+        }
+    }
 }

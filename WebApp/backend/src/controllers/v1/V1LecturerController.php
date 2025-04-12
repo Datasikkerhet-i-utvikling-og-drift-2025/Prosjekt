@@ -112,7 +112,7 @@ class V1LecturerController
 
     public function getCourse(): void
     {
-        ApiHelper::requirePost();
+        ApiHelper::requireGet();
         ApiHelper::requireApiKey();
 
         try {

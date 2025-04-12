@@ -144,5 +144,49 @@ class V1GuestController
 
     }
 
+    public function getLecturerById()
+    {
+        ApiHelper::requireGet();
+
+        try {
+            $input = ApiHelper::getJsonInput();
+            $lecturerId = $input['lecturerId'] ?? null;
+
+            if (!$lecturerId) {
+                ApiHelper::sendError(400, 'Lecturer ID is required.');
+                return;
+            }
+
+            $response = $this->guestService->getLecturerById((int)$lecturerId);
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(400, 'Invalid JSON input.', ['exception' => $e->getMessage()]);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+    }
+
+    public function getCommentsByMessageId()
+    {
+        ApiHelper::requireGet();
+
+        try {
+            $input = ApiHelper::getJsonInput();
+            $messageId = $input['messageId'] ?? null;
+
+            if (!$messageId) {
+                ApiHelper::sendError(400, 'Message ID is required.');
+                return;
+            }
+
+            $response = $this->guestService->getCommentsByMessageId((int)$messageId);
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(400, 'Invalid JSON input.', ['exception' => $e->getMessage()]);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+    }
+
 
 }
