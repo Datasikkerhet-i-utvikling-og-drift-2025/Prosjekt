@@ -25,33 +25,33 @@ abstract class User
         }
     }
 
-    /** @var string $firstName User's first name. */
-    public string $firstName {
+    /** @var string $first_name User's first name. */
+    public string $first_name {
         get {
-            return $this->firstName;
+            return $this->first_name;
         }
         set {
-            $this->firstName = $value;
+            $this->first_name = $value;
         }
     }
 
-    /** @var string $lastName User's last name. */
-    public string $lastName {
+    /** @var string $last_name User's last name. */
+    public string $last_name {
         get {
-            return $this->lastName;
+            return $this->last_name;
         }
         set {
-            $this->lastName = $value;
+            $this->last_name = $value;
         }
     }
 
-    /** @var string $fullName User's full name (concatenation of first and last name). */
-    public string $fullName {
+    /** @var string $full_name User's full name (concatenation of first and last name). */
+    public string $full_name {
         get {
-            return $this->fullName;
+            return $this->full_name;
         }
         set {
-            $this->fullName = $value;
+            $this->full_name = $value;
         }
     }
 
@@ -85,43 +85,43 @@ abstract class User
         }
     }
 
-    /** @var string|null $resetToken Optional token for password reset functionality. */
-    protected ?string $resetToken {
+    /** @var string|null $reset_token Optional token for password reset functionality. */
+    protected ?string $reset_token {
         get {
-            return $this->resetToken;
+            return $this->reset_token;
         }
         set {
-            $this->resetToken = $value;
+            $this->reset_token = $value;
         }
     }
 
-    /** @var DateTime|null $resetTokenCreatedAt Timestamp when the reset token was generated. */
-    protected ?DateTime $resetTokenCreatedAt {
+    /** @var DateTime|null $reset_token_created_at Timestamp when the reset token was generated. */
+    protected ?DateTime $reset_token_created_at {
         get {
-            return $this->resetTokenCreatedAt;
+            return $this->reset_token_created_at;
         }
         set {
-            $this->resetTokenCreatedAt = $value;
+            $this->reset_token_created_at = $value;
         }
     }
 
-    /** @var DateTime $createdAt Timestamp when the user was created in the system. */
-    protected DateTime $createdAt {
+    /** @var DateTime $created_at Timestamp when the user was created in the system. */
+    protected DateTime $created_at {
         get {
-            return $this->createdAt;
+            return $this->created_at;
         }
         set {
-            $this->createdAt = $value;
+            $this->created_at = $value;
         }
     }
 
-    /** @var DateTime $updatedAt Timestamp of the last modification of the user record. */
-    protected DateTime $updatedAt {
+    /** @var DateTime $updated_at Timestamp of the last modification of the user record. */
+    protected DateTime $updated_at {
         get {
-            return $this->updatedAt;
+            return $this->updated_at;
         }
         set {
-            $this->updatedAt = $value;
+            $this->updated_at = $value;
         }
     }
 
@@ -131,33 +131,33 @@ abstract class User
      * This constructor initializes the user properties based on the provided user data array.
      * It ensures that timestamps are set correctly and assigns default values where necessary.
      *
-     * @param array $userData Associative array containing user data with the following keys:<br>
+     * @param array $user_data Associative array containing user data with the following keys:<br>
      *        - `id` (int|null) User ID (if null, will be assigned by the database).<br>
-     *        - `firstName` (string) User's first name.<br>
-     *        - `lastName` (string) User's last name.<br>
+     *        - `first_name` (string) User's first name.<br>
+     *        - `last_name` (string) User's last name.<br>
      *        - `email` (string) User's email address.<br>
      *        - `password` (string) User's password (hashed or plain text).<br>
      *        - `role` (UserRole) User's assigned role.<br>
-     *        - `resetToken` (string|null) Optional reset token for password recovery.<br>
-     *        - `resetTokenCreatedAt` (string|null) Timestamp of when the reset token was created.<br>
-     *        - `createdAt` (string|null) Timestamp when the user was created (defaults to `now`).<br>
-     *        - `updatedAt` (string|null) Timestamp when the user was last updated (defaults to `now`).
+     *        - `reset_token` (string|null) Optional reset token for password recovery.<br>
+     *        - `reset_token_created_at` (string|null) Timestamp of when the reset token was created.<br>
+     *        - `created_at` (string|null) Timestamp when the user was created (defaults to `now`).<br>
+     *        - `updated_at` (string|null) Timestamp when the user was last updated (defaults to `now`).
      *
      * @throws DateMalformedStringException If any provided date string cannot be converted to a DateTime object.
      */
-    public function __construct(array $userData)
+    public function __construct(array $user_data)
     {
-        $this->id = $userData['id'] ?? null;
-        $this->firstName = InputValidator::sanitizeString($userData['firstName'] ?? '');
-        $this->lastName = InputValidator::sanitizeString($userData['lastName'] ?? '');
-        $this->fullName = $this->firstName . " " . $this->lastName;
-        $this->email = isset($userData['email']) && InputValidator::isValidEmail($userData['email']) ? $userData['email'] : '';
-        $this->password = $userData['password'] ?? '';
-        $this->role = UserRole::tryFrom($userData['role']) ?? UserRole::STUDENT;
-        $this->resetToken = isset($userData['resetToken']) ? InputValidator::sanitizeString($userData['resetToken']) : null;
-        $this->resetTokenCreatedAt = isset($userData['resetTokenCreatedAt']) ? new DateTime($userData['resetTokenCreatedAt']) : null;
-        $this->createdAt = new DateTime($userData['createdAt'] ?? 'now');
-        $this->updatedAt = new DateTime($userData['updatedAt'] ?? 'now');
+        $this->id = $user_data['id'] ?? null;
+        $this->first_name = InputValidator::sanitizeString($user_data['first_name'] ?? '');
+        $this->last_name = InputValidator::sanitizeString($user_data['last_name'] ?? '');
+        $this->full_name = $this->first_name . " " . $this->last_name;
+        $this->email = isset($user_data['email']) && InputValidator::isValidEmail($user_data['email']) ? $user_data['email'] : '';
+        $this->password = $user_data['password'] ?? '';
+        $this->role = UserRole::tryFrom($user_data['role']) ?? UserRole::STUDENT;
+        $this->reset_token = isset($user_data['reset_token']) ? InputValidator::sanitizeString($user_data['reset_token']) : null;
+        $this->reset_token_created_at = isset($user_data['reset_token_created_at']) ? new DateTime($user_data['reset_token_created_at']) : null;
+        $this->created_at = new DateTime($user_data['created_at'] ?? 'now');
+        $this->updated_at = new DateTime($user_data['updated_at'] ?? 'now');
     }
 
 
@@ -168,24 +168,24 @@ abstract class User
      * prepared SQL statement before execution, reducing the risk of SQL injection.
      *
      * It also handles specific attributes for `Student` and `Lecturer` subclasses,
-     * binding additional fields like `studyProgram`, `enrollmentYear`, and `imagePath`.
+     * binding additional fields like `study_program`, `enrollment_year`, and `image_path`.
      *
      * @param PDOStatement $stmt The prepared statement to which user attributes will be bound.
      *
      * @return void
      */
-    protected function bindUserDataForDbStmt(PDOStatement $stmt): void
+    public function bindUserDataForDbStmt(PDOStatement $stmt): void
     {
-        $stmt->bindValue(':firstName', $this->firstName, PDO::PARAM_STR);
-        $stmt->bindValue(':lastName', $this->lastName, PDO::PARAM_STR);
-        $stmt->bindValue(':fullName', $this->fullName, PDO::PARAM_STR);
+        $stmt->bindValue(':first_name', $this->first_name, PDO::PARAM_STR);
+        $stmt->bindValue(':last_name', $this->last_name, PDO::PARAM_STR);
+        $stmt->bindValue(':full_name', $this->full_name, PDO::PARAM_STR);
         $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
         $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
         $stmt->bindValue(':role', $this->role->value, PDO::PARAM_STR);
 
-        $stmt->bindValue(':studyProgram', $this->studyProgram ?? null, isset($this->studyProgram) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-        $stmt->bindValue(':enrollmentYear', $this->enrollmentYear ?? null, isset($this->enrollmentYear) ? PDO::PARAM_INT : PDO::PARAM_NULL);
-        $stmt->bindValue(':imagePath', $this->imagePath ?? null, isset($this->imagePath) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':study_program', $this->study_program ?? null, isset($this->study_program) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':enrollment_year', $this->enrollment_year ?? null, isset($this->enrollment_year) ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':image_path', $this->image_path ?? null, isset($this->image_path) ? PDO::PARAM_STR : PDO::PARAM_NULL);
     }
 
 
@@ -197,13 +197,13 @@ abstract class User
     public function toArray(): array {
         return [
             'id' => $this->id,
-            'first_name' => $this->firstName,
-            'last_name' => $this->lastName,
-            'full_name' => $this->fullName,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'full_name' => $this->full_name,
             'email' => $this->email,
             'role' => $this->role->value,
-            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s')
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s')
         ];
     }
 
