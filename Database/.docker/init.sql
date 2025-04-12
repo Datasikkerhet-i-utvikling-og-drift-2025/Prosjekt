@@ -16,6 +16,17 @@ CREATE TABLE users (
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Password Email Reset Table
+CREATE TABLE password_resets (
+                                 id INT AUTO_INCREMENT PRIMARY KEY,
+                                 user_id INT NOT NULL,
+                                 token VARCHAR(64) NOT NULL, -- SHA256 hash er 64 tegn hex
+                                 expires_at TIMESTAMP NOT NULL,
+                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 INDEX token_idx (token), -- For raskt oppslag på token
+                                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- Sikrer dataintegritet og rydder opp hvis bruker slettes
+);
+
 -- Courses Table
 CREATE TABLE courses (
                          id INT AUTO_INCREMENT PRIMARY KEY,

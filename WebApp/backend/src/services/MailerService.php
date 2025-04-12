@@ -1,6 +1,6 @@
 <?php
 
-namespace services; // Eller ditt foretrukne namespace
+namespace services;
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../helpers/Logger.php';
 
