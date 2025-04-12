@@ -189,10 +189,14 @@ class ApiManager
                 'data' => $decodedResponse
             ];
         } catch (JsonException $e) {
+
             return [
                 'success' => false,
                 'httpCode' => 500,
-                'errors' => ['Invalid JSON handling: ' . $e->getMessage()]
+                'errors' => [
+                    'Invalid JSON handling: ' . $e->getMessage(),
+                    'Response: ' . var_export($response, true) // Add the raw response for debugging
+                ]
             ];
         } catch (RuntimeException $e) {
             return [

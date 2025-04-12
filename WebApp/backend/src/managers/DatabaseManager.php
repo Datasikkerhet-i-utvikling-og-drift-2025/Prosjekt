@@ -82,6 +82,8 @@ class DatabaseManager
                 //$this->logger->info("Connected to database");
             } catch (PDOException $e) {
                 $this->logger->error("Database connection failed: " . $e->getMessage());
+                // Throw an exception to indicate failure
+                throw new RuntimeException("Database connection failed: " . $e->getMessage());
             }
         }
         return $this->pdo;

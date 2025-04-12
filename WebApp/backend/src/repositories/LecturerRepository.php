@@ -42,7 +42,6 @@ class LecturerRepository
         return $this->db->executeTransaction("Saving user data in database");
     }
 
-
     /**
      * Retrieves all courses taught by a lecturer.
      *
