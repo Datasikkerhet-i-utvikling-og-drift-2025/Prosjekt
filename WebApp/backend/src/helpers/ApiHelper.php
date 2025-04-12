@@ -134,6 +134,10 @@ class ApiHelper
         }
     }
 
+    /**
+     * @return void
+     * @throws JsonException
+     */
     public static function requireGet(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
