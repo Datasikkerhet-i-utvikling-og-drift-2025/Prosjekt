@@ -7,6 +7,7 @@ use helpers\Logger;
 use managers\DatabaseManager;
 use PDO;
 
+
 class LecturerRepository
 {
     private DatabaseManager $db;
@@ -20,6 +21,29 @@ class LecturerRepository
     public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
+    }
+
+    /**
+     * Creates a new course in the database.
+     *
+     * @param string $code Unique course code.
+     * @param string $name Name of the course.
+     * @param int $lecturerId ID of the lecturer responsible for the course.
+     * @param string $pinCode 4-digit access code for the course.
+     *
+     * @return bool Returns true if the course was created successfully, false otherwise.
+     */
+    public function createCourse(Course $course): bool
+    {
+        $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
+                VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
+
+        $stmt = $this->db->prepareStmt(
+            $sql,
+            fn($stmt) => $course->bindCourseDataForDbStmt($stmt)
+        );
+
+        return $this->db->executeTransaction("Saving user data in database");
     }
 
 

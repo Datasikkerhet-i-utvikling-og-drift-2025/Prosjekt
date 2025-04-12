@@ -19,28 +19,36 @@ use controllers\v1\V1LecturerController;
 use controllers\v1\V1StudentController;
 use Exception;
 use helpers\AccessControlManager;
-use helpers\Logger;
 use helpers\GrayLogger;
 use managers\DatabaseManager;
 use managers\JWTManager;
-use repositories\CommentRepository;
-use repositories\CourseRepository;
+use models\Student;
+use repositories\GuestRepository;
 use repositories\LecturerRepository;
-use repositories\MessageRepository;
+use repositories\StudentRepository;
 use repositories\UserRepository;
-
 use services\AuthService;
-use services\GuestService;
 use services\MessageService;
 
-// Log application startup
 $logger = GrayLogger::getInstance();
-Logger::info('Initializing application...');
-  
+
+
+// Log application startup
+//$logger->info('Initializing api...');
+
 try {
     // Initialize manager classes
-    $db = new DatabaseManager();
-    $pdo = $db->connectToDb();
+    $userDb = new DatabaseManager("user");
+    $pdo = $userDb->connectToDb();
+
+    $lecturerDb = new DatabaseManager("lecturer");
+    $pdo = $lecturerDb->connectToDb();
+
+    $studentDb = new DatabaseManager("student");
+    $pdo = $studentDb->connectToDb();
+
+    $guestDb = new DatabaseManager("guest");
+    $pdo = $guestDb->connectToDb();
 
     //$accessControlManager = new AccessControlManager();
     $jwtManager = new JWTManager();
@@ -48,16 +56,10 @@ try {
 
 
     // Initialize repository classes
-    $userRepository = new UserRepository($db);
-    $courseRepository = new CourseRepository($db);
-    $messageRepository = new MessageRepository($db);
-    $lecturerRepository = new LecturerRepository($db);
-    $commentRepository = new CommentRepository($db);
-    
-    //graylogger
-  
-
-
+    $userRepository = new UserRepository($userDb);
+    $lecturerRepository = new LecturerRepository($lecturerDb);
+    $guestRepository = new GuestRepository($guestDb);
+    $studentRepository = new StudentRepository($studentDb);
 
 
     // Initialize service classes
@@ -67,14 +69,14 @@ try {
     // Create controller instances
     $authController = new V1AuthController($authService);
     //$studentController = new StudentController($messageService);
-    $lecturerController = new V1LecturerController($messageService);
+    //$lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);
     $guestService = new GuestService($courseRepository);
     $guestController = new V1GuestController($messageService, $guestService);
 
-    Logger::info('Controllers initialized successfully.');
+    //$logger->info('Controllers initialized successfully.');
 } catch (Exception $e) {
-    Logger::error('Error initializing components: ' . $e->getMessage());
+    $logger->error('Error initializing components: ' . $e->getMessage());
     http_response_code(500);
     die('Internal server error. Check logs for details.');
 }
@@ -93,8 +95,8 @@ try {
         //['POST', '/api/auth/login', [$authController, 'login']],
         //['GET', '/api/auth/logout', [$authController, 'logout']],
         //['POST', '/api/auth/change-password', [$authController, 'changePassword']],
-        //['POST', '/api/auth/password-reset/request', [$authController, 'requestPasswordReset']],
-        //['POST', '/api/auth/password-reset', [$authController, 'resetPassword']],
+        ['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
+        ['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
 
         // Student routes
         //['GET', '/api/student/courses', [$studentController, 'getCourses']],
@@ -103,8 +105,8 @@ try {
 
         // Lecturer routes
         //['GET', '/api/lecturer/courses', [$lecturerController, 'getCourses']],
-        ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
-        ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
+        //['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
+        //['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
         //['POST', '/api/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
 
         // Admin routes
@@ -123,37 +125,13 @@ try {
 
     ];
 
-    Logger::info('Routes initialized successfully.');
+    //$logger->info('Routes initialized successfully.');
 } catch (Exception $e) {
-    Logger::error('Error initializing routes: ' . $e->getMessage());
+    $this->logger->error('Error initializing routes: ' . $e->getMessage());
     http_response_code(500);
     die('Internal server error while initializing routes.');
 }
 
-// Debug route (only for development)
-$routes[] = ['GET', '/debug/routes', function () use ($routes) {
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(array_map(static function ($route) {
-        return [
-            'method' => $route[0],
-            'uri' => $route[1],
-            'controller' => is_array($route[2]) ? get_class($route[2][0]) : 'Closure',
-            'action' => is_array($route[2]) ? $route[2][1] : null,
-        ];
-    }, $routes), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-    Logger::info('Debug route accessed.');
-    exit;
-}];
-
-// Log routes to a file
-$logFile = __DIR__ . '/../../logs/routes.log';
-try {
-    file_put_contents($logFile, json_encode($routes, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-    Logger::info('Routes logged successfully to ' . $logFile);
-} catch (Exception $e) {
-    Logger::error('Failed to write routes log: ' . $e->getMessage());
-}
-
 // Return routes to the main entry point
-Logger::info('Application initialized successfully.');
+//$logger->info('Api initialized successfully.');
 return $routes;

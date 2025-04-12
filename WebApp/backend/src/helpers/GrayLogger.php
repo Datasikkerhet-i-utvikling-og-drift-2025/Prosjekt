@@ -1,6 +1,8 @@
 <?php
 namespace helpers;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
+
 use Gelf\Message;
 use Gelf\Publisher;
 use Gelf\Transport\UdpTransport;
@@ -45,8 +47,10 @@ class GrayLogger
             $this->publisher = new Publisher($transport);
         } catch (Throwable $e) {
             $this->fallbackLog("[GrayLogger] Transport initialization failed: " . $e->getMessage());
+            $this->publisher = null;
         }
     }
+
 
     /**
      * Returns the singleton instance of the logger.
@@ -77,7 +81,6 @@ class GrayLogger
             $message->setShortMessage($shortMessage);
             $message->setLevel($this->mapLogLevel($level));
             $message->setTimestamp(microtime(true));
-            $message->setFacility('Feedback System');
             $message->setHost('backend');
 
             foreach ($context as $key => $value) {
@@ -204,4 +207,53 @@ class GrayLogger
     {
         $this->log($message, $context, 'error');
     }
+
+    /**
+     * Logs a notice-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
+    public function notice(string $message, array $context = []): void
+    {
+        $this->log($message, $context, 'notice');
+    }
+
+    /**
+     * Logs a critical-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
+    public function critical(string $message, array $context = []): void
+    {
+        $this->log($message, $context, 'critical');
+    }
+
+    /**
+     * Logs an alert-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
+    public function alert(string $message, array $context = []): void
+    {
+        $this->log($message, $context, 'alert');
+    }
+
+    /**
+     * Logs an emergency-level message.
+     *
+     * @param string $message Log message.
+     * @param array $context Additional metadata.
+     * @return void
+     */
+    public function emergency(string $message, array $context = []): void
+    {
+        $this->log($message, $context, 'emergency');
+    }
+
 }

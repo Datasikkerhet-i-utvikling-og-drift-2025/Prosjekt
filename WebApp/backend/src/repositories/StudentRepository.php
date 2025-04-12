@@ -5,6 +5,7 @@ namespace repositories;
 use helpers\InputValidator;
 use helpers\Logger;
 use managers\DatabaseManager;
+use PDO;
 
 class StudentRepository
 {
@@ -39,16 +40,15 @@ class StudentRepository
             return false;
         }
 
-        $sql = "INSERT INTO messages (student_id, course_id, anonymous_id, content, created_at)
-                VALUES (:studentId, :courseId, :anonymousId, :content, NOW())";
+        $sql = "CALL sendMessage(:studentId, :courseId, :anonymousId, :content)";
 
         $this->db->prepareStmt(
             $sql,
             fn($stmt) => $stmt
-                ->bindValue(":studentId", $studentId, \PDO::PARAM_STR)
-                ->bindValue(":courseId", $courseId, \PDO::PARAM_STR)
-                ->bindValue(":anonymousId", $anonymousId, \PDO::PARAM_STR)
-                ->bindValue(":content", InputValidator::sanitizeString($content), \PDO::PARAM_STR)
+                ->bindValue(":studentId", $studentId, PDO::PARAM_STR)
+                ->bindValue(":courseId", $courseId, PDO::PARAM_STR)
+                ->bindValue(":anonymousId", $anonymousId, PDO::PARAM_STR)
+                ->bindValue(":content", InputValidator::sanitizeString($content), PDO::PARAM_STR)
         );
 
         return $this->db->executeTransaction("Sending message from student ID: $studentId to course ID: $courseId");
@@ -64,16 +64,11 @@ class StudentRepository
      */
     public function getMessagesByStudent(string $studentId): array
     {
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-                       c.code AS course_code, c.name AS course_name
-                FROM messages m
-                JOIN courses c ON m.course_id = c.id
-                WHERE m.student_id = :studentId
-                ORDER BY m.created_at DESC";
+        $sql = "CALL getMessagesByStudent(:studentId)";
 
         $this->db->prepareStmt(
             $sql,
-            fn($stmt) => $stmt->bindValue(":studentId", $studentId, \PDO::PARAM_STR)
+            fn($stmt) => $stmt->bindValue(":studentId", $studentId, PDO::PARAM_STR)
         );
 
         return $this->db->fetchAll("Fetching messages for student ID: $studentId");
@@ -90,17 +85,13 @@ class StudentRepository
      */
     public function getMessageWithReply(string $messageId, string $studentId): ?array
     {
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, 
-                       c.code AS course_code, c.name AS course_name
-                FROM messages m
-                JOIN courses c ON m.course_id = c.id
-                WHERE m.id = :messageId AND m.student_id = :studentId";
+        $sql = "CALL getMessageWithReply(:messageId, :studentId)";
 
         $this->db->prepareStmt(
             $sql,
             fn($stmt) => $stmt
-                ->bindValue(":messageId", $messageId, \PDO::PARAM_STR)
-                ->bindValue(":studentId", $studentId, \PDO::PARAM_STR)
+                ->bindValue(":messageId", $messageId, PDO::PARAM_STR)
+                ->bindValue(":studentId", $studentId, PDO::PARAM_STR)
         );
 
         return $this->db->fetchSingle("Fetching message ID: $messageId for student ID: $studentId");
@@ -114,8 +105,7 @@ class StudentRepository
      */
     public function getAvailableCourses(): array
     {
-        $sql = "SELECT id, code, name 
-                FROM courses";
+        $sql = "CALL getAvailableCourses()";
 
         $this->db->prepareStmt($sql);
 

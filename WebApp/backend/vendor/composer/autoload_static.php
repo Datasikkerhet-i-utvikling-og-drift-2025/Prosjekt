@@ -11,7 +11,6 @@ class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
         array (
             'Psr\\Log\\' => 8,
             'Prosjekt\\WebApp\\' => 16,
-            'ParagonIE\\ConstantTime\\' => 23,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
         'G' => 
@@ -28,10 +27,6 @@ class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
         'Prosjekt\\WebApp\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
-        ),
-        'ParagonIE\\ConstantTime\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
         'PHPMailer\\PHPMailer\\' => 
         array (

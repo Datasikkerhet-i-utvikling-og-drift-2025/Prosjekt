@@ -2,6 +2,7 @@
 
 namespace managers;
 
+use CURLFile;
 use JsonException;
 use RuntimeException;
 use Throwable;
@@ -17,9 +18,9 @@ use Throwable;
 class ApiManager
 {
     /**
-     * @var string The bearer token used for API authentication.
+     * @var string The bearer key used for API authentication.
      */
-    private string $apiToken;
+    private string $apiKey;
 
     /**
      * @var string The base URL for the API, typically stored in an environment variable.
@@ -29,14 +30,14 @@ class ApiManager
     /**
      * ApiManager constructor.
      *
-     * @throws RuntimeException If either the base URL or the API token is not set.
+     * @throws RuntimeException If either the base URL or the API key is not set.
      */
     public function __construct()
     {
         try {
-            $this->apiToken = (string) getenv('API_TOKEN');
-            if (empty($this->apiToken)) {
-                throw new RuntimeException('API token (API_TOKEN) not set or empty in environment.');
+            $this->apiKey = (string) getenv('API_KEY');
+            if (empty($this->apiKey)) {
+                throw new RuntimeException('API key (API_KEY) not set or empty in environment.');
             }
 
             $this->baseUrl = rtrim((string) getenv('API_URL'), '/');
@@ -126,7 +127,7 @@ class ApiManager
             $hasFile = isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK;
 
             $headers = [
-                'Authorization: Bearer ' . $this->apiToken,
+                'Authorization: Bearer ' . $this->apiKey,
                 'Accept: application/json'
             ];
 
@@ -139,7 +140,7 @@ class ApiManager
 
             if (!empty($data) && $method !== 'GET') {
                 if ($hasFile) {
-                    $data['profilePicture'] = new \CURLFile(
+                    $data['profilePicture'] = new CURLFile(
                         $_FILES['profilePicture']['tmp_name'],
                         $_FILES['profilePicture']['type'],
                         $_FILES['profilePicture']['name']

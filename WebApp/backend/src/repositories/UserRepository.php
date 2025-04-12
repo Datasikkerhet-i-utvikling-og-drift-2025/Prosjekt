@@ -4,6 +4,7 @@ namespace repositories;
 
 use DateMalformedStringException;
 use factories\UserFactory;
+use helpers\GrayLogger;
 use helpers\Logger;
 use managers\DatabaseManager;
 use models\User;
@@ -12,6 +13,7 @@ use PDO;
 class UserRepository
 {
     private DatabaseManager $db;
+    private GrayLogger $logger;
 
 
     /**
@@ -22,6 +24,7 @@ class UserRepository
     public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
+        $this->logger = GrayLogger::getInstance();
     }
 
 
@@ -33,10 +36,9 @@ class UserRepository
      */
     public function createUser(User $user): bool
     {
-        $sql = "INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year, image_path, created_at, updated_at) 
-                VALUES (:firstName, :lastName, :fullName, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath, NOW(), NOW())";
+        $sql = "CALL createUser(:firstName, :lastName, :fullName, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath)";
 
-        $this->db->prepareStmt(
+        $stmt = $this->db->prepareStmt(
             $sql,
             fn($stmt) => $user->bindUserDataForDbStmt($stmt)
         );
@@ -54,9 +56,7 @@ class UserRepository
      */
     public function getUserByEmail(string $email): ?User
     {
-        $sql = "SELECT * FROM users 
-                WHERE email = :email 
-                LIMIT 1";
+        $sql = "CALL getUserByEmail(:email)";
 
         $this->db->prepareStmt($sql, fn($stmt) => $stmt->bindValue(":email", $email, PDO::PARAM_STR));
         $userData = $this->db->fetchSingle("Fetching user by email: $email");
@@ -78,18 +78,7 @@ class UserRepository
             return false;
         }
 
-        $sql = "UPDATE users 
-                SET first_name = :firstName,
-                    last_name = :lastName,
-                    full_name = :fullName,
-                    email = :email,
-                    password = :password,
-                    role = :role,
-                    study_program = :studyProgram,
-                    enrollment_year = :enrollmentYear,
-                    image_path = :imagePath,
-                    updated_at = NOW()
-                WHERE id = :id";
+        $sql = "CALL updateUser(:id, :firstName, :lastName, :fullName, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath)";
 
         $this->db->prepareStmt(
             $sql,
@@ -108,8 +97,7 @@ class UserRepository
      */
     public function deleteUserById(string $userId): bool
     {
-        $sql = "DELETE FROM users 
-                WHERE id = :id";
+        $sql = "CALL deleteUserById(:id)";
 
         $this->db->prepareStmt(
             $sql,
@@ -128,8 +116,7 @@ class UserRepository
      */
     public function deleteUserByEmail(string $userEmail): bool
     {
-        $sql = "DELETE FROM users 
-                WHERE email = :email";
+        $sql = "CALL deleteUserByEmail(:email)";
 
         $this->db->prepareStmt(
             $sql,
@@ -149,9 +136,7 @@ class UserRepository
      */
     public function getUserById(string $userId): ?User
     {
-        $sql = "SELECT * FROM users 
-                WHERE id = :id 
-                LIMIT 1";
+        $sql = "CALL getUserById(:id)";
 
         $this->db->prepareStmt(
             $sql,
@@ -170,8 +155,7 @@ class UserRepository
      */
     public function getAllUsers(): array
     {
-        $sql = "SELECT * 
-                FROM users";
+        $sql = "CALL getAllUsers()";
 
         $this->db->prepareStmt($sql);
         $usersData = $this->db->fetchAll("Fetching all users from the database");
@@ -189,10 +173,7 @@ class UserRepository
      */
     public function savePasswordResetToken(string $userId, string $token): bool
     {
-        $sql = "UPDATE users 
-                SET reset_token = :token, 
-                    reset_token_created_at = NOW() 
-                WHERE id = :id";
+        $sql = "CALL savePasswordResetToken(:id, :token)";
 
         $this->db->prepareStmt($sql,
             fn($stmt) => $stmt
@@ -213,10 +194,7 @@ class UserRepository
      */
     public function getUserByResetToken(string $token): ?User
     {
-        $sql = "SELECT * 
-                FROM users 
-                WHERE reset_token = :token 
-                  AND reset_token_created_at >= NOW() - INTERVAL 1 HOUR";
+        $sql = "CALL getUserByResetToken(:token)";
 
         $this->db->prepareStmt(
             $sql,
@@ -237,11 +215,7 @@ class UserRepository
      */
     public function updatePasswordAndClearToken(string $userId, string $hashedPassword): bool
     {
-        $sql = "UPDATE users 
-                SET password = :password, 
-                    reset_token = NULL, 
-                    reset_token_created_at = NULL 
-                WHERE id = :id";
+        $sql = "CALL updatePasswordAndClearToken(:id, :password)";
 
         $this->db->prepareStmt(
             $sql,
@@ -252,4 +226,18 @@ class UserRepository
 
         return $this->db->executeTransaction("Updating password and clearing reset token for user ID: $userId");
     }
+
+    #public function updatePassword(int $userId, string $hashedPassword): bool
+    #{
+    #    $sql = "UPDATE users SET password = :password WHERE id = :id";
+    #    try {
+    #        $stmt = $this->db->prepareStmt($sql);
+    #        $stmt->bindValue(':password', $hashedPassword, PDO::PARAM_STR);
+    #        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+    #        return $stmt->execute(); // Returnerer true hvis spørringen kjørte ok
+    #    } catch (PDOException $e) {
+    #        error_log("Database Error (updatePassword): " . $e->getMessage());
+    #        return false;
+    #    }
+    #}
 }

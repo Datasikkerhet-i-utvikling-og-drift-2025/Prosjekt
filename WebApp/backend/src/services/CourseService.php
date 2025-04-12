@@ -47,12 +47,13 @@ class CourseService
         return new ApiResponse(true, 'Course id retieved successfully', null, ['courseId' => $courseId]);
     }
 
-
+/* flyttet til GuestService
     /**
      * @param string $pinCode
      * @return ApiResponse
      * @throws Exception
      */
+    /*
     public function getCourseByPin(string $pinCode): ApiResponse
     {
         //hmmm har Inputvalidator en saniteringsfunksjon for pincode?
@@ -65,9 +66,9 @@ class CourseService
             return new ApiResponse(false, 'Course not found', null, ['courseId' => $pinCode]);
         }
         return new ApiResponse(true, 'Course pin retrieved successfully', null, ['courseId' => $pinCode]);
-    }
+    }*/
 
-
+/*redundant
     /**
      * A lecturer should be able to create a new course
      * @param array $courseData

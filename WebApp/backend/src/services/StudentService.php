@@ -6,7 +6,6 @@ use DateMalformedStringException;
 use Exception;
 use Helpers\ApiResponse;
 use JsonException;
-use models\Message;
 use repositories\StudentRepository;
 use helpers\InputValidator;
 use helpers\GrayLogger;
@@ -40,7 +39,6 @@ class StudentService
      * @param ?string $anonymousId
      * @param string $content
      * @return ApiResponse
-     * @throws DateMalformedStringException
      * @throws Exception
      */
     public function sendMessage(string $studentId, string $courseId, ?string $anonymousId, string $content): ApiResponse

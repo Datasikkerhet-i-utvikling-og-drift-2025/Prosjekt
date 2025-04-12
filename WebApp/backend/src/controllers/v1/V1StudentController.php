@@ -36,7 +36,7 @@ class V1StudentController
     public function sendMessage(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
            $postData = ApiHelper::getJsonInput();
@@ -68,7 +68,7 @@ class V1StudentController
     public function getMessagesByStudent(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $studentId = $_POST['studentId'] ?? null;
@@ -85,6 +85,30 @@ class V1StudentController
         }
     }
 
+    public function getMessageWithReply(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiKey();
+
+        try {
+            $messageId = $_POST['messageId'] ?? null;
+            $studentId = $_POST['studentId'] ?? null;
+            if (!$messageId) {
+                ApiHelper::sendError(400, 'MessageId is required.', ['exception' => 'messageId']);
+            }
+            if (!$studentId) {
+                ApiHelper::sendError(400, 'StudentId is required.', ['exception' => 'studentId']);
+            }
+
+            $response = $this->studentService->getMessagesWithReply($studentId, $messageId);
+
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+
+    }
+
     /**
      * @return void
      * @throws JsonException
@@ -92,7 +116,7 @@ class V1StudentController
     public function getAvailableCourses(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $response = $this->studentService->getAvailableCourses();
