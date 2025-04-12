@@ -124,7 +124,7 @@ class ApiManager
                 throw new RuntimeException('Failed to initialize cURL.');
             }
 
-            $hasFile = isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK;
+            $hasFile = isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK;
 
             $headers = [
                 'Authorization: Bearer ' . $this->apiKey,
@@ -141,9 +141,9 @@ class ApiManager
             if (!empty($data) && $method !== 'GET') {
                 if ($hasFile) {
                     $data['profilePicture'] = new CURLFile(
-                        $_FILES['profilePicture']['tmp_name'],
-                        $_FILES['profilePicture']['type'],
-                        $_FILES['profilePicture']['name']
+                        $_FILES['profile_picture']['tmp_name'],
+                        $_FILES['profile_picture']['type'],
+                        $_FILES['profile_picture']['name']
                     );
 
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);

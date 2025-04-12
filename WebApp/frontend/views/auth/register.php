@@ -65,13 +65,13 @@ require_once __DIR__ . '/../partials/header.php';
 
     <form action="" method="POST" enctype="multipart/form-data">
         <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" name="firstName" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['firstName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Tom Heine" value="<?= htmlspecialchars($_POST['firstName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </div>
 
         <div class="form-group">
             <label for="last_name">Last Name</label>
-            <input type="text" id="lastName" name="lastName" placeholder="Nätt" value="<?= htmlspecialchars($_POST['lastName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+            <input type="text" id="last_name" name="last_name" placeholder="Nätt" value="<?= htmlspecialchars($_POST['lastName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
         </div>
 
         <div class="form-group">
@@ -85,8 +85,8 @@ require_once __DIR__ . '/../partials/header.php';
         </div>
 
         <div class="form-group">
-            <label for="repeatPassword">Repeat Password</label>
-            <input type="password" id="repeatPassword" name="repeatPassword" placeholder="Password123!" required>
+            <label for="repeat_password">Repeat Password</label>
+            <input type="password" id="repeat_password" name="repeat_password" placeholder="Password123!" required>
         </div>
 
         <div class="form-group">
@@ -100,42 +100,42 @@ require_once __DIR__ . '/../partials/header.php';
 
         <div id="student-fields" style="display: <?= ($_POST['role'] ?? '') === 'student' ? 'block' : 'none' ?>;">
             <div class="form-group">
-                <label for="studyProgram">Study Program</label>
-                <input type="text" id="studyProgram" name="studyProgram" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <label for="study_program">Study Program</label>
+                <input type="text" id="study_program" name="study_program" placeholder="Information Systems" value="<?= htmlspecialchars($_POST['study_program'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="enrollmentYear">Cohort Year</label>
-                <input type="number" id="enrollmentYear" name="enrollmentYear" placeholder="2025" value="<?= htmlspecialchars($_POST['enrollmentYear'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                <label for="enrollment_year">Cohort Year</label>
+                <input type="number" id="enrollment_year" name="enrollment_year" placeholder="2025" value="<?= htmlspecialchars($_POST['enrollmentYear'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
         </div>
         <div id="lecturer-fields" style="display: <?= ($_POST['role'] ?? '') === 'lecturer' ? 'block' : 'none' ?>;">
     <div class="form-group">
-        <label for="profilePicture">Profile Picture</label>
-        <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+        <label for="profile_picture">Profile Picture</label>
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
     </div>
 
     <div class="form-group">
         <label for="course_code">Course Code</label>
-        <input type="text" id="courseCode" name="courseCode"
+        <input type="text" id="course_code" name="courseCode"
                placeholder="ITF12345"
-               value="<?= htmlspecialchars($_POST['courseCode'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+               value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
         <label for="course_name">Course Name</label>
-        <input type="text" id="courseName" name="courseName"
+        <input type="text" id="course_name" name="course_name"
                placeholder="Datasikkerhet i utvikling og drift"
-               value="<?= htmlspecialchars($_POST['courseName'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+               value="<?= htmlspecialchars($_POST['course_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 
     <div class="form-group">
         <label for="coursePin">Course PIN</label>
-        <input type="text" id="coursePin" name="coursePin"
+        <input type="text" id="course_pin" name="course_pin"
                placeholder="1337"
                pattern="[0-9]{4}"
                title="Please enter a 4-digit PIN code"
-               value="<?= htmlspecialchars($_POST['coursePin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+               value="<?= htmlspecialchars($_POST['course_pin'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
 </div>
 
@@ -213,7 +213,7 @@ require_once __DIR__ . '/../partials/header.php';
 
     // Valider fornavn mens brukeren skriver
     // getElementById first_name samsvarte ikke med id på linje 62
-    document.getElementById('firstName').addEventListener('input', function() {
+    document.getElementById('first_name').addEventListener('input', function() {
         if (this.value.length < 3) {
             showError(this, 'First name must be at least 3 characters long');
         } else {
@@ -223,7 +223,7 @@ require_once __DIR__ . '/../partials/header.php';
 
     // Valider etternavn mens brukeren skriver
     // getElementById last_name samsvarte ikke med id på linje 66
-    document.getElementById('lastName').addEventListener('input', function() {
+    document.getElementById('last_name').addEventListener('input', function() {
         if (this.value.length < 3) {
             showError(this, 'Last name must be at least 3 characters long');
         } else {
@@ -243,7 +243,7 @@ require_once __DIR__ . '/../partials/header.php';
 
     // Valider kurskode mens brukeren skriver
     // getElementById course_code samsvarte ikke med id på linje 113
-    document.getElementById('courseCode').addEventListener('input', function() {
+    document.getElementById('course_code').addEventListener('input', function() {
         if (this.value.length > 10) {
             showError(this, 'Course code must not exceed 10 characters');
         } else {
@@ -255,11 +255,11 @@ require_once __DIR__ . '/../partials/header.php';
     // retter opp id referenaser til input-feltene i skjemaet
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
-        const repeatPassword = document.getElementById('repeatPassword').value;
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
+        const repeatPassword = document.getElementById('repeat_password').value;
+        const firstName = document.getElementById('first_name').value;
+        const lastName = document.getElementById('last_name').value;
         const email = document.getElementById('email').value;
-        const courseCode = document.getElementById('courseCode').value;
+        const courseCode = document.getElementById('course_code').value;
 
         if (password.length < 8) {
             e.preventDefault();
@@ -269,19 +269,19 @@ require_once __DIR__ . '/../partials/header.php';
 
         if (repeatPassword !== password) {
             e.preventDefault();
-            showError(document.getElementById('repeatPassword'), 'Passwords must match');
+            showError(document.getElementById('repeat_password'), 'Passwords must match');
             return false;
         }
 
         if (firstName.length < 3) {
             e.preventDefault();
-            showError(document.getElementById('firstName'), 'First name must be at least 3 characters long');
+            showError(document.getElementById('first_name'), 'First name must be at least 3 characters long');
             return false;
         }
 
         if (lastName.length < 3) {
             e.preventDefault();
-            showError(document.getElementById('lastName'), 'Last name must be at least 3 characters long');
+            showError(document.getElementById('last_name'), 'Last name must be at least 3 characters long');
             return false;
         }
 
@@ -294,7 +294,7 @@ require_once __DIR__ . '/../partials/header.php';
 
         if (courseCode.length > 10) {
             e.preventDefault();
-            showError(document.getElementById('courseCode'), 'Course code must not exceed 10 characters');
+            showError(document.getElementById('course_code'), 'Course code must not exceed 10 characters');
             return false;
         }
     });
