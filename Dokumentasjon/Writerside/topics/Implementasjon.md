@@ -59,7 +59,12 @@ Vi bruker docker for å teste nettsiden.
 | **Mobilapp-funksjoner (kun for studenter)** | ✅ (uten passordfunksjoner) | ❌ | ❌ | ❌ |
 | **API-dokumentasjon**                     | ❌      | ❌        | ✅           | ❌           |
 
+### Risk Management
 [Risk Management regneark](https://docs.google.com/spreadsheets/d/1ZZaXRinwKW2zdoBFIOjep6W1I5B51jLRdOeJP1Hkgjw/edit?gid=0#gid=0)
+
+[Abuse cases og sikkerhetskrav](https://docs.google.com/document/d/1IovEz9TezHcv1PA1U5anjifejnY8JdbSEXsRv8btZio/edit?tab=t.0)
+
+[Config filer](https://github.com/Datasikkerhet-i-utvikling-og-drift-2025/Prosjekt/tree/main/Config%20filer)
 
 ### Det som ble levert
 [Repo av det som ble levert](https://github.com/Datasikkerhet-i-utvikling-og-drift-2025/Prosjekt)
