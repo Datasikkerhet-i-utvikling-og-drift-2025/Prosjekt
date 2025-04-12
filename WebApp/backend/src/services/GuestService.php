@@ -99,7 +99,7 @@ class GuestService
         if (!$input) {
             return new ApiResponse(false, 'Course not found', null, ['courseId' => $pinCode]);
         }
-        return new ApiResponse(true, 'Course pin retrieved successfully', null, ['courseId' => $pinCode]);
+        return new ApiResponse(true, 'Course pin retrieved successfully', $input, ['courseId' => $pinCode]);
     }
 
     /** Er ikke helt ferdig med denne

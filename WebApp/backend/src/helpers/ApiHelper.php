@@ -134,6 +134,18 @@ class ApiHelper
         }
     }
 
+    /**
+     * @return void
+     * @throws JsonException
+     */
+    public static function requireGet(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            self::$logger->warning("Method not allowed: " . $_SERVER['REQUEST_METHOD']);
+            self::sendError(405, 'Method Not Allowed. Use GET.');
+        }
+    }
+
 
     /**
      * Validates the API Token provided in the Authorization header.

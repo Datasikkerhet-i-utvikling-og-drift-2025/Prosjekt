@@ -8,6 +8,7 @@ use managers\DatabaseManager;
 use models\Comment;
 use models\Course;
 use models\Lecturer;
+use PDO;
 
 /**
  * Repository class for handling comment-related database operations.
@@ -49,11 +50,10 @@ class GuestRepository
 
         $sql = "CALL addComment(:message_id, :guest_name, :content)";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt(
-            $stmt,
-            [':message_id', ':guest_name', ':content'],
-            [(int)$messageId, InputValidator::sanitizeString($guestName), InputValidator::sanitizeString($content)]
+        $stmt = $this->db->prepareStmt($sql, fn($stmt) => $stmt
+            ->bindValue(":message_id", $messageId, PDO::PARAM_STR)
+            ->bindValue(":guest_name", InputValidator::sanitizeString($guestName), PDO::PARAM_STR)
+            ->bindValue(":content", InputValidator::sanitizeString($content), PDO::PARAM_STR)
         );
 
         $logger = "Adding comment to message ID: $messageId";
@@ -76,8 +76,9 @@ class GuestRepository
 
         $sql = "CALL getCommentsByMessageId(:message_id)";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':message_id', (int)$messageId);
+        $stmt = $this->db->prepareStmt($sql, fn($stmt) => $stmt
+            ->bindValue(":message_id", (int)$messageId, PDO::PARAM_INT)
+        );
         $logger = "Fetching comments for message ID: $messageId";
 
         $commentsData = $this->db->fetchAll($stmt, $logger);
@@ -105,8 +106,10 @@ class GuestRepository
         }
 
         $sql = "CALL reportMessage(:messageId, :reason)";
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindArrayToSqlStmt($stmt, [':messageId', ':reason'], [$messageId, InputValidator::sanitizeString($reason)]);
+        $stmt = $this->db->prepareStmt($sql, fn($stmt) => $stmt
+            ->bindValue(":messageId", $messageId, PDO::PARAM_INT)
+            ->bindValue(":reason", InputValidator::sanitizeString($reason), PDO::PARAM_STR)
+        );
 
         $loggerMessage = "Reporting message ID: $messageId";
         return $this->db->executeTransaction($stmt, $loggerMessage);
@@ -120,8 +123,9 @@ class GuestRepository
         }
 
         $sql = "CALL getLecturerById(:lecturerId)";
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':lecturerId', $lecturerId);
+        $stmt = $this->db->prepareStmt($sql, fn($stmt) => $stmt
+            ->bindValue(":lecturerId", $lecturerId, PDO::PARAM_INT)
+        );
 
         $loggerMessage = "Fetching lecturer ID: $lecturerId";
         $lecturerData = $this->db->fetchSingle($stmt, $loggerMessage);
@@ -148,8 +152,9 @@ class GuestRepository
         }
 
         $sql = "CALL getCourseByPinCode(:pinCode)";
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':pinCode', $pinCode);
+        $stmt = $this->db->prepareStmt($sql, fn($stmt) => $stmt
+            ->bindValue(":pinCode", $pinCode, PDO::PARAM_INT)
+        );
 
         $logger = "Fetching course by pinCode: " . $pinCode;
         $data = $this->db->fetchSingle($stmt, $logger);
@@ -167,8 +172,9 @@ class GuestRepository
     {
         $sql = "CALL getMessagesForCourse(:courseId)";
 
-        $stmt = $this->db->prepareStmt($sql);
-        $this->db->bindSingleValueToSqlStmt($stmt, ':courseId', $courseId);
+        $stmt = $this->db->prepareStmt($sql, fn($stmt) => $stmt
+            ->bindValue(":courseId", $courseId, PDO::PARAM_INT)
+        );
 
         $loggerMessage = "Fetching messages for course ID: $courseId";
         return $this->db->fetchAll($stmt, $loggerMessage);

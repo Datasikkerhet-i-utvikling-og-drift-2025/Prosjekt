@@ -5,6 +5,7 @@ namespace repositories;
 use helpers\InputValidator;
 use helpers\Logger;
 use managers\DatabaseManager;
+use models\Course;
 use PDO;
 
 

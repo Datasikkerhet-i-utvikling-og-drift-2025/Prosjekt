@@ -41,10 +41,10 @@ class V1GuestController
 
      public function authorizePin(): void
     {
-        ApiHelper::requirePost();
+        ApiHelper::requireGet();
 
         try {
-            $pin = $_POST['pin'] ?? null;
+            $pin = $_GET['pin'] ?? null;
 
             if (!$pin) {
                 ApiHelper::sendError(400, 'PIN is required.');
@@ -53,14 +53,10 @@ class V1GuestController
 
             $course = $this->guestService->getCourseByPin($pin);
 
-            if ($course) {
-                // Authorization successful
-                //$response = new ApiResponse(true, 'Authorization successful.', ['course' => $course]);
-                //ApiHelper::sendApiResponse(200, $response);
-
-                // If it's a web page request and not just an API call, you might redirect here:
-                $_SESSION['authorized_courses'][$course['id']] = true;
-                header('Location: /guests/dashboard?course_id=' . $course['id']);
+            if ($course->success == true) {
+                //Authorization successful
+                $response = new ApiResponse(true, 'Authorization successful.', ['course' => $course]);
+                ApiHelper::sendApiResponse(200, $response);
                 exit;
             } else {
                 // Invalid PIN
@@ -78,8 +74,7 @@ class V1GuestController
     
     public function getMessagesByCourse()
     {
-        ApiHelper::requirePost();
-        //ApiHelper::requireApiToken();
+        ApiHelper::requireGet();
 
         try {
             $input = ApiHelper::getJsonInput();
