@@ -28,7 +28,9 @@ use repositories\LecturerRepository;
 use repositories\StudentRepository;
 use repositories\UserRepository;
 use services\AuthService;
-use services\MessageService;
+use services\GuestService;
+use services\LecturerService;
+use services\StudentService;
 
 $logger = GrayLogger::getInstance();
 
@@ -64,14 +66,15 @@ try {
 
     // Initialize service classes
     $authService = new AuthService($userRepository, $lecturerRepository, $jwtManager);
-    //$messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
+    $lecturerService = new LecturerService($lecturerRepository);
+    $guestService = new GuestService($guestRepository);
+    $studentService = new StudentService($studentRepository);
 
     // Create controller instances
     $authController = new V1AuthController($authService);
-    //$studentController = new StudentController($messageService);
-    //$lecturerController = new V1LecturerController($messageService);
-    //$adminController = new AdminController($db);
-    //$guestController = new GuestController($pdo);
+    $studentController = new V1StudentController($studentService);
+    $lecturerController = new V1LecturerController($lecturerService);
+    $guestController = new V1GuestController($guestService);
 
     //$logger->info('Controllers initialized successfully.');
 } catch (Exception $e) {
@@ -117,9 +120,10 @@ try {
         //['GET', '/api/admin/user/details', [$adminController, 'getUserDetails']],
 
         // Guest routes
-        //['GET', '/api/guest/messages', [$guestController, 'getMessages']],
-        //['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
-        //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
+        ['GET', '/api/guest/authorize', [$guestController, 'authorizePin']],
+        ['GET', '/api/guest/messages', [$guestController, 'getMessagesByCourse']],
+        ['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
+        ['POST', '/api/guest/messages/comment', [$guestController, 'sendComment']],
     ];
 
     //$logger->info('Routes initialized successfully.');
