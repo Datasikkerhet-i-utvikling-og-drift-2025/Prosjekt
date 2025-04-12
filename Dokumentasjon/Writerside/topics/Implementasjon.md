@@ -41,7 +41,7 @@ Nettsidene har følgende funksjoner:
 
 Vi bruker docker for å teste nettsiden.
 
-## Div
+## Steg 2
 
 | Funksjonalitet                         | Student | Foreleser | Administrator | Gjestebruker |
 |-----------------------------------------|---------|-----------|--------------|--------------|
@@ -70,6 +70,7 @@ Vi bruker docker for å teste nettsiden.
 | Kommentere på meldinger                  | ❌      | ❌        | ❌           | ✅           |
 | **Mobilapp-funksjoner (kun for studenter)** | ✅ (uten passordfunksjoner) | ❌ | ❌ | ❌ |
 | **API-dokumentasjon**                     | ❌      | ❌        | ✅           | ❌           |
+
 
 ![Alt text](../../pictures/DatasikkerhetIUtviklingOgDriftArkitektur.png)
 

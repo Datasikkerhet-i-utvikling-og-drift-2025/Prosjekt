@@ -1,19 +1,19 @@
 -- Insert an admin user
-INSERT INTO users (name, email, password, role)
+INSERT INTO users (first_name, last_name, full_name, email, password, role)
 VALUES
-    ('Admin User', 'admin@admin.com', SHA2('admin', 256), 'admin'); -- Using SHA2 for password hashing
+    ('Admin', 'User', 'Admin User', 'admin@admin.com', SHA2('admin', 256), 'admin'); -- Using SHA2 for password hashing
 
 -- Insert lecturers
-INSERT INTO users (name, email, password, role)
+INSERT INTO users (first_name, last_name, full_name, email, password, role)
 VALUES
-    ('Lecturer One', 'lecturer1@example.com', SHA2('password123', 256), 'lecturer'),
-    ('Lecturer Two', 'lecturer2@example.com', SHA2('password123', 256), 'lecturer');
+    ('Lecturer', 'One', 'Lecturer One', 'lecturer1@example.com', SHA2('password123', 256), 'lecturer'),
+    ('Lecturer', 'Two', 'Lecturer Two', 'lecturer2@example.com', SHA2('password123', 256), 'lecturer');
 
 -- Insert students
-INSERT INTO users (name, email, password, role, study_program, study_year)
+INSERT INTO users (first_name, last_name, full_name, email, password, role, study_program, enrollment_year)
 VALUES
-    ('Student One', 'student1@example.com', SHA2('password123', 256), 'student', 'Computer Science', 1),
-    ('Student Two', 'student2@example.com', SHA2('password123', 256), 'student', 'Cyber Security', 2);
+    ('Student', 'One', 'Student One', 'student1@example.com', SHA2('password123', 256), 'student', 'Computer Science', 1),
+    ('Student', 'Two', 'Student Two', 'student2@example.com', SHA2('password123', 256), 'student', 'Cyber Security', 2);
 
 -- Insert courses
 INSERT INTO courses (code, name, lecturer_id, pin_code)
@@ -39,7 +39,7 @@ VALUES
     (1, 4, 'This message contains inappropriate content.'),
     (2, 5, 'Potential spam detected.');
 
--- Test script execution
+-- Test script execution (display the data)
 SELECT * FROM users;
 SELECT * FROM courses;
 SELECT * FROM messages;
