@@ -1,49 +1,87 @@
 <?php
+use managers\ApiManager;
 session_start();
-require_once __DIR__ . '/../../managers/DatabaseManager.php';
 require_once __DIR__ . '/../partials/header.php';
 require_once __DIR__ . '/../partials/navbar.php';
 
-
-use managers\DatabaseManager;
 // Sanitize output
 function sanitize($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$dbManager = new DatabaseManager();
-$pdo = $dbManager->connectToDb();
-
 $courseId = $_GET['course_id'] ?? null;
 $authorized = $courseId !== null && isset($_SESSION['authorized_courses']) && isset($_SESSION['authorized_courses'][$courseId]);
 
-if (!$authorized) {
-    echo "<form method='POST' action='/api/v1/guest/authorize'>
-        <label>Enter PIN to view course messages:</label>
-        <input type='text' name='pin' required>
-        <input type='hidden' name='courseId' value='" . htmlspecialchars($courseId ?? '') . "'>
-        <button type='submit'>Submit</button>
-      </form>";
-    include __DIR__ . '/../partials/footer.php';
-    exit;
+
+// Handle PIN submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo '<pre>';
+    print_r($_POST);
+    echo '</pre>';
+
+    $pin = $_POST['pin'] ?? '';
+    try {
+        $apiManager = new ApiManager();
+        $responseData = $apiManager->get('/api/v1/guest/authorize', ['pin' => $pin, 'course_id' => $courseId]);
+
+        if ($responseData['success'] === true) {
+            $_SESSION['authorized_courses'][$responseData['data']['course_id']] = true;
+            header('Location: /guests/dashboard?course_id=' . $responseData['data']['course_id']);
+            exit;
+        } else {
+            $_SESSION['errors'] = $responseData['errors'] ?? ['Invalid PIN.'];
+        }
+    } catch (Throwable $e) {
+        $_SESSION['errors'] = ['Unexpected error: ' . $e->getMessage()];
+    }
 }
 
+if (isset($_SESSION['errors'])) {
+    echo "<p style='color:red;'>" . implode("<br>", $_SESSION['errors']) . "</p>";
+    unset($_SESSION['errors']);
+}
 
-// Fetch lecturer details
-$stmt = $pdo->prepare("SELECT name, image_path FROM users WHERE id = :lecturer_id AND role = 'lecturer'");
-$stmt->execute([':lecturer_id' => $course['lecturer_id']]);
-$lecturer = $stmt->fetch();
+if ($authorized) {
+    // Fetch course details if authorized
+    try try {
+        $apiManager = new ApiManager();
+        $responseData = $apiManager->get('/api/v1/guest/authorize', ['pin' => $pin, 'course_id' => $courseId]);
 
-// Fetch messages for the course
-$stmt = $pdo->prepare("SELECT id, content, is_reported FROM messages WHERE course_id = :course_id");
-$stmt->execute([':course_id' => $course['id']]);
-$messages = $stmt->fetchAll();
+        if ($responseData['success'] === true) {
+            // Store the course_id in session after authorization
+            $_SESSION['authorized_courses'][$responseData['data']['course_id']] = true;
+            
+            // Fetch additional course details here (assuming your API provides this)
+            $courseId = $responseData['data']['course_id'];
+            $courseDetails = $apiManager->get('/api/v1/courses/' . $courseId);  // Assuming an endpoint that provides course info
 
-// Fetch comments for the messages
-$stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
-$comments = $stmtComments->fetchAll();
+            // Store course details in session or pass them to the frontend
+            $_SESSION['course_details'] = $courseDetails['data'];  // Store in session if you want to keep it for later
+
+            // Redirect to dashboard with course_id in the URL
+            header('Location: /guests/dashboard?course_id=' . $courseId);
+            exit;
+        } else {
+            $_SESSION['errors'] = $responseData['errors'] ?? ['Invalid PIN.'];
+        }
+    } catch (Throwable $e) {
+        $_SESSION['errors'] = ['Unexpected error: ' . $e->getMessage()];
+    }
+}
+
 ?>
-<div class="container">
+
+<?php if (!$authorized): ?>
+    <!-- PIN input form -->
+    <form method="POST" action="">
+        <label>Enter PIN to view course messages:</label>
+        <input type="text" name="pin" required>
+        <input type="hidden" name="courseId" value="<?= sanitize($courseId ?? '') ?>">
+        <button type="submit">Submit</button>
+    </form>
+<?php else: ?>
+    <!-- Course details displayed after successful PIN -->
+   <div class="container">
     <h1>Course Messages</h1>
     <p><strong>Course:</strong> <?= sanitize($course['code']) ?> - <?= sanitize($course['name']) ?></p>
     <p><strong>Lecturer:</strong> <?= sanitize($lecturer['name'] ?? 'Unknown') ?></p>
@@ -191,5 +229,5 @@ function closeReportModal() {
     text-align: center; /* Center the text */
 }
 </style>
-
+<?php endif; ?>
 <?php include __DIR__ . '/../partials/footer.php'; ?>
