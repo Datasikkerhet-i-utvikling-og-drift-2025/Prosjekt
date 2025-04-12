@@ -2,6 +2,7 @@
 namespace helpers;
 
 use helpers\ApiResponse;
+use helpers\Logger;
 use JetBrains\PhpStorm\NoReturn;
 use JsonException;
 

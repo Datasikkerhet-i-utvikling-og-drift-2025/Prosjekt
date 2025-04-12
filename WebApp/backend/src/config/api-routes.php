@@ -20,6 +20,7 @@ use controllers\v1\V1StudentController;
 use Exception;
 use helpers\AccessControlManager;
 use helpers\Logger;
+use helpers\GrayLogger;
 use managers\DatabaseManager;
 use managers\JWTManager;
 use repositories\CommentRepository;
@@ -27,16 +28,15 @@ use repositories\CourseRepository;
 use repositories\LecturerRepository;
 use repositories\MessageRepository;
 use repositories\UserRepository;
-use repositories\commentRepository;
-use repositories\LecturerRepository;
-use repositories\MessageRepository;
+
 use services\AuthService;
 use services\GuestService;
 use services\MessageService;
 
 // Log application startup
+$logger = GrayLogger::getInstance();
 Logger::info('Initializing application...');
-
+  
 try {
     // Initialize manager classes
     $db = new DatabaseManager();
@@ -53,12 +53,16 @@ try {
     $messageRepository = new MessageRepository($db);
     $lecturerRepository = new LecturerRepository($db);
     $commentRepository = new CommentRepository($db);
+    
+    //graylogger
+  
+
 
 
 
     // Initialize service classes
     $authService = new AuthService($userRepository, $courseRepository, $jwtManager);
-    $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
+    $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository, $logger);
 
     // Create controller instances
     $authController = new V1AuthController($authService);
@@ -66,7 +70,7 @@ try {
     $lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);
     $guestService = new GuestService($courseRepository);
-    $guestController = new V1GuestController($messageService, $sessionManager, $guestService);
+    $guestController = new V1GuestController($messageService, $guestService);
 
     Logger::info('Controllers initialized successfully.');
 } catch (Exception $e) {
@@ -115,7 +119,7 @@ try {
         //['GET', '/api/guest/messages', [$guestController, 'getMessages']],
         //['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
         //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
-        ['POST', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
+        ['GET', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
 
     ];
 

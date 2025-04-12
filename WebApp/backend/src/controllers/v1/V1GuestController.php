@@ -3,6 +3,7 @@
 namespace controllers\v1;
 
 use helpers\ApiHelper;
+use helpers\Logger;
 use helpers\ApiResponse;
 use managers\SessionManager;
 use services\MessageService;
@@ -18,20 +19,18 @@ use Exception;
 class V1GuestController
 {
     private MessageService $messageService;
-    private SessionManager $sessionManager;
+    //private SessionManager $sessionManager;
     private GuestService $guestService;
 
     /**
      * V1GuestController constructor.
      *
      * @param MessageService $messageService
-     * @param SessionManager $sessionManager
      * @param GuestService $guestService
      */
-    public function __construct(MessageService $messageService, SessionManager $sessionManager, GuestService $guestService)
+    public function __construct(MessageService $messageService, GuestService $guestService)
     {
         $this->messageService = $messageService;
-        $this->sessionManager = $sessionManager;
         $this->guestService = $guestService;
     }
     /**
@@ -45,6 +44,7 @@ class V1GuestController
 
      public function authorizePin(): void
     {
+        Logger::info('Authorize PIN endpoint called.');
         ApiHelper::requirePost();
 
         try {
@@ -75,6 +75,7 @@ class V1GuestController
         } catch (JsonException $e) {
             ApiHelper::sendError(400, 'Invalid JSON.', ['exception' => $e->getMessage()]);
         } catch (Exception $e) {
+            Logger::error($e->getMessage());
             ApiHelper::sendError(500, 'Server error.', ['exception' => $e->getMessage()]);
         }
     }

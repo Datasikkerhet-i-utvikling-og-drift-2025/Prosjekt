@@ -41,6 +41,14 @@
     ],
     [
         "GET",
+        "\/api\/v1\/guest\/authorize",
+        [
+            {},
+            "authorizePin"
+        ]
+    ],
+    [
+        "GET",
         "\/debug\/routes",
         {}
     ]
