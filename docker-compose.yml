@@ -75,7 +75,7 @@ services:
       - ./WebApp/frontend:/var/www/html
     environment:
       - API_URL=http://backend
-      - API_TOKEN=${API_TOKEN}
+      - API_KEY=${API_KEY}
       - URL=${URL}
     env_file:
       - .env
