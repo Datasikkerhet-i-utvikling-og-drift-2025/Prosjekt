@@ -174,7 +174,7 @@ abstract class User
      *
      * @return void
      */
-    protected function bindUserDataForDbStmt(PDOStatement $stmt): void
+    public function bindUserDataForDbStmt(PDOStatement $stmt): void
     {
         $stmt->bindValue(':firstName', $this->firstName, PDO::PARAM_STR);
         $stmt->bindValue(':lastName', $this->lastName, PDO::PARAM_STR);

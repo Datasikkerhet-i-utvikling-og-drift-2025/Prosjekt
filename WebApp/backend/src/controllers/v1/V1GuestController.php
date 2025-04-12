@@ -41,11 +41,10 @@ class V1GuestController
 
      public function authorizePin(): void
     {
-        Logger::info('Authorize PIN endpoint called.');
-        ApiHelper::requirePost();
+        ApiHelper::requireGet();
 
         try {
-            $pin = $_POST['pin'] ?? null;
+            $pin = $_GET['pin'] ?? null;
 
             if (!$pin) {
                 ApiHelper::sendError(400, 'PIN is required.');
@@ -80,8 +79,7 @@ class V1GuestController
     
     public function getMessagesByCourse()
     {
-        ApiHelper::requirePost();
-        //ApiHelper::requireApiToken();
+        ApiHelper::requireGet();
 
         try {
             $input = ApiHelper::getJsonInput();

@@ -14,20 +14,16 @@ use helpers\GrayLogger;
 class StudentService
 {
     private StudentRepository $studentRepository;
-    private InputValidator $inputValidator;
     private GrayLogger $logger;
 
 
     /**
      * @param StudentRepository $studentRepository
-     * @param InputValidator $inputValidator
      */
     public function __construct(
-        StudentRepository $studentRepository,
-        InputValidator $inputValidator
+        StudentRepository $studentRepository
     ){
         $this->studentRepository = $studentRepository;
-        $this->inputValidator = $inputValidator;
         $this->logger = GrayLogger::getInstance();
     }
 
