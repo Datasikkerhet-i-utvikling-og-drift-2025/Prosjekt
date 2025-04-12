@@ -36,7 +36,7 @@ class UserRepository
      */
     public function createUser(User $user): bool
     {
-        $sql = "CALL createUser(:firstName, :lastName, :fullName, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath)";
+        $sql = "CALL createUser(:first_name, :last_name, :full_name, :email, :password, :role, :study_program, :enrollment_year, :image_path)";
 
         $stmt = $this->db->prepareStmt(
             $sql,
