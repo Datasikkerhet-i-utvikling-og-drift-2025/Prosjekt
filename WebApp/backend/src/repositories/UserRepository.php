@@ -36,7 +36,7 @@ class UserRepository
      */
     public function createUser(User $user): bool
     {
-        $sql = "CALL createUser(:firstName, :lastName, :fullName, :email, :password, :role, :studyProgram, :enrollmentYear, :imagePath)";
+        $sql = "CALL createUser(:first_name, :last_name, :full_name, :email, :password, :role, :study_program, :enrollment_year, :image_path)";
 
         $stmt = $this->db->prepareStmt(
             $sql,
@@ -60,6 +60,7 @@ class UserRepository
 
         $this->db->prepareStmt($sql, fn($stmt) => $stmt->bindValue(":email", $email, PDO::PARAM_STR));
         $userData = $this->db->fetchSingle("Fetching user by email: $email");
+        $this->logger->debug("Fetched raw user data", ['userData' => $userData]);
 
         return $userData ? UserFactory::createUser($userData) : null;
     }

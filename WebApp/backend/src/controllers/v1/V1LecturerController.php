@@ -110,4 +110,27 @@ class V1LecturerController
         }
     }
 
+    public function getCourse(): void
+    {
+        ApiHelper::requirePost();
+        ApiHelper::requireApiKey();
+
+        try {
+            $input = ApiHelper::getJsonInput();
+
+            $courseId = $input['courseId'] ?? null;
+
+            if (!$courseId) {
+                ApiHelper::sendError(400, 'Course id is required.');
+            }
+
+            $response = $this->lecturerService->getCourse((int)$courseId);
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (JsonException $e) {
+            ApiHelper::sendError(400, 'Invalid JSON input.',  ['exception' => $e->getMessage()]);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+    }
+
 }

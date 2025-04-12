@@ -35,12 +35,12 @@ class InputValidator
     private static function getRegistrationRules(string $role): array
     {
         $commonRules = [
-            'firstName' => [
+            'first_name' => [
                 'required' => true,
                 'min'      => 3,
                 'max'      => 50
             ],
-            'lastName' => [
+            'last_name' => [
                 'required' => true,
                 'min'      => 3,
                 'max'      => 50
@@ -53,7 +53,7 @@ class InputValidator
                 'required' => true,
                 'regex'    => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'
             ],
-            'repeatPassword' => [
+            'repeat_password' => [
                 'required' => true
             ],
             'role' => [
@@ -62,24 +62,24 @@ class InputValidator
         ];
 
         if ($role === 'student') {
-            $commonRules['studyProgram'] = [
+            $commonRules['study_program'] = [
                 'required' => true,
                 'max'      => 100
             ];
-            $commonRules['enrollmentYear'] = [
+            $commonRules['enrollment_year'] = [
                 'required' => true,
                 'integer'  => true
             ];
         } elseif ($role === 'lecturer') {
-            $commonRules['courseCode'] = [
+            $commonRules['course_code'] = [
                 'required' => true,
                 'max'      => 10
             ];
-            $commonRules['courseName'] = [
+            $commonRules['course_name'] = [
                 'required' => true,
                 'max'      => 100
             ];
-            $commonRules['coursePin'] = [
+            $commonRules['course_pin'] = [
                 'required' => true,
                 'regex'    => '/^\d{4}$/'
             ];

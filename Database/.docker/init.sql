@@ -177,7 +177,22 @@ END //
 
 CREATE PROCEDURE getUserByEmail(IN userEmail VARCHAR(255))
 BEGIN
-    SELECT * FROM users WHERE email = userEmail LIMIT 1;
+    SELECT
+        id,
+        first_name,
+        last_name,
+        full_name,
+        email,
+        password,
+        role,
+        study_program,
+        enrollment_year,
+        image_path,
+        created_at,
+        updated_at
+    FROM users
+    WHERE email = userEmail
+    LIMIT 1;
 END //
 
 CREATE PROCEDURE updateUser(

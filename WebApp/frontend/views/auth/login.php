@@ -1,7 +1,5 @@
 <?php
 
-
-
 use managers\ApiManager;
 
 session_start();
@@ -28,23 +26,14 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $responseData = $apiManager->post('/api/v1/auth/login', $_POST);
-
-        if ($responseData['success'] === true && isset($responseData['data']['data'])) {
+        /*echo '<pre>';
+        var_dump($responseData);
+        echo '</pre>';
+        exit;*/
+        if ($responseData['success'] === true && isset($responseData['data']['data']['token'])) {
             $_SESSION['user'] = $responseData['data']['data'];
-
-            $role = $_SESSION['user']['role'] ?? '';
-
-            if ($role === 'student') {
-                header('Location: /student/dashboard');
-            } elseif ($role === 'lecturer') {
-                header('Location: /lecturer/dashboard');
-            } elseif ($role === 'admin') {
-                header('Location: /admin/dashboard');
-            } else {
-                header('Location: /');
-            }
+            header('Location: /' . $_SESSION['user']['role'] . '/dashboard');
             exit;
-
         } else {
             $_SESSION['errors'] = $responseData['data']['errors'] ?? ['Invalid login credentials.'];
         }

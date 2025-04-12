@@ -89,7 +89,7 @@ class AuthService
 
         $user = UserFactory::createUser($data);
         $this->logger->debug('User object created', ['user' => $user->toArray()]);
-        $this->logger->debug('Sanitized userData', $data);
+        $this->logger->debug('Sanitized userData', [$data]);
         $this->logger->debug('User object before save', ['user' => $user->toArray()]);
         if (!$this->userRepository->createUser($user)) {
             $this->logger->error('Failed to save user to database.');
@@ -141,13 +141,30 @@ class AuthService
     public function login(array $credentials): ApiResponse
     {
         $this->logger->info('Login attempt', ['email' => $credentials['email'] ?? null]);
+        $this->logger->debug('Login debug', [
+            'email' => $credentials['email'] ?? null,
+            'password' => $credentials['password'] ?? null
+        ]);
 
         if (empty($credentials['email']) || empty($credentials['password'])) {
             return new ApiResponse(false, 'Email and password required.');
         }
 
         $user = $this->userRepository->getUserByEmail($credentials['email']);
+        $this->logger->debug('User loaded from DB', ['user' => $user->toArray() ?? []]);
+
+        $this->logger->debug("Password verification check", [
+            'enteredPassword' => $credentials['password'],
+            'storedHash' => $user->password,
+            'verifyResult' => AuthHelper::verifyPassword($credentials['password'], $user->password)
+        ]);
+
+
         if (!$user || !AuthHelper::verifyPassword($credentials['password'], $user->password)) {
+            $this->logger->debug('Verifying password', [
+                'plain' => $credentials['password'],
+                'hashedFromDb' => $user->password
+            ]);
             $this->logger->warning('Invalid login credentials', ['email' => $credentials['email']]);
             return new ApiResponse(false, 'Invalid credentials.');
         }

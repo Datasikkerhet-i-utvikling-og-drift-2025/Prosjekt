@@ -11,7 +11,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_ADMIN}
+      - MYSQL_USER=${DB_ADMIN_USER}
       - MYSQL_PASSWORD=${DB_ADMIN_PASS}
     env_file:
       - .env

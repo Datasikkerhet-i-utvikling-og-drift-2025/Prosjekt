@@ -92,24 +92,20 @@ try {
         ['POST', '/api/v1/auth/register', [$authController, 'register']],
         ['POST', '/api/v1/auth/login', [$authController, 'login']],
         ['GET', '/api/v1/auth/logout', [$authController, 'logout']],
-
-        //['POST', '/api/auth/register', [$authController, 'register']],
-        //['POST', '/api/auth/login', [$authController, 'login']],
-        //['GET', '/api/auth/logout', [$authController, 'logout']],
-        //['POST', '/api/auth/change-password', [$authController, 'changePassword']],
         ['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
         ['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
 
         // Student routes
-        //['GET', '/api/student/courses', [$studentController, 'getCourses']],
-        //['GET', '/api/student/messages', [$studentController, 'getMyMessages']],
-        //['POST', '/api/v1/student/message/send', [$studentController, 'sendMessage']],
+        ['GET', '/api/v1/student/courses', [$studentController, 'getAvailableCourses']],
+        ['GET', '/api/v1/student/getMessagesWithReply', [$studentController, 'getMessageWithReply']],
+        ['POST', '/api/v1/student/sendMessage/', [$studentController, 'sendMessage']],
+        ['GET', '/api/v1/student/getMessages', [$studentController, 'getMessagesByStudent']],
 
         // Lecturer routes
-        //['GET', '/api/lecturer/courses', [$lecturerController, 'getCourses']],
-        //['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
-        //['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
-        //['POST', '/api/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
+        ['GET', '/api/v1/lecturer/courses', [$lecturerController, 'getCourse']],
+        ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
+        ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
+        ['GET', '/api/v1/lecturer/messageById', [$lecturerController, 'getMessageById']],
 
         // Admin routes
         //['GET', '/api/admin/users', [$adminController, 'getAllUsers']],
