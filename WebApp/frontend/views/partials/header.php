@@ -2,9 +2,10 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use managers\SessionManager;
+use managers\ApiManager;
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    $sessionManager = new SessionManager();
 }
 
 

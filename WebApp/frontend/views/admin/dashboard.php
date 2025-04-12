@@ -1,5 +1,8 @@
 <?php
-session_start();
+use managers\SessionManager;
+use managers\ApiManager;
+
+$sessionManager = new SessionManager();
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {

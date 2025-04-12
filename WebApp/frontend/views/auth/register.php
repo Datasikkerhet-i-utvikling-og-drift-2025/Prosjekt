@@ -1,20 +1,14 @@
 <?php
 
+use managers\SessionManager;
 use managers\ApiManager;
 
-session_start();
-if (isset($_SESSION['user'])) {
-    $role = $_SESSION['user']['role'] ?? '';
-    if ($role === 'student') {
-        header('Location: /student/dashboard');
-        exit;
-    } elseif ($role === 'lecturer') {
-        header('Location: /lecturer/dashboard');
-        exit;
-    } elseif ($role === 'admin') {
-        header('Location: /admin/dashboard');
-        exit;
-    }
+$sessionManager = new SessionManager(); // erstatter session_start()
+
+if ($sessionManager->isAuthenticated()) {
+    $role = $sessionManager->getUserRole();
+    header("Location: /$role/dashboard");
+    exit;
 }
 
 try {

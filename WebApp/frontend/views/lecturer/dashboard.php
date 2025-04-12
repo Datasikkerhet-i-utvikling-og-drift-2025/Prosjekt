@@ -18,7 +18,10 @@ $comments = [];
 $errorMessage = '';
 */
 
-session_start();
+use managers\SessionManager;
+use managers\ApiManager;
+
+$sessionManager = new SessionManager();
 
 require_once __DIR__ . '/../../helpers/Logger.php';
 

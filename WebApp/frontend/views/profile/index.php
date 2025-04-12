@@ -1,5 +1,8 @@
 <?php
-session_start();
+use managers\SessionManager;
+use managers\ApiManager;
+
+$sessionManager = new SessionManager();
 
 // Check if user is logged in
 if (!isset($_SESSION['user'])) {

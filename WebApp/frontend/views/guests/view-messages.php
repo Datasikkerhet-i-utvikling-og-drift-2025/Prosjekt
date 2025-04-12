@@ -1,9 +1,11 @@
 <?php
-session_start();
+use managers\SessionManager;
+use managers\ApiManager;
+
+$sessionManager = new SessionManager();
 
 // Include required files using __DIR__
 require_once __DIR__ . '/../partials/header.php';
-require_once __DIR__ . '/../../managers/DatabaseManager.php';
 
 // Sanitize input
 function sanitize($value) {
