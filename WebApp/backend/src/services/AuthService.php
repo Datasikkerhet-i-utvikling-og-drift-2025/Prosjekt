@@ -389,7 +389,7 @@ class AuthService
     private function buildPasswordResetEmailBody(string $userName, string $resetLink, int $expiryHours): string
     {
         $appName = htmlspecialchars($this->config['APP_NAME'] ?? 'Our Application');
-        $link = htmlspecialchars($resetLink); // Viktig å escape lenken
+        $link = $resetLink; // Viktig å escape lenken
 
         // Bygg en enkel HTML-epost
         $body = "<p>Hello " . htmlspecialchars($userName) . ",</p>";

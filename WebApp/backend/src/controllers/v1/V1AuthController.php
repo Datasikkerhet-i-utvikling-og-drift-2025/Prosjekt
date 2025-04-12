@@ -89,8 +89,7 @@ class V1AuthController
     public function requestPasswordReset(): void
     {
         ApiHelper::requirePost();
-        // Vanligvis kreves *ikke* API token her, da brukeren ikke er logget inn.
-        ApiHelper::requireApiKey(); // Fjern eller kommenter ut denne
+
 
         try {
             $input = ApiHelper::getInput(); // Henter JSON-data fra request body
@@ -128,8 +127,7 @@ class V1AuthController
     public function resetPassword(): void
     {
         ApiHelper::requirePost();
-        // Krever ikke API token her heller, brukeren bruker reset-tokenet.
-        // ApiHelper::requireApiToken(); // Fjern eller kommenter ut
+
 
         try {
             $input = ApiHelper::getInput(); // Henter JSON-data

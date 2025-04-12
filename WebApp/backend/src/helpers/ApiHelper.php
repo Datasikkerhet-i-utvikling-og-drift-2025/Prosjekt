@@ -67,7 +67,11 @@ class ApiHelper
      */
     public static function getInput(): array
     {
+
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        self::initLogger();
+        self::$logger->debug("ApiHelper::getInput Raw \$_SERVER['CONTENT_TYPE']: " . var_export($contentType, true)); // Logg rå verdi
+
         self::$logger->debug("ApiHelper::getInput called with Content-Type: $contentType");
 
         if (str_starts_with($contentType, 'application/json')) {

@@ -2,8 +2,10 @@
 
 namespace repositories; // Tilpass namespace
 
+use helpers\GrayLogger;
 use managers\DatabaseManager;
 use PDO;
+
 
 /**
  * Repository for handling password reset token database operations.
@@ -14,6 +16,7 @@ class PasswordResetRepository
     private DatabaseManager $db;
     private const HASH_ALGO = 'sha256'; // Algoritme for å hashe tokenet
 
+    private GrayLogger $logger;
     /**
      * PasswordResetRepository constructor.
      * @param PDO $db A PDO database connection instance.
@@ -22,6 +25,7 @@ class PasswordResetRepository
     {
         $this->db = $db;
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->logger = GrayLogger::getInstance();
     }
 
     /**
