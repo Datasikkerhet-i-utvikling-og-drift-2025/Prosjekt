@@ -66,6 +66,23 @@ class GuestService
         }
     }
 
+    public function getMessagesByCourseId(int $courseId): ApiResponse
+    {
+        $this->logger->info('Get messages by course ID method called', ['courseId' => $courseId]);
+        // Sanitize and validate input
+        if (!InputValidator::isValidInteger($courseId)) {
+            return new ApiResponse(false, 'Invalid course ID.', null, ['courseId' => $courseId]);
+        }
+
+        // Retrieve messages from the repository
+        $messages = $this->guestRepository->getMessagesByCourse($courseId);
+        if ($messages) {
+            return new ApiResponse(true, 'Messages retrieved successfully.', $messages, ['courseId' => $courseId]);
+        } else {
+            return new ApiResponse(false, 'No messages found for this course.', null, ['courseId' => $courseId]);
+        }
+    }
+
     /**
      * @param string $pinCode
      * @return ApiResponse

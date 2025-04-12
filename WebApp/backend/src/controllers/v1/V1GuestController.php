@@ -18,8 +18,6 @@ use Exception;
 
 class V1GuestController
 {
-    private MessageService $messageService;
-    //private SessionManager $sessionManager;
     private GuestService $guestService;
 
     /**
@@ -28,9 +26,8 @@ class V1GuestController
      * @param MessageService $messageService
      * @param GuestService $guestService
      */
-    public function __construct(MessageService $messageService, GuestService $guestService)
+    public function __construct(GuestService $guestService)
     {
-        $this->messageService = $messageService;
         $this->guestService = $guestService;
     }
     /**
@@ -55,7 +52,7 @@ class V1GuestController
                 return; // Stop here if there's an error
             }
 
-            $course = $this->guestService->authorizeCourseByPin($pin);
+            $course = $this->guestService->getCourseByPin($pin);
 
             if ($course) {
                 // Authorization successful
@@ -94,7 +91,7 @@ class V1GuestController
                 return;
             }
 
-            $response = $this->messageService->getMessagesByCourse($courseId);
+            $response = $this->guestService->getMessagesByCourseId($courseId);
 
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {
@@ -121,7 +118,7 @@ class V1GuestController
                 return;
             }
 
-            $response = $this->messageService->reportMessage((int)$messageId, $reason);
+            $response = $this->guestService->reportMessage((int)$messageId, $reason);
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (Exception $e) {
             ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
@@ -136,6 +133,7 @@ class V1GuestController
 
         try {
             $input = ApiHelper::getJsonInput();
+            $guestName = $input['guestName'] ?? null;
             $messageId = $input['messageId'] ?? null;
             $content = $input['content'] ?? null;
 
@@ -144,7 +142,7 @@ class V1GuestController
                 return;
             }
 
-            $response = $this->messageService->sendComment((int)$messageId, $content);
+            $response = $this->guestService->sendComment((int)$messageId, $guestName, $content);
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (Exception $e) {
             ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
