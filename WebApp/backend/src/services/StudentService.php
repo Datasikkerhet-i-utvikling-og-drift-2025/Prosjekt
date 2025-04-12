@@ -101,11 +101,8 @@ class StudentService
      * @throws JsonException
      */
 
-    public function getMessagesByStudent(string $studentId): ApiResponse
+    public function getMessagesByStudent(int $studentId): ApiResponse
     {
-        $this->logger->info('getMessagesByStudent function initiated. Params in use: ', ['studentId' => $studentId]);
-        $studentId = InputValidator::sanitizeString($studentId);
-        $this->logger->info('Sanitized: ' . $studentId);
         //hmm allways true when reached?
         if (!$studentId = InputValidator::isValidInteger($studentId)){
             $this->logger->warning('did not contain any studentId, or is?', ['studentId' => $studentId]);
@@ -115,7 +112,7 @@ class StudentService
 
         $messages = $this->studentRepository->getMessagesByStudent($studentId);
         if (empty($messages)) {
-            return new ApiResponse(false, 'Student id is invalid!', null, ['studentId' => $studentId]);
+            return new ApiResponse(false, 'messages not found', null, ['studentId' => $studentId]);
         }
         $this->logger->info('Success', ['studentId' => $studentId, 'messages' => $messages]);
         return new ApiResponse(true, 'Messages found!', $messages);
@@ -129,10 +126,8 @@ class StudentService
      * @return ApiResponse
      * @throws JsonException
      */
-    public function getMessagesWithReply(string $messageId, string $studentId): ApiResponse
+    public function getMessagesWithReply(int $messageId, int $studentId): ApiResponse
     {
-        $messageId = InputValidator::sanitizeString($messageId);
-        $studentId = InputValidator::sanitizeString($studentId);
         if (!$messageId = InputValidator::isValidInteger($messageId)){
             return new ApiResponse(false, 'Message id is invalid!', null, ['messageId' => $messageId]);
         }

@@ -143,5 +143,42 @@ class V1GuestController
 
     }
 
+    public function getComments()
+    {
+        ApiHelper::requireGet();
+
+        try {
+            $input = ApiHelper::getInput();
+
+            if (!$input['messageId']) {
+                ApiHelper::sendError(400, 'Message ID is required.');
+                return;
+            }
+
+            $response = $this->guestService->getComments((int)$input['messageId']);
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+    }
+
+    public function getLecturer()
+    {
+        ApiHelper::requireGet();
+
+        try {
+            $lecturerId = $_GET['lecturerId'] ?? null;
+
+            if (!$lecturerId) {
+                ApiHelper::sendError(400, 'Lecturer ID is required.');
+                return;
+            }
+
+            $response = $this->guestService->getLecturerById((int)$lecturerId);
+            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+        } catch (Exception $e) {
+            ApiHelper::sendError(500, 'Internal server error.', ['exception' => $e->getMessage()]);
+        }
+    }
 
 }
