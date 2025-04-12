@@ -83,15 +83,6 @@ class V1LecturerController
     }
 
     /**
-     * @throws JsonException
-     */
-    public function getLecturerDetails(): void
-    {
-        ApiHelper::requirePost();
-        ApiHelper::requireApiKey();
-    }
-
-    /**
      * @return void
      * @throws JsonException
      */
