@@ -95,15 +95,15 @@ class Student extends User
     {
         return [
             'id' => $this->id,
-            'firstName' => $this->first_name,
-            'lastName' => $this->last_name,
-            'fullName' => $this->full_name,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'full_name' => $this->full_name,
             'email' => $this->email,
             'role' => $this->role->value,
-            'createdAt' => $this->created_at->format('Y-m-d H:i:s'),
-            'updatedAt' => $this->updated_at->format('Y-m-d H:i:s'),
-            'studyProgram' => $this->studyProgram,
-            'enrollmentYear' => $this->enrollmentYear
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'study_program' => $this->studyProgram,
+            'enrollment_year' => $this->enrollmentYear
         ];
     }
 
