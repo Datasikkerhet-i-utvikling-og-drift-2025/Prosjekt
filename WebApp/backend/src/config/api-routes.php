@@ -120,10 +120,10 @@ try {
         //['GET', '/api/admin/user/details', [$adminController, 'getUserDetails']],
 
         // Guest routes
-        ['GET', '/api/guest/authorize', [$guestController, 'authorizePin']],
-        ['GET', '/api/guest/messages', [$guestController, 'getMessagesByCourse']],
-        ['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
-        ['POST', '/api/guest/messages/comment', [$guestController, 'sendComment']],
+        ['GET', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
+        ['GET', '/api/v1/guest/messages', [$guestController, 'getMessagesByCourse']],
+        ['POST', '/api/v1/guest/messages/report', [$guestController, 'reportMessage']],
+        ['POST', '/api/v1/guest/messages/comment', [$guestController, 'sendComment']],
     ];
 
     //$logger->info('Routes initialized successfully.');
