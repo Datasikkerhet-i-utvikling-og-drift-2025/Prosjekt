@@ -23,7 +23,12 @@ class AuthHelper
      */
     public static function hashPassword(string $password): string
     {
-        return password_hash($password, PASSWORD_DEFAULT);
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        self::$logger->debug("Hashing password", [
+            'plain' => $password,
+            'hashed password' => $hashedPassword,
+        ]);
+        return $hashedPassword;
     }
 
     /**

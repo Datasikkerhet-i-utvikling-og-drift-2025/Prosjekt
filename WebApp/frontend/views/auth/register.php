@@ -111,7 +111,7 @@ require_once __DIR__ . '/../partials/header.php';
 
     <div class="form-group">
         <label for="course_code">Course Code</label>
-        <input type="text" id="course_code" name="courseCode"
+        <input type="text" id="course_code" name="course_code"
                placeholder="ITF12345"
                value="<?= htmlspecialchars($_POST['course_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
     </div>
@@ -195,7 +195,7 @@ require_once __DIR__ . '/../partials/header.php';
     });
 
     // getElementById repeat_password samsvarte ikke med id på linje 82
-    document.getElementById('repeatPassword').addEventListener('input', function() {
+    document.getElementById('repeat_password').addEventListener('input', function() {
         const password = document.getElementById('password').value;
         const repeatPassword = this.value;
         if (repeatPassword !== password) {

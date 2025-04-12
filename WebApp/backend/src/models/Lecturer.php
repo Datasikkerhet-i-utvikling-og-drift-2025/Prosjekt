@@ -41,7 +41,7 @@ class Lecturer extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->imagePath = $userData['imagePath'] ?? "";
+        $this->imagePath = $userData['image_path'] ?? "";
     }
 
 
@@ -59,10 +59,10 @@ class Lecturer extends User
     {
         parent::bindUserDataForDbStmt($stmt);
 
-        $stmt->bindValue(':imagePath', $this->imagePath, PDO::PARAM_STR );
+        $stmt->bindValue(':image_path', $this->imagePath, PDO::PARAM_STR );
 
-        $stmt->bindValue(':studyProgram', $this->studyProgram ?? null, isset($this->studyProgram) ? PDO::PARAM_STR : PDO::PARAM_NULL);
-        $stmt->bindValue(':enrollmentYear', $this->enrollmentYear ?? null, isset($this->enrollmentYear) ? PDO::PARAM_INT : PDO::PARAM_NULL);
+        $stmt->bindValue(':study_program', $this->studyProgram ?? null, isset($this->studyProgram) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':enrollment_year', $this->enrollmentYear ?? null, isset($this->enrollmentYear) ? PDO::PARAM_INT : PDO::PARAM_NULL);
     }
 
     /**
@@ -74,14 +74,14 @@ class Lecturer extends User
     {
         return [
             'id' => $this->id,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
-            'fullName' => $this->fullName,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'full_name' => $this->full_name,
             'email' => $this->email,
             'role' => $this->role->value,
-            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
-            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
-            'imagePath' => $this->imagePath
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'image_path' => $this->imagePath
         ];
     }
 

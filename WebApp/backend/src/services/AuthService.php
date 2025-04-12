@@ -76,19 +76,20 @@ class AuthService
         }
 
         $data = $validation['sanitized'];
+        $this->logger->debug('Sanitized userData', $data);
 
         if ($this->userRepository->getUserByEmail($data['email'])) {
             $this->logger->warning('Email already registered', ['email' => $data['email']]);
             return new ApiResponse(false, 'Email already registered.');
         }
 
-        $this->logger->info('Hashing password and processing image upload...');
+        $this->logger->info('Hashing password...');
         $data['password'] = AuthHelper::hashPassword($data['password']);
-        $data['imagePath'] = $this->handleProfilePictureUpload();
+        //$data['imagePath'] = $this->handleProfilePictureUpload();
 
+        $this->logger->debug('Creating user from', $data);
         $user = UserFactory::createUser($data);
         $this->logger->debug('User object created', ['user' => $user->toArray()]);
-        $this->logger->debug('Sanitized userData', [$data]);
         $this->logger->debug('User object before save', ['user' => $user->toArray()]);
         if (!$this->userRepository->createUser($user)) {
             $this->logger->error('Failed to save user to database.');
@@ -98,11 +99,13 @@ class AuthService
         $this->logger->info('User saved to database', ['email' => $user->email]);
 
         if ($user->role->value === 'lecturer') {
+            $data['study_program'] = null;
+            $data['enrollment_year'] = null;
             $this->logger->info('Creating course for lecturer...');
             try {
                 $lecturer = $this->userRepository->getUserByEmail($data['email']);
-                $data['lecturerId'] = $lecturer->id ?? null;
-                $data['pinCode'] = $data['coursePin'];
+                $data['lecturer_id'] = $lecturer->id ?? null;
+                $data['pin_code'] = $data['course_pin'];
                 $course = new Course($data);
 
                 if (!$this->lecturerRepository->createCourse($course)) {
@@ -110,7 +113,7 @@ class AuthService
                     return new ApiResponse(false, 'Registration succeeded, but course creation failed.');
                 }
 
-                $this->logger->info('Course created successfully.', ['courseCode' => $data['courseCode']]);
+                $this->logger->info('Course created successfully.', ['course_code' => $data['course_code']]);
             } catch (Throwable $e) {
                 $this->logger->error('Exception during course creation.', ['exception' => $e->getMessage()]);
                 return new ApiResponse(false, 'Course creation failed.', null, ['exception' => $e->getMessage()]);
@@ -129,6 +132,7 @@ class AuthService
         $this->logger->info('Registration successful', ['user' => $userArray]);
         return new ApiResponse(true, 'Registration successful.', $userArray);
     }
+
 
     /**
      * Authenticates a user and issues JWT.
@@ -189,7 +193,7 @@ class AuthService
      * @return string|null
      * @throws RandomException
      */
-    private function handleProfilePictureUpload(): ?string
+    /*private function handleProfilePictureUpload(): ?string
     {
         if (!isset($_FILES['profilePicture']) || $_FILES['profilePicture']['error'] !== UPLOAD_ERR_OK) {
             return null;
@@ -224,7 +228,7 @@ class AuthService
         }
 
         return '/uploads/profile_pictures/' . $fileName;
-    }
+    }*/
 
     /**
      * Handles the logic for initiating a password reset request.

@@ -17,8 +17,8 @@ class InputValidator
         $result = self::validateInputs($input, $rules);
 
         if (
-            isset($result['sanitized']['password'], $result['sanitized']['repeatPassword']) &&
-            $result['sanitized']['password'] !== $result['sanitized']['repeatPassword']
+            isset($result['sanitized']['password'], $result['sanitized']['repeat_password']) &&
+            $result['sanitized']['password'] !== $result['sanitized']['repeat_password']
         ) {
             $result['errors']['password'][] = "Passwords do not match.";
         }

@@ -91,11 +91,11 @@ class Course
     public function __construct(array $courseData)
     {
         $this->id = $courseData['id'] ?? null;
-        $this->code = InputValidator::sanitizeString($courseData['courseCode']);
-        $this->name = InputValidator::sanitizeString($courseData['courseName']);
+        $this->code = InputValidator::sanitizeString($courseData['course_code']);
+        $this->name = InputValidator::sanitizeString($courseData['course_name']);
         $this->lecturerId = (int) $courseData['lecturerId'];
-        $this->pinCode = InputValidator::sanitizeString($courseData['pinCode']);
-        $this->createdAt = new DateTime($courseData['createdAt'] ?? 'now');
+        $this->pinCode = InputValidator::sanitizeString($courseData['pin_code']);
+        $this->createdAt = new DateTime($courseData['created_at'] ?? 'now');
     }
 
 
@@ -123,8 +123,8 @@ class Course
     {
         $stmt->bindValue(':code', $this->code, PDO::PARAM_STR);
         $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
-        $stmt->bindValue(':lecturerId', $this->lecturerId, PDO::PARAM_INT);
-        $stmt->bindValue(':pinCode', $this->pinCode, PDO::PARAM_STR);
+        $stmt->bindValue(':lecturer_id', $this->lecturerId, PDO::PARAM_INT);
+        $stmt->bindValue(':pin_code', $this->pinCode, PDO::PARAM_STR);
     }
 
 }

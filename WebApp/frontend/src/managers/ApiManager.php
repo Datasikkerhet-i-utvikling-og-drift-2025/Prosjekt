@@ -3,7 +3,9 @@
 namespace managers;
 
 use CURLFile;
+use finfo;
 use JsonException;
+use Random\RandomException;
 use RuntimeException;
 use Throwable;
 
@@ -140,20 +142,17 @@ class ApiManager
 
             if (!empty($data) && $method !== 'GET') {
                 if ($hasFile) {
-                    $data['profilePicture'] = new CURLFile(
-                        $_FILES['profile_picture']['tmp_name'],
-                        $_FILES['profile_picture']['type'],
-                        $_FILES['profile_picture']['name']
-                    );
-
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-                } else {
-                    $jsonData = json_encode($data, JSON_THROW_ON_ERROR);
-                    $headers[] = 'Content-Type: application/json';
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    $profilePicturePath = $this->handleProfilePictureUpload();
+                    if ($profilePicturePath) {
+                        $data['image_path'] = $profilePicturePath;
+                    }
                 }
+
+                // Handle the data (either with file or as JSON)
+                $jsonData = json_encode($data, JSON_THROW_ON_ERROR);
+                $headers[] = 'Content-Type: application/json';
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             }
 
 
@@ -208,5 +207,50 @@ class ApiManager
             ];
         }
     }
+
+    /**
+     * Handles secure upload of a profile picture.
+     *
+     * @return string|null
+     * @throws RandomException|RandomException
+     */
+    private function handleProfilePictureUpload(): ?string
+    {
+        if (!isset($_FILES['profilePicture']) || $_FILES['profilePicture']['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $file = $_FILES['profilePicture'];
+        $allowedTypes = ['image/jpeg', 'image/png'];
+        $maxSize = 10 * 1024 * 1024;
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($file['tmp_name']);
+
+        if (!in_array($mimeType, $allowedTypes, true)) {
+            throw new RuntimeException('Invalid image format.');
+        }
+
+        if ($file['size'] > $maxSize) {
+            throw new RuntimeException('Image exceeds maximum size.');
+        }
+
+        $ext = $mimeType === 'image/png' ? 'png' : 'jpg';
+        $fileName = bin2hex(random_bytes(16)) . '.' . $ext;
+        $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
+
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $uploadDir));
+        }
+
+        $path = $uploadDir . $fileName;
+        if (!move_uploaded_file($file['tmp_name'], $path)) {
+            throw new RuntimeException('Failed to save uploaded file.');
+        }
+
+        return '/uploads/profile_pictures/' . $fileName;
+    }
+
+
 
 }

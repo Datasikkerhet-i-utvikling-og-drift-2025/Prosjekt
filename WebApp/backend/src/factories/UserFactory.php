@@ -11,6 +11,7 @@ use models\Student;
 
 class UserFactory
 {
+
     /**
      * Creates a user object based on the role provided in the user data array.
      *
