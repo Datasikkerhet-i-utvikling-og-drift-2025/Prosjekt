@@ -139,6 +139,7 @@ class AuthService
      */
     public function login(array $credentials): ApiResponse
     {
+        sleep(3);
         $this->logger->info('Login attempt', ['email' => $credentials['email'] ?? null]);
         $this->logger->debug('Login debug', [
             'email' => $credentials['email'] ?? null,
