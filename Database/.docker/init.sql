@@ -270,7 +270,7 @@ END //
 delimiter ;
 
 -- Admin får full tilgang
--- CREATE USER 'admin'@'%' IDENTIFIED BY 'adminPass';
+CREATE USER 'admin'@'%' IDENTIFIED BY 'adminPass';
 GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;
 
 -- Student-bruker med tilgang til utvalgte prosedyrer
