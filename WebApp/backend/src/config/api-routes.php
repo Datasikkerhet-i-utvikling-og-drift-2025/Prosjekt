@@ -99,7 +99,7 @@ try {
         ['GET', '/api/v1/student/courses', [$studentController, 'getAvailableCourses']],
         ['GET', '/api/v1/student/getMessagesWithReply', [$studentController, 'getMessageWithReply']],
         ['POST', '/api/v1/student/sendMessage/', [$studentController, 'sendMessage']],
-        ['GET', '/api/v1/student/getMessages', [$studentController, 'getMessagesByStudent']],
+        ['POST', '/api/v1/student/getMessages', [$studentController, 'getMessagesByStudent']],
 
         // Lecturer routes
         ['GET', '/api/v1/lecturer/courses', [$lecturerController, 'getCourse']],
@@ -119,7 +119,9 @@ try {
         ['GET', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
         ['GET', '/api/v1/guest/messages', [$guestController, 'getMessagesByCourse']],
         ['POST', '/api/v1/guest/messages/report', [$guestController, 'reportMessage']],
-        ['POST', '/api/v1/guest/messages/comment', [$guestController, 'sendComment']],
+        ['POST', '/api/v1/guest/messages/sendComment', [$guestController, 'sendComment']],
+        ['POST', '/api/v1/guest/messages/getComments', [$guestController, 'getComments']],
+        ['GET', '/api/v1/guest/messages/getLecturer', [$guestController, 'getLecturer']],   
     ];
 
     //$logger->info('Routes initialized successfully.');

@@ -5,9 +5,8 @@ namespace repositories;
 use helpers\InputValidator;
 use helpers\Logger;
 use managers\DatabaseManager;
-use models\Course;
 use PDO;
-
+use models\Course;
 
 class LecturerRepository
 {
@@ -27,17 +26,13 @@ class LecturerRepository
     /**
      * Creates a new course in the database.
      *
-     * @param string $code Unique course code.
-     * @param string $name Name of the course.
-     * @param int $lecturerId ID of the lecturer responsible for the course.
-     * @param string $pinCode 4-digit access code for the course.
+     * @param Course $course The course model
      *
      * @return bool Returns true if the course was created successfully, false otherwise.
      */
     public function createCourse(Course $course): bool
     {
-        $sql = "INSERT INTO courses (code, name, lecturer_id, pin_code, created_at)
-                VALUES (:code, :name, :lecturerId, :pinCode, NOW())";
+        $sql = "CALL createCourse(:code, :name, :lecturerId, :pinCode)";
 
         $stmt = $this->db->prepareStmt(
             $sql,
@@ -57,11 +52,9 @@ class LecturerRepository
      */
     public function getCourses(string $lecturerId): array
     {
-        $sql = "SELECT id, code, name, pin_code, created_at 
-                FROM courses 
-                WHERE lecturer_id = :lecturerId";
+        $sql = "CALL getCourses(:lecturerId)";
 
-        $this->db->prepareStmt(
+        $stmt = $this->db->prepareStmt(
             $sql,
             fn($stmt) => $stmt->bindValue(":lecturerId", $lecturerId, PDO::PARAM_STR)
         );
@@ -79,9 +72,7 @@ class LecturerRepository
      */
     public function getMessagesForCourse(string $courseId): array
     {
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, m.anonymous_id
-                FROM messages m
-                WHERE m.course_id = :courseId";
+        $sql = "CALL getMessagesForCourse(:courseId)";
 
         $this->db->prepareStmt(
             $sql,
@@ -107,9 +98,7 @@ class LecturerRepository
             return false;
         }
 
-        $sql = "UPDATE messages 
-                SET reply = :replyContent, updated_at = NOW() 
-                WHERE id = :messageId";
+        $sql = "CALL replyToMessage(:messageId, :replyContent)";
 
         $this->db->prepareStmt(
             $sql,
@@ -131,9 +120,7 @@ class LecturerRepository
      */
     public function getMessageById(string $messageId): ?array
     {
-        $sql = "SELECT m.id AS message_id, m.content, m.reply, m.created_at, m.anonymous_id
-                FROM messages m
-                WHERE m.id = :messageId";
+        $sql = "CALL getMessageById(:messageId)";
 
         $this->db->prepareStmt(
             $sql,
@@ -159,8 +146,7 @@ class LecturerRepository
             return false;
         }
 
-        $sql = "INSERT INTO reports (message_id, report_reason, created_at)
-                VALUES (:messageId, :reason, NOW())";
+        $sql = "CALL reportMessage(:messageId, :reason)";
 
         $this->db->prepareStmt(
             $sql,

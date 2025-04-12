@@ -215,7 +215,7 @@ class InputValidator
      * @param string $value The value to check
      * @return bool True if valid
      */
-    public static function isValidInteger(string $value): bool
+    public static function isValidInteger(int $value): bool
     {
         return (bool) filter_var($value, FILTER_VALIDATE_INT);
     }

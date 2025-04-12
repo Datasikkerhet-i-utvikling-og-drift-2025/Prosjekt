@@ -71,13 +71,13 @@ class V1StudentController
         ApiHelper::requireApiKey();
 
         try {
-            $studentId = $_POST['studentId'] ?? null;
+            $input = ApiHelper::getInput();
 
-            if (!$studentId) {
+            if (!$input) {
                 ApiHelper::sendError(400, 'StudentId is required.', ['exception' => 'studentId']);
             }
 
-           $response = $this->studentService->getMessagesByStudent($studentId);
+           $response = $this->studentService->getMessagesByStudent($input['studentId']);
 
             ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {
@@ -115,7 +115,7 @@ class V1StudentController
      */
     public function getAvailableCourses(): void
     {
-        ApiHelper::requirePost();
+        ApiHelper::requireGet();
         ApiHelper::requireApiKey();
 
         try {

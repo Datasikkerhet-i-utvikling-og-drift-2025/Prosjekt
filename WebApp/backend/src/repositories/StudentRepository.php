@@ -62,7 +62,7 @@ class StudentRepository
      *
      * @return array Returns an array of messages associated with the student.
      */
-    public function getMessagesByStudent(string $studentId): array
+    public function getMessagesByStudent(int $studentId): array
     {
         $sql = "CALL getMessagesByStudent(:studentId)";
 
@@ -83,7 +83,7 @@ class StudentRepository
      *
      * @return array|null Returns an associative array containing the message details or null if not found.
      */
-    public function getMessageWithReply(string $messageId, string $studentId): ?array
+    public function getMessageWithReply(int $messageId, int $studentId): ?array
     {
         $sql = "CALL getMessageWithReply(:messageId, :studentId)";
 

@@ -211,10 +211,12 @@ class DatabaseManager
         }
 
         try {
-            $success = $this->executeTransaction($loggerMessage);
+            $success = $this->stmt->execute();
+            $this->logger->debug("Result status: " . $success);
             if (!$success) { return [];}
 
             $result = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+            $this->stmt->closeCursor();
             $loggerMessage && $this->logger->info("Successfully fetched data: " . $loggerMessage);
             $this->logger->debug("Fetch result: " . $result);
             return $result;

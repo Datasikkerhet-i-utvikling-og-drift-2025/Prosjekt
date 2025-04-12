@@ -1,19 +1,28 @@
 <?php
 use managers\SessionManager;
 use managers\ApiManager;
+session_start();
 
 $sessionManager = new SessionManager();
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
     //Logger::info("Unauthorized access attempt to student dashboard. Session data: " . var_export($_SESSION, true));
-    header('Location: /student/dashboard');
+    header('Location: /');
     exit;
 }
 
 // Get the student's name for display
-$studentName = $_SESSION['user']['name'] ?? 'Student';
+$studentName = $_SESSION['user']['first_name'] ?? 'Student';
+$apiManager = new ApiManager();
 
+    // Fetch student messages
+    $messages = $apiManager->post('/api/v1/student/getMessages', [
+        'studentId' => $_SESSION['user']['id'],
+    ]);
+
+    // Fetch available courses
+    $courses = $apiManager->get('/api/v1/student/courses');
 
 ?>
 
@@ -32,21 +41,18 @@ $studentName = $_SESSION['user']['name'] ?? 'Student';
     <section class="messages-section">
         <h2>Your Messages</h2>
         <div id="messages-container">
-            <?php if (!empty($messages)): ?>
+            <?php if (!empty($messages['data'])): ?>
                 <?php foreach ($messages as $message): ?>
                     <div class="message-item">
                         <p><strong>Course:</strong> <?php echo htmlspecialchars($courseMap[$message['course_id']] ?? 'Unknown', ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Message:</strong> <?php echo htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
                             <p><strong>Lecturer's reply:</strong> <?php echo htmlspecialchars($message['reply'] ?? 'No reply yet', ENT_QUOTES, 'UTF-8'); ?></p>
                             <p><strong>Guest comments:</strong></p>
-                                <?php foreach ($comments as $comment): ?>
-                                    <?php if ($comment['message_id'] === $message['id']): ?>
+                                <?php foreach ($apiManager->post('/api/v1/guest/messages/getComments', ['messageId' => $message['id']]) as $comment): ?>
                                         <div class="guest-item">
                                             <p><strong>Guest name: </strong> <?php echo htmlspecialchars($comment['guest_name'] != '' ? $comment['guest_name'] : 'Anonym', ENT_QUOTES, 'UTF-8'); ?></p>
                                             <p> <strong>comment: </strong> <?php echo htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8'); ?></p>
                                         </div>
-                                    <?php else: ?>
-                                    <?php endif; ?>
                                 <?php endforeach; ?>
                     </div>
                 <?php endforeach; ?>
@@ -60,7 +66,7 @@ $studentName = $_SESSION['user']['name'] ?? 'Student';
     <section class="courses-section">
         <h2>Available Courses</h2>
         <div id="courses-container">
-            <?php if (!empty($courses)): ?>
+            <?php if (!empty($courses['data'])): ?>
                 <?php foreach ($courses as $course): ?>
                     <div class="course-item">
                         <p><strong>Course Code:</strong> <?php echo htmlspecialchars($course['code'], ENT_QUOTES, 'UTF-8'); ?></p>

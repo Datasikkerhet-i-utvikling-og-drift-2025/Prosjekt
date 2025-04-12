@@ -62,10 +62,11 @@ class ApiManager
     public function get(string $endpoint, array $queryParams = []): array
     {
         if (!empty($queryParams)) {
-            $endpoint .= '?' . http_build_query($queryParams);
+            return $this->request($endpoint."?".http_build_query($queryParams), 'GET');
         }
-
-        return $this->request($endpoint, 'GET');
+        else {
+            return $this->request($endpoint, 'GET');
+        }
     }
 
     /**
