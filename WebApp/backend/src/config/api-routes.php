@@ -105,7 +105,7 @@ try {
         ['GET', '/api/v1/lecturer/courses', [$lecturerController, 'getCourse']],
         ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
         ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
-        ['GET', '/api/lecturer/messageById', [$lecturerController, 'getMessageById']],
+        ['GET', '/api/v1/lecturer/messageById', [$lecturerController, 'getMessageById']],
 
         // Admin routes
         //['GET', '/api/admin/users', [$adminController, 'getAllUsers']],
