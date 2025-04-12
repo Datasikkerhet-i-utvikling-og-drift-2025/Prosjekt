@@ -26,13 +26,12 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $responseData = $apiManager->post('/api/v1/auth/login', $_POST);
-        echo '<pre>';
+        /*echo '<pre>';
         var_dump($responseData);
         echo '</pre>';
-        exit;
-
-        if ($responseData['success'] === true && isset($responseData['data']['token'])) {
-            $_SESSION['user'] = $responseData['data'];
+        exit;*/
+        if ($responseData['success'] === true && isset($responseData['data']['data']['token'])) {
+            $_SESSION['user'] = $responseData['data']['data'];
             header('Location: /' . $_SESSION['user']['role'] . '/dashboard');
             exit;
         } else {

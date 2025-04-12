@@ -1,46 +1,17 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../helpers/Logger.php';
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'student') {
-    Logger::info("Unauthorized access attempt to student dashboard. Session data: " . var_export($_SESSION, true));
-    header('Location: ' '/student/dashboard' '/');
+    //Logger::info("Unauthorized access attempt to student dashboard. Session data: " . var_export($_SESSION, true));
+    header('Location: /student/dashboard');
     exit;
 }
 
 // Get the student's name for display
 $studentName = $_SESSION['user']['name'] ?? 'Student';
 
-// Include required files
-require_once __DIR__ . '/../../managers/DatabaseManager.php';
 
-try {
-    $db = new service\DatabaseService();
-    $pdo = $db->pdo;
-
-    // Fetch student messages
-    $stmtMessages = $pdo->prepare("SELECT id, course_id, content, reply FROM messages WHERE student_id = :student_id");
-    $stmtMessages->execute([':student_id' => $_SESSION['user']['id']]);
-    $messages = $stmtMessages->fetchAll();
-
-    // Fetch available courses
-    $stmtCourses = $pdo->query("SELECT id, code, name FROM courses");
-    $courses = $stmtCourses->fetchAll();
-
-    $courseMap = [];
-    foreach ($courses as $course) {
-        $courseMap[$course['id']] = $course['code'];
-    }
-    //Fetch guest comments
-    $stmtComments = $pdo->query("SELECT message_id, guest_name, content FROM comments");
-    $comments = $stmtComments->fetchAll();
-
-    Logger::info("Student dashboard loaded successfully for user ID {$_SESSION['user']['id']}.");
-} catch (Exception $e) {
-    $error = 'Failed to load data. Please try again later.';
-    Logger::error('Error loading student dashboard: ' . $e->getMessage());
-}
 ?>
 
 <?php include __DIR__ . '/../partials/header.php'; ?>

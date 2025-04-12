@@ -28,7 +28,9 @@ use repositories\LecturerRepository;
 use repositories\StudentRepository;
 use repositories\UserRepository;
 use services\AuthService;
-use services\MessageService;
+use services\GuestService;
+use services\LecturerService;
+use services\StudentService;
 
 $logger = GrayLogger::getInstance();
 
@@ -64,14 +66,15 @@ try {
 
     // Initialize service classes
     $authService = new AuthService($userRepository, $lecturerRepository, $jwtManager);
-    //$messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
+    $lecturerService = new LecturerService($lecturerRepository);
+    $guestService = new GuestService($guestRepository);
+    $studentService = new StudentService($studentRepository);
 
     // Create controller instances
     $authController = new V1AuthController($authService);
-    //$studentController = new StudentController($messageService);
-    //$lecturerController = new V1LecturerController($messageService);
-    //$adminController = new AdminController($db);
-    //$guestController = new GuestController($pdo);
+    $studentController = new V1StudentController($studentService);
+    $lecturerController = new V1LecturerController($lecturerService);
+    $guestController = new V1GuestController($guestService);
 
     //$logger->info('Controllers initialized successfully.');
 } catch (Exception $e) {
@@ -89,24 +92,20 @@ try {
         ['POST', '/api/v1/auth/register', [$authController, 'register']],
         ['POST', '/api/v1/auth/login', [$authController, 'login']],
         ['GET', '/api/v1/auth/logout', [$authController, 'logout']],
-
-        //['POST', '/api/auth/register', [$authController, 'register']],
-        //['POST', '/api/auth/login', [$authController, 'login']],
-        //['GET', '/api/auth/logout', [$authController, 'logout']],
-        //['POST', '/api/auth/change-password', [$authController, 'changePassword']],
         ['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
         ['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
 
         // Student routes
-        //['GET', '/api/student/courses', [$studentController, 'getCourses']],
-        //['GET', '/api/student/messages', [$studentController, 'getMyMessages']],
-        //['POST', '/api/v1/student/message/send', [$studentController, 'sendMessage']],
+        ['GET', '/api/v1/student/courses', [$studentController, 'getAvailableCourses']],
+        ['GET', '/api/v1/student/getMessagesWithReply', [$studentController, 'getMessageWithReply']],
+        ['POST', '/api/v1/student/sendMessage/', [$studentController, 'sendMessage']],
+        ['GET', '/api/v1/student/getMessages', [$studentController, 'getMessagesByStudent']],
 
         // Lecturer routes
-        //['GET', '/api/lecturer/courses', [$lecturerController, 'getCourses']],
-        //['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
-        //['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
-        //['POST', '/api/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
+        ['GET', '/api/v1/lecturer/courses', [$lecturerController, 'getCourse']],
+        ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
+        ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
+        ['GET', '/api/v1/lecturer/messageById', [$lecturerController, 'getMessageById']],
 
         // Admin routes
         //['GET', '/api/admin/users', [$adminController, 'getAllUsers']],
@@ -117,9 +116,10 @@ try {
         //['GET', '/api/admin/user/details', [$adminController, 'getUserDetails']],
 
         // Guest routes
-        //['GET', '/api/guest/messages', [$guestController, 'getMessages']],
-        //['POST', '/api/guest/messages/report', [$guestController, 'reportMessage']],
-        //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
+        ['GET', '/api/v1/guest/authorize', [$guestController, 'authorizePin']],
+        ['GET', '/api/v1/guest/messages', [$guestController, 'getMessagesByCourse']],
+        ['POST', '/api/v1/guest/messages/report', [$guestController, 'reportMessage']],
+        ['POST', '/api/v1/guest/messages/comment', [$guestController, 'sendComment']],
     ];
 
     //$logger->info('Routes initialized successfully.');

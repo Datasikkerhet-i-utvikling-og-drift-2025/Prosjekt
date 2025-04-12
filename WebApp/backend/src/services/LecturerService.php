@@ -122,5 +122,27 @@ class LecturerService
         return new ApiResponse(true, 'Message retrieved successfully.', $message);
     }
 
+    /**
+     * @param int $courseId
+     * @return ApiResponse
+     * @throws JsonException
+     */
+    public function getCourse(int $courseId): ApiResponse
+    {
+        $this->logger->info('Getting course by ID', ['courseId' => $courseId]);
+
+        $validation = InputValidator::isValidInteger($courseId);
+        $this->logger->info('Attempting to get course by ID', ['courseId' => $courseId]);
+
+
+        $course = $this->lecturerRepository->getCourses($validation);
+        if(!$course) {
+            $this->logger->error('Failed to retrieve course', ['courseId' => $courseId]);
+            return new ApiResponse(false, 'Failed to retrieve course.', null, ['courseId' => $courseId]);
+        }
+
+        $this->logger->info('course retrieved successfully', ['courseId' => $courseId]);
+        return new ApiResponse(true, 'course retrieved successfully.', $course);
+    }
 
 }
