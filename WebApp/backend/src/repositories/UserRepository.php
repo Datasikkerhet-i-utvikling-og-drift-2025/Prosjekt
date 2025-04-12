@@ -4,6 +4,7 @@ namespace repositories;
 
 use DateMalformedStringException;
 use factories\UserFactory;
+use helpers\GrayLogger;
 use helpers\Logger;
 use managers\DatabaseManager;
 use models\User;
@@ -12,6 +13,7 @@ use PDO;
 class UserRepository
 {
     private DatabaseManager $db;
+    private GrayLogger $logger;
 
 
     /**
@@ -22,6 +24,7 @@ class UserRepository
     public function __construct(DatabaseManager $db)
     {
         $this->db = $db;
+        $this->logger = GrayLogger::getInstance();
     }
 
 

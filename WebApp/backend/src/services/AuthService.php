@@ -43,7 +43,6 @@ class AuthService
      * AuthService constructor.
      *
      * @param UserRepository $userRepository
-     * @param CourseRepository $courseRepository
      * @param JWTManager $jwtManager
      */
     public function __construct(UserRepository $userRepository, LecturerRepository $lecturerRepository, JWTManager $jwtManager)
@@ -52,9 +51,9 @@ class AuthService
         $this->lecturerRepository = $lecturerRepository;
         $this->jwtManager = $jwtManager;
         $this->logger = GrayLogger::getInstance();
-        $this->mailerService = $mailerService;
-        $this->config = $config;
-        $this->passwordResetRepository = $passwordResetRepository;
+        //$this->mailerService = $mailerService;
+        //$this->config = $config;
+        //$this->passwordResetRepository = $passwordResetRepository;
     }
 
     /**
@@ -89,7 +88,8 @@ class AuthService
 
         $user = UserFactory::createUser($data);
         $this->logger->debug('User object created', ['user' => $user->toArray()]);
-
+        $this->logger->debug('Sanitized userData', $data);
+        $this->logger->debug('User object before save', ['user' => $user->toArray()]);
         if (!$this->userRepository->createUser($user)) {
             $this->logger->error('Failed to save user to database.');
             return new ApiResponse(false, 'Registration failed.');

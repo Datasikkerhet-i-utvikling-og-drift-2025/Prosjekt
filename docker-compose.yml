@@ -30,16 +30,24 @@ services:
     depends_on:
       - mysql
     environment:
-      - DB_HOST=mysql
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_ADMIN}
-      - DB_PASS=${DB_ADMIN_PASS}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_ADMIN_USER}
+      - MYSQL_PASSWORD=${DB_ADMIN_PASS}
+      - DB_USER=${DB_USER}
+      - DB_USER_PASS=${DB_USER_PASS}
+      - DB_STUDENT_USER=${DB_STUDENT_USER}
+      - DB_STUDENT_PASS=${DB_STUDENT_PASS}
+      - DB_LECTURER_USER=${DB_LECTURER_USER}
+      - DB_LECTURER_PASS=${DB_LECTURER_PASS}
+      - DB_GUEST_USER=${DB_GUEST_USER}
+      - DB_GUEST_PASS=${DB_GUEST_PASS}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_PORT=${SMTP_PORT}
       - JWT_SECRET=${JWT_SECRET}
-      - API_TOKEN=${API_TOKEN}
+      - API_KEY=${API_KEY}
       - URL=${URL}
       - API_URL=${API_URL}
     env_file:

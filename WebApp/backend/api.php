@@ -16,11 +16,15 @@ require_once __DIR__ . '/src/repositories/UserRepository.php'; // User repositor
 
 use helpers\ApiHelper;
 use helpers\AuthHelper;
+use helpers\GrayLogger;
 use helpers\Logger;
 use repositories\UserRepository;
 
+ApiHelper::initLogger();
+$logger = GrayLogger::getInstance();
+
 // Initialize Logger
-Logger::info('API entry point initialized.');
+//$logger->info('API entry point initialized.');
 
 // Ensure routes are loaded only once
 static $routes = null;
@@ -32,9 +36,9 @@ if ($routes === null) {
             throw new RuntimeException('No routes configured.');
         }
 
-        Logger::info('Routes loaded successfully.');
+        //$logger->info('Routes loaded successfully.');
     } catch (Exception $e) {
-        Logger::error('Failed to load routes: ' . $e->getMessage());
+        $logger->error('Failed to load routes: ' . $e->getMessage());
         ApiHelper::sendError(500, 'Internal Server Error. Failed to load routes.');
         exit;
     }
@@ -44,7 +48,7 @@ if ($routes === null) {
 $method = $_SERVER['REQUEST_METHOD'];
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query parameters
 
-Logger::info("Incoming request: $method $requestUri");
+$logger->info("Incoming request: $method $requestUri");
 
 // Match route (supporting dynamic routes like `/users/{id}`)
 $matchedRoute = null;
@@ -69,22 +73,22 @@ if ($matchedRoute) {
         //AuthHelper::validateAuthorizationHeader();
 
         // Log matched route
-        Logger::info("Matched route: $method $requestUri. Executing callback.");
+        $logger->info("Matched route: $method $requestUri. Executing callback.");
 
         // Execute callback with path parameters
         call_user_func_array($matchedRoute, $pathParams);
     } catch (Exception $e) {
-        Logger::error('Error executing route callback: ' . $e->getMessage());
+        $logger->error('Error executing route callback: ' . $e->getMessage());
         ApiHelper::sendError(500, 'Internal Server Error. Please try again later.', [
             'details' => $e->getMessage(),
         ]);
     }
 } else {
     // Handle unmatched route
-    Logger::warning("Route not found: $method $requestUri");
+    $logger->warning("Route not found: $method $requestUri");
     ApiHelper::sendError(404, 'Route not found.');
 }
 
 // Log execution time for performance monitoring
 $executionTime = round((microtime(true) - $startExecutionTime) * 1000, 2);
-Logger::info("API request handling completed in {$executionTime}ms.");
+$logger->info("API request handling completed in {$executionTime}ms.");

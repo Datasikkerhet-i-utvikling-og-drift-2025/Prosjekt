@@ -23,7 +23,7 @@ class V1LecturerController
     public function getMessages(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken(); // (optional security)
+        ApiHelper::requireApiKey(); // (optional security)
 
         try {
             $input = ApiHelper::getJsonInput(); // Get parsed JSON as array
@@ -54,7 +54,7 @@ class V1LecturerController
     public function sendReply(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $input = ApiHelper::getJsonInput();
@@ -81,10 +81,15 @@ class V1LecturerController
             ApiHelper::sendError(500, 'Internal server error.', ['error' => $e->getMessage()]  );
         }
     }
+
+    /**
+     * @throws JsonException
+     */
     public function getLecturerDetails(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
+    }
 
     /**
      * @return void
@@ -94,7 +99,7 @@ class V1LecturerController
     public function getMessageById(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $input = ApiHelper::getJsonInput();
@@ -105,8 +110,8 @@ class V1LecturerController
                 ApiHelper::sendError(400, 'Message id is required.');
             }
 
-            $response = $this->lecturerService->getMessageById($messageId);
-            ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
+            //$response = $this->lecturerService->getMessageById($messageId);
+            //ApiHelper::sendApiResponse($response->success ? 200 : 400, $response);
         } catch (JsonException $e) {
             ApiHelper::sendError(400, 'Invalid JSON input.',  ['exception' => $e->getMessage()]);
         } catch (Exception $e) {

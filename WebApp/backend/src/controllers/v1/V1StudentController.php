@@ -36,7 +36,7 @@ class V1StudentController
     public function sendMessage(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
            $postData = ApiHelper::getJsonInput();
@@ -68,7 +68,7 @@ class V1StudentController
     public function getMessagesByStudent(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $studentId = $_POST['studentId'] ?? null;
@@ -88,7 +88,7 @@ class V1StudentController
     public function getMessageWithReply(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $messageId = $_POST['messageId'] ?? null;
@@ -116,7 +116,7 @@ class V1StudentController
     public function getAvailableCourses(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $response = $this->studentService->getAvailableCourses();

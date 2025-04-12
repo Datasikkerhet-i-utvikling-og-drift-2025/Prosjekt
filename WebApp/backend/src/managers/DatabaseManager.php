@@ -3,10 +3,13 @@
 
 namespace managers;
 
+use helpers\GrayLogger;
 use helpers\Logger;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use RuntimeException;
 
 class DatabaseManager
 {
@@ -19,6 +22,8 @@ class DatabaseManager
     private ?PDO $pdo = null;
     private ?PDOStatement $stmt = null; // Stores the last prepared statement
 
+    private GrayLogger $logger;
+
     public function __construct(string $role)
     {
         $this->host = $_ENV['DB_HOST'];
@@ -26,24 +31,32 @@ class DatabaseManager
 
         switch($role) {
             case 'user':
-                $this->username = $_ENV['DB_USER_USER'];
-                $this->password = $_ENV['DB_USER_PASS'];
+                $this->username = $_ENV['DB_USER'] ?? throw new RuntimeException('DB_USER not set');
+                $this->password = $_ENV['DB_USER_PASS'] ?? throw new RuntimeException('DB_USER_PASS not set');
                 break;
             case 'lecturer':
-                $this->username = $_ENV['DB_LECTURER_USER'];
-                $this->password = $_ENV['DB_LECTURER_PASS'];
+                $this->username = $_ENV['DB_LECTURER_USER'] ?? throw new RuntimeException('DB_LECTURER_USER not set');
+                $this->password = $_ENV['DB_LECTURER_PASS'] ?? throw new RuntimeException('DB_LECTURER_PASS not set');
                 break;
             case 'student':
-                $this->username = $_ENV['DB_STUDENT_USER'];
-                $this->password = $_ENV['DB_STUDENT_PASS'];
+                $this->username = $_ENV['DB_STUDENT_USER'] ?? throw new RuntimeException('DB_STUDENT_USER not set');
+                $this->password = $_ENV['DB_STUDENT_PASS'] ?? throw new RuntimeException('DB_STUDENT_PASS not set');
                 break;
             case 'guest':
-                $this->username = $_ENV['DB_GUEST_USER'];
-                $this->password = $_ENV['DB_GUEST_PASS'];
+                $this->username = $_ENV['DB_GUEST_USER'] ?? throw new RuntimeException('DB_GUEST_USER not set');
+                $this->password = $_ENV['DB_GUEST_PASS'] ?? throw new RuntimeException('DB_GUEST_PASS not set');
                 break;
             default:
-                throw new \InvalidArgumentException("Invalid role: $role");
+                throw new InvalidArgumentException("Invalid role: $role");
         }
+
+        $this->logger = GrayLogger::getInstance();
+        //$this->logger->debug("ENV vars loaded for role: $role", [
+        //    'DB_HOST' => $_ENV['DB_HOST'] ?? 'missing',
+        //    'DB_NAME' => $_ENV['DB_NAME'] ?? 'missing',
+        //    'username' => $this->username ?? 'null',
+        //    'password' => $this->password ?? 'null'
+        //]);
     }
 
     /**
@@ -66,9 +79,9 @@ class DatabaseManager
                 ];
 
                 $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
-                Logger::success("Connected to database");
+                //$this->logger->info("Connected to database");
             } catch (PDOException $e) {
-                Logger::error("Database connection failed: " . $e->getMessage());
+                $this->logger->error("Database connection failed: " . $e->getMessage());
             }
         }
         return $this->pdo;
@@ -99,7 +112,7 @@ class DatabaseManager
 
             return true;
         } catch (PDOException $e) {
-            Logger::error("SQL preparation failed: " . $e->getMessage());
+            $this->logger->error("SQL preparation failed: " . $e->getMessage());
             return false;
         }
     }
@@ -116,26 +129,27 @@ class DatabaseManager
     public function executeTransaction(?string $loggerMessage = null): bool
     {
         if ($this->pdo === null || $this->stmt === null) {
-            Logger::error("Execution failed: No prepared statement or database connection.");
+            $this->logger->error("Execution failed: No prepared statement or database connection.");
             return false;
         }
 
         try {
             $this->pdo->beginTransaction();
             $result = $this->stmt->execute();
+            $this->stmt->closeCursor();
 
             if ($result) {
                 $this->pdo->commit();
-                $loggerMessage && Logger::success("Successfully " . $loggerMessage);
+                $loggerMessage && $this->logger->info("Successfully " . $loggerMessage);
             } else {
                 $this->pdo->rollBack();
-                $loggerMessage && Logger::error("Failed " . $loggerMessage);
+                $loggerMessage && $this->logger->error("Failed " . $loggerMessage);
             }
 
             return $result;
         } catch (PDOException $e) {
             $this->pdo->rollBack();
-            Logger::error(($loggerMessage ?? "Unknown operation") . " caused error: " . $e->getMessage());
+            $this->logger->error(($loggerMessage ?? "Unknown operation") . " caused error: " . $e->getMessage());
             return false;
         }
     }
@@ -167,14 +181,14 @@ class DatabaseManager
             $success = $stmt->execute();
 
             if ($success) {
-                $loggerMessage && Logger::success("Successfully executed: " . $loggerMessage);
+                $loggerMessage && $this->logger->info("Successfully executed: " . $loggerMessage);
             } else {
-                $loggerMessage && Logger::error("Execution failed: " . $loggerMessage);
+                $loggerMessage && $this->logger->error("Execution failed: " . $loggerMessage);
             }
 
             return $success;
         } catch (PDOException $e) {
-            Logger::error(($loggerMessage ?? "Direct SQL execution") . " failed: " . $e->getMessage());
+            $this->logger->error(($loggerMessage ?? "Direct SQL execution") . " failed: " . $e->getMessage());
             return false;
         }
     }
@@ -191,7 +205,7 @@ class DatabaseManager
     public function fetchAll(?string $loggerMessage = null): array
     {
         if ($this->stmt === null) {
-            Logger::error("Fetch failed: No prepared statement.");
+            $this->logger->error("Fetch failed: No prepared statement.");
             return [];
         }
 
@@ -200,10 +214,10 @@ class DatabaseManager
             if (!$success) { return [];}
 
             $result = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
-            $loggerMessage && Logger::success("Successfully fetched data: " . $loggerMessage);
+            $loggerMessage && $this->logger->info("Successfully fetched data: " . $loggerMessage);
             return $result;
         } catch (PDOException $e) {
-            Logger::error("Fetching data failed: " . $e->getMessage());
+            $this->logger->error("Fetching data failed: " . $e->getMessage());
             return [];
         }
     }
@@ -219,7 +233,7 @@ class DatabaseManager
     public function fetchSingle(?string $loggerMessage = null): ?array
     {
         if ($this->stmt === null) {
-            Logger::error("Fetch failed: No prepared statement.");
+            $this->logger->error("Fetch failed: No prepared statement.");
             return null;
         }
 
@@ -228,15 +242,16 @@ class DatabaseManager
             if (!$success) { return null; }
 
             $result = $this->stmt->fetch(PDO::FETCH_ASSOC);
+            $this->stmt->closeCursor();
             if (!$result) {
-                $loggerMessage && Logger::warning("No data found: " . $loggerMessage);
+                $loggerMessage && $this->logger->warning("No data found: " . $loggerMessage);
                 return null;
             }
 
-            $loggerMessage && Logger::success("Successfully fetched single row: " . $loggerMessage);
+            $loggerMessage && $this->logger->info("Successfully fetched single row: " . $loggerMessage);
             return $result;
         } catch (PDOException $e) {
-            Logger::error("Fetching single row failed: " . $e->getMessage());
+            $this->logger->error("Fetching single row failed: " . $e->getMessage());
             return null;
         }
     }
@@ -250,7 +265,7 @@ class DatabaseManager
     {
         $this->pdo = null;
         $this->stmt = null;
-        Logger::info("Database connection closed.");
+        $this->logger->info("Database connection closed.");
     }
 }
 

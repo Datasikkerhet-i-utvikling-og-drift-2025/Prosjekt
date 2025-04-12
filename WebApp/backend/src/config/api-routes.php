@@ -34,7 +34,7 @@ $logger = GrayLogger::getInstance();
 
 
 // Log application startup
-$this->logger::info('Initializing application...');
+//$logger->info('Initializing api...');
 
 try {
     // Initialize manager classes
@@ -63,19 +63,19 @@ try {
 
 
     // Initialize service classes
-    $authService = new AuthService($userRepository, $courseRepository, $jwtManager);
-    $messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
+    $authService = new AuthService($userRepository, $lecturerRepository, $jwtManager);
+    //$messageService = new MessageService($messageRepository, $commentRepository, $lecturerRepository);
 
     // Create controller instances
     $authController = new V1AuthController($authService);
     //$studentController = new StudentController($messageService);
-    $lecturerController = new V1LecturerController($messageService);
+    //$lecturerController = new V1LecturerController($messageService);
     //$adminController = new AdminController($db);
     //$guestController = new GuestController($pdo);
 
-    $this->logger::info('Controllers initialized successfully.');
+    //$logger->info('Controllers initialized successfully.');
 } catch (Exception $e) {
-    $this->logger::error('Error initializing components: ' . $e->getMessage());
+    $logger->error('Error initializing components: ' . $e->getMessage());
     http_response_code(500);
     die('Internal server error. Check logs for details.');
 }
@@ -94,8 +94,8 @@ try {
         //['POST', '/api/auth/login', [$authController, 'login']],
         //['GET', '/api/auth/logout', [$authController, 'logout']],
         //['POST', '/api/auth/change-password', [$authController, 'changePassword']],
-        ['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
-        ['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
+        //['POST', '/api/v1/auth/password-reset/request', [$authController, 'requestPasswordReset']],
+        //['POST', '/api/v1/auth/password-reset', [$authController, 'resetPassword']],
 
         // Student routes
         //['GET', '/api/student/courses', [$studentController, 'getCourses']],
@@ -104,8 +104,8 @@ try {
 
         // Lecturer routes
         //['GET', '/api/lecturer/courses', [$lecturerController, 'getCourses']],
-        ['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
-        ['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
+        //['GET', '/api/v1/lecturer/messages', [$lecturerController, 'getMessages']], //'getMessagesForCourse'
+        //['POST', '/api/v1/lecturer/message/reply', [$lecturerController, 'sendReply']], //'replyToMessage'
         //['POST', '/api/lecturer/message/resolve', [$lecturerController, 'markMessageAsResolved']],
 
         // Admin routes
@@ -122,37 +122,13 @@ try {
         //['POST', '/api/guest/messages/comment', [$guestController, 'addComment']],
     ];
 
-    $this->logger::info('Routes initialized successfully.');
+    //$logger->info('Routes initialized successfully.');
 } catch (Exception $e) {
-    $this->logger::error('Error initializing routes: ' . $e->getMessage());
+    $this->logger->error('Error initializing routes: ' . $e->getMessage());
     http_response_code(500);
     die('Internal server error while initializing routes.');
 }
 
-// Debug route (only for development)
-$routes[] = ['GET', '/debug/routes', function () use ($routes) {
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(array_map(static function ($route) {
-        return [
-            'method' => $route[0],
-            'uri' => $route[1],
-            'controller' => is_array($route[2]) ? get_class($route[2][0]) : 'Closure',
-            'action' => is_array($route[2]) ? $route[2][1] : null,
-        ];
-    }, $routes), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-    $this->logger::info('Debug route accessed.');
-    exit;
-}];
-
-// Log routes to a file
-$logFile = __DIR__ . '/../../logs/routes.log';
-try {
-    file_put_contents($logFile, json_encode($routes, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-    $this->logger::info('Routes logged successfully to ' . $logFile);
-} catch (Exception $e) {
-    $this->logger::error('Failed to write routes log: ' . $e->getMessage());
-}
-
 // Return routes to the main entry point
-$this->logger::info('Application initialized successfully.');
+//$logger->info('Api initialized successfully.');
 return $routes;

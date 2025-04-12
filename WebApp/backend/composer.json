@@ -13,6 +13,6 @@
     ],
     "require": {
         "phpmailer/phpmailer": "^6.9",
-        "graylog2/gelf-php": "^1.7"
+        "graylog2/gelf-php": "^2.0.2"
     }
 }

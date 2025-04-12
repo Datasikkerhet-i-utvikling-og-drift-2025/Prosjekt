@@ -17,3 +17,5 @@ gen
 /WebApp/frontend/public/uploads/
 /WebApp/backend/public/uploads/
 /WebApp/vendor/
+
+*.log

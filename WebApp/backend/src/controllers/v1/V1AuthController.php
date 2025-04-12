@@ -22,7 +22,6 @@ class V1AuthController
      * V1AuthController constructor.
      *
      * @param AuthService $authService
-     * @param SessionManager $sessionManager
      */
     public function __construct(AuthService $authService)
     {
@@ -40,7 +39,7 @@ class V1AuthController
     public function register(): void
     {
         ApiHelper::requirePost();
-        ApiHelper::requireApiToken();
+        ApiHelper::requireApiKey();
 
         try {
             $input = ApiHelper::getInput();
@@ -91,7 +90,7 @@ class V1AuthController
     {
         ApiHelper::requirePost();
         // Vanligvis kreves *ikke* API token her, da brukeren ikke er logget inn.
-        // ApiHelper::requireApiToken(); // Fjern eller kommenter ut denne
+        ApiHelper::requireApiKey(); // Fjern eller kommenter ut denne
 
         try {
             $input = ApiHelper::getInput(); // Henter JSON-data fra request body
