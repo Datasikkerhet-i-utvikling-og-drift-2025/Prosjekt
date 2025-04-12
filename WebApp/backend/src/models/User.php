@@ -152,7 +152,7 @@ abstract class User
         $this->lastName = InputValidator::sanitizeString($userData['lastName'] ?? '');
         $this->fullName = $this->firstName . " " . $this->lastName;
         $this->email = isset($userData['email']) && InputValidator::isValidEmail($userData['email']) ? $userData['email'] : '';
-        $this->password = AuthHelper::ensurePasswordHashed($userData['password'] ?? '');
+        $this->password = $userData['password'] ?? '';
         $this->role = UserRole::tryFrom($userData['role']) ?? UserRole::STUDENT;
         $this->resetToken = isset($userData['resetToken']) ? InputValidator::sanitizeString($userData['resetToken']) : null;
         $this->resetTokenCreatedAt = isset($userData['resetTokenCreatedAt']) ? new DateTime($userData['resetTokenCreatedAt']) : null;

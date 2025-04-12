@@ -60,6 +60,7 @@ class UserRepository
 
         $this->db->prepareStmt($sql, fn($stmt) => $stmt->bindValue(":email", $email, PDO::PARAM_STR));
         $userData = $this->db->fetchSingle("Fetching user by email: $email");
+        $this->logger->debug("Fetched raw user data", ['userData' => $userData]);
 
         return $userData ? UserFactory::createUser($userData) : null;
     }

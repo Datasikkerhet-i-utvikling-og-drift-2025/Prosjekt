@@ -8,6 +8,13 @@ namespace helpers;
      */
 class AuthHelper
 {
+    private static GrayLogger $logger;
+
+    public static function initLogger(): void
+    {
+        self::$logger = GrayLogger::getInstance();
+    }
+
     /**
      * Securely hash a password.
      *
@@ -28,8 +35,16 @@ class AuthHelper
      */
     public static function verifyPassword(string $password, string $hashedPassword): bool
     {
-        return password_verify($password, $hashedPassword);
+        $result = password_verify($password, $hashedPassword);
+        if (!$result) {
+            self::$logger->debug("Password verification failed", [
+                'plain' => $password,
+                'hash' => $hashedPassword,
+            ]);
+        }
+        return $result;
     }
+
 
     /**
      * Check if a password is already hashed.

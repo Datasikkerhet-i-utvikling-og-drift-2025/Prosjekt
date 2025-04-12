@@ -136,6 +136,7 @@ class DatabaseManager
         try {
             $this->pdo->beginTransaction();
             $result = $this->stmt->execute();
+            $this->logger->debug("Result status: " . $result);
             $this->stmt->closeCursor();
 
             if ($result) {
@@ -215,6 +216,7 @@ class DatabaseManager
 
             $result = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
             $loggerMessage && $this->logger->info("Successfully fetched data: " . $loggerMessage);
+            $this->logger->debug("Fetch result: " . $result);
             return $result;
         } catch (PDOException $e) {
             $this->logger->error("Fetching data failed: " . $e->getMessage());
@@ -238,16 +240,18 @@ class DatabaseManager
         }
 
         try {
-            $success = $this->executeTransaction($loggerMessage);
-            if (!$success) { return null; }
+            $success = $this->stmt->execute();
+            $this->logger->debug("Result status: " . $success);
 
             $result = $this->stmt->fetch(PDO::FETCH_ASSOC);
             $this->stmt->closeCursor();
-            if (!$result) {
+
+            if ($result === false || $result === null) {
                 $loggerMessage && $this->logger->warning("No data found: " . $loggerMessage);
                 return null;
             }
 
+            $this->logger->debug("Fetch result", ['data' => $result]);
             $loggerMessage && $this->logger->info("Successfully fetched single row: " . $loggerMessage);
             return $result;
         } catch (PDOException $e) {
@@ -255,6 +259,7 @@ class DatabaseManager
             return null;
         }
     }
+
 
     /**
      * Closes the database connection and clears the prepared statement.
