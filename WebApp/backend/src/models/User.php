@@ -197,13 +197,13 @@ abstract class User
     public function toArray(): array {
         return [
             'id' => $this->id,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
-            'fullName' => $this->fullName,
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'full_name' => $this->fullName,
             'email' => $this->email,
             'role' => $this->role->value,
-            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
-            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s')
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s')
         ];
     }
 

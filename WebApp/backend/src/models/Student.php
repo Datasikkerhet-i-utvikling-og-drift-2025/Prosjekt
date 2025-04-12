@@ -61,8 +61,8 @@ class Student extends User
     public function __construct(array $userData)
     {
         parent::__construct($userData);
-        $this->studyProgram = $userData['studyProgram'];
-        $this->enrollmentYear = $userData['enrollmentYear'] ?? (int)date("Y");
+        $this->studyProgram = $userData['study_program'];
+        $this->enrollmentYear = $userData['enrollment_year'] ?? (int)date("Y");
     }
 
 
@@ -80,10 +80,10 @@ class Student extends User
     {
         parent::bindUserDataForDbStmt($stmt);
 
-        $stmt->bindValue(':studyProgram', $this->studyProgram, PDO::PARAM_STR);
-        $stmt->bindValue(':enrollmentYear', $this->enrollmentYear, PDO::PARAM_INT);
+        $stmt->bindValue(':study_program', $this->studyProgram, PDO::PARAM_STR);
+        $stmt->bindValue(':enrollment_year', $this->enrollmentYear, PDO::PARAM_INT);
 
-        $stmt->bindValue(':imagePath', $this->imagePath ?? null, isset($this->imagePath) ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':image_path', $this->imagePath ?? null, isset($this->imagePath) ? PDO::PARAM_STR : PDO::PARAM_NULL);
     }
 
     /**
@@ -95,15 +95,15 @@ class Student extends User
     {
         return [
             'id' => $this->id,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
-            'fullName' => $this->fullName,
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'full_name' => $this->fullName,
             'email' => $this->email,
             'role' => $this->role->value,
-            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
-            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
-            'studyProgram' => $this->studyProgram,
-            'enrollmentYear' => $this->enrollmentYear
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+            'study_program' => $this->studyProgram,
+            'enrollment_year' => $this->enrollmentYear
         ];
     }
 
