@@ -31,6 +31,7 @@ return [
     '/register'            => __DIR__ . '/../views/auth/register.php',
     '/reset-password'      => __DIR__ . '/../views/auth/reset-password.php',
     '/change-password'     => __DIR__ . '/../views/auth/change-password.php',
+    '/logout'              => __DIR__ . '/../views/auth/logout.php',
 
     // Student Views
     '/student/dashboard'      => __DIR__ . '/../views/student/dashboard.php',

@@ -1,9 +1,13 @@
 <?php
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+use managers\SessionManager;
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +53,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <li><a href="/profile">My Profile</a></li>
                     <?php endif; ?>
 
-                    <li><a href="/api/v1/auth/logout" class="logout-link">Logout</a></li>
+                    <li><a href="/logout" class="logout-link">Logout</a></li>
                 <?php else: ?>
                     <li><a href="/">Login</a></li>
                     <li><a href="/register">Register</a></li>

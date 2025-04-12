@@ -6,7 +6,9 @@ error_reporting(E_ALL);
 use managers\ApiManager;
 
 // Autoload ApiManager
+require_once __DIR__ . '/../src/managers/AccessControlManager.php';
 require_once __DIR__ . '/../src/managers/ApiManager.php';
+require_once __DIR__ . '/../src/managers/SessionManager.php';
 
 // Load view routes
 $routes = require __DIR__ . '/../config/view-routes.php';
